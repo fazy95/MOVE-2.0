@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:id="@+id/estimate_detail_header_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="53dp"
+        android:background="@color/app_color">
+
+        <com.mylibrary.widgets.CustomTextView
+            android:id="@+id/estimate_detail_ride_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/estimate_detail_label_rideEstimation"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/estimate_detail_header_layout"
+        android:layout_above="@+id/estimate_detail_ok_layout"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff">
+
+            <RelativeLayout
+                android:id="@+id/estimate_detail_top_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="#cdcdcd">
+
+                <RelativeLayout
+                    android:id="@+id/estimate_detail_pickup_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginBottom="1px"
+                    android:layout_marginTop="1px"
+                    android:background="#ffffff">
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/estimate_detail_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:background="#ffffff"
+                        android:text="@string/estimate_detail_label_pickup"
+                        android:textColor="#cc0000"
+                        android:textSize="15dp"/>
+
+                    <View
+                        android:id="@+id/estimate_detail_pickup_view2"
+                        android:layout_width="1px"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="17dp"
+                        android:layout_toRightOf="@+id/estimate_detail_label"
+                        android:background="#cdcdcd"/>
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/estimate_detail_pickup_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/estimate_detail_pickup_view2"
+                        android:background="#ffffff"
+                        android:text=""
+                        android:textColor="#4e4e4e"
+                        android:textSize="13sp"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/estimate_detail_drop_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="66dp"
+                    android:layout_below="@+id/estimate_detail_pickup_layout"
+                    android:layout_marginBottom="1px"
+                    android:background="#ffffff">
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/estimate_detail_drop_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="17dp"
+                        android:background="#ffffff"
+                        android:text="@string/estimate_detail_label_drop"
+                        android:textColor="#4D7F17"
+                        android:textSize="15dp"/>
+
+                    <View
+                        android:id="@+id/estimate_detail_drop_view2"
+                        android:layout_width="1px"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="30dp"
+                        android:layout_toRightOf="@+id/estimate_detail_drop_label"
+                        android:background="#cdcdcd"/>
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/estimate_detail_drop_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@+id/estimate_detail_drop_view2"
+                        android:background="#ffffff"
+                        android:text=""
+                        android:textColor="#4e4e4e"
+                        android:textSize="13sp"/>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/estimate_detail_price_range_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/estimate_detail_top_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textColor="#4e4e4e"
+                android:textSize="17sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/estimate_detail_price_approximate_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/estimate_detail_price_range_textview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text=""
+                android:textColor="#878484"
+                android:textSize="13dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/estimate_detail_peektime_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/estimate_detail_price_approximate_textview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text=""
+                android:textColor="#878484"
+                android:visibility="gone"
+                android:textSize="13dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/estimate_detail_nightcharge_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/estimate_detail_peektime_textview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text=""
+                android:textColor="#878484"
+                android:visibility="gone"
+                android:textSize="13dp"/>
+
+            <ImageView
+                android:id="@+id/estimate_detail_ratecard_imageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@+id/estimate_detail_nightcharge_textview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/estimate_note_icon"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/estimate_detail_note_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/estimate_detail_ratecard_imageView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#878484"
+                android:textSize="14dp"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+    <RelativeLayout
+        android:id="@+id/estimate_detail_ok_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/app_color">
+
+        <com.mylibrary.widgets.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/estimate_detail_label_ok"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="ripple_blue_color">#01C1E5</color>
+    <color name="darkgreen_color">#027536</color>
+    <color name="spinner_line_color">#e5e5e5</color>
+    <color name="spinner_arrow_color">#e5e5e5</color>
+    <color name="spinner_floatlabel_color">#F05253</color>
+    <color name="spinner_highlight_color">#4CB5AC</color>
+
+    <color name="app_color">#01A7CD</color>
+    <color name="app_color_transperent">#cc01A7CD</color>
+    <color name="app_color_button">#CC2793ff</color>
+
+
+   <!-- <color name="app_color">#F05253</color>
+    <color name="app_color_transperent">#ccF05253</color>
+    <color name="app_color_button">#ccF05253</color>
+-->
+
+
+</resources>

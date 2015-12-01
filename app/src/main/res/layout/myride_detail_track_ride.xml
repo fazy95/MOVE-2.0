@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/myride_detail_track_your_ride_bottom_layout">
+
+
+        <RelativeLayout
+            android:id="@+id/trackyour_ride_header_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="53dp"
+            android:background="@color/app_color">
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_track_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="@string/track_your_ride_label_track"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_done_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="15dp"
+                android:text="@string/track_your_ride_label_done"
+                android:textColor="#ffffff"
+                android:textSize="16sp"/>
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/myride_detail_track_your_ride_driver_info_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="90dp"
+            android:layout_below="@+id/trackyour_ride_header_layout"
+            android:layout_centerHorizontal="true"
+            android:background="#252524">
+
+            <com.mylibrary.widgets.RoundedImageView
+                android:id="@+id/myride_detail_track_your_ride_driverimage"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="16dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_driver_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@+id/myride_detail_track_your_ride_driverimage"
+                android:layout_toLeftOf="@+id/myride_detail_track_your_ride_label_arrival_layout"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="15sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_driver_carmodel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/myride_detail_track_your_ride_driver_name"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@+id/myride_detail_track_your_ride_label_arrival_layout"
+                android:layout_toRightOf="@+id/myride_detail_track_your_ride_driverimage"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="13sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_driver_carNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/myride_detail_track_your_ride_driver_carmodel"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@+id/myride_detail_track_your_ride_label_arrival_layout"
+                android:layout_toRightOf="@+id/myride_detail_track_your_ride_driverimage"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="13sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_driver_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/myride_detail_track_your_ride_driver_carNo"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@+id/myride_detail_track_your_ride_label_arrival_layout"
+                android:layout_toRightOf="@+id/myride_detail_track_your_ride_driverimage"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="13sp"/>
+
+            <RelativeLayout
+                android:id="@+id/myride_detail_track_your_ride_label_arrival_layout"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:background="@drawable/curve_background_light_green">
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/myride_detail_track_your_ride_arrive_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/track_your_ride_label_arrive_in"
+                    android:textColor="#4e4e4e"
+                    android:textSize="12sp"/>
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/myride_detail_track_your_ride_arrive_time_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/myride_detail_track_your_ride_arrive_label"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="2dp"
+                    android:text=""
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/myride_detail_track_your_ride_arrive_minute_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1px"
+                    android:layout_below="@+id/myride_detail_track_your_ride_arrive_time_textview"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/track_your_ride_label_minutes"
+                    android:textColor="#4e4e4e"
+                    android:textSize="13sp"
+                    android:visibility="invisible"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+        <fragment
+            android:id="@+id/myride_detail_track_your_ride_mapview"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/myride_detail_track_your_ride_driver_info_layout"
+            android:clickable="false"/>
+
+
+        <RelativeLayout
+            android:id="@+id/myride_detail_track_your_ride_alert_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:background="#D9030303"
+            android:visibility="gone">
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/myride_detail_track_your_ride_alert_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:text=""
+                android:textColor="#FCC900"
+                android:textSize="13sp"/>
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/myride_detail_track_your_ride_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="#252524">
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#252524"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/myride_detail_track_your_ride_calldriver_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="@drawable/curve_background_green"
+                android:gravity="center"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/phone_icon_white"/>
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="@string/track_your_ride_label_callDriver"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp"
+                        android:textStyle="bold" android:layout_marginTop="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/myride_detail_track_your_ride_endtrip_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="@drawable/curve_background_light_red"
+                android:gravity="center"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="#00000000"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="19dp"
+                        android:layout_height="19dp"
+                        android:src="@drawable/shutdown_icon" android:layout_marginTop="1dp"/>
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/track_your_ride_label_endTrip"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

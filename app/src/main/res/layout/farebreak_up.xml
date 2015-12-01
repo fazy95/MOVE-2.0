@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/fare_breakup_payment_layout"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#00000000">
+
+            <ImageView
+                android:id="@+id/fare_breakup_imageview"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/cabily_aboutus_logo"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fare_breakup_imageview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="25dp"
+                android:text="@string/fare_breakup_label_message"
+                android:textColor="#004F46"
+                android:textSize="20dp"/>
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_total_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/fare_breakup_label"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="30dp"
+                android:text="@string/fare_breakup_label_total_amount"
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_total_amount_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fare_breakup_label"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_toRightOf="@+id/fare_breakup_total_amount_label"
+                android:text=""
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_duration_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/fare_breakup_total_amount_textview"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/fare_breakup_label_duration"
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_duration_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fare_breakup_total_amount_textview"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/fare_breakup_duration_label"
+                android:text=""
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_waiting_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/fare_breakup_duration_textview"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/fare_breakup_label_waiting"
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_waiting_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fare_breakup_duration_textview"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/fare_breakup_waiting_label"
+                android:text=""
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_timetravel_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/fare_breakup_waiting_textview"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/fare_breakup_label_timeTravel"
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fare_breakup_timetravel_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fare_breakup_waiting_textview"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/fare_breakup_timetravel_label"
+                android:text=""
+                android:textColor="#4e4e4e"
+                android:textSize="15dp"/>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/fare_breakup_payment_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#004F46">
+
+        <com.mylibrary.widgets.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/fare_breakup_label_payment"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

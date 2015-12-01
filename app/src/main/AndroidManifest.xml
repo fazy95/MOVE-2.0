@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.casperon.app.cabily"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.NETWORK"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+    <!-- Push Notification Permission -->
+    <uses-permission android:name="com.cabily.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+
+    <!-- MAP Permission -->
+    <permission
+        android:name="com.cabily.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.cabily.permission.MAPS_RECEIVE"/>
+
+
+    <application
+        android:name="com.mylibrary.volley.AppController"
+        android:allowBackup="true"
+        android:icon="@drawable/app_logo"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name="com.cabily.app.SplashPage"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/PrimarycolorThemeSplash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+
+        <!-- Push Notification Permission -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <receiver
+            android:name="com.mylibrary.pushnotification.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+
+                <category android:name="com.cabily"/>
+            </intent-filter>
+        </receiver>
+
+
+        <!-- Auto Connect Internet Permission -->
+        <receiver android:name="com.cabily.utils.NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.mylibrary.pushnotification.GCMNotificationIntentService"/>
+
+
+        <!-- Start Chat Service Permission -->
+        <service
+            android:name="com.mylibrary.xmpp.ChatService"
+            android:exported="false">
+        </service>
+
+
+        <!-- MAP Permission -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDX3ihFwLTKgZcrIL-NhZVP7ejdemZaIFk"/>
+
+
+        <activity android:name="net.hockeyapp.android.UpdateActivity" />
+
+
+        <activity
+            android:name="com.cabily.app.SingUpAndSignIn"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.LoginPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.RegisterPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ForgotPassword"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ForgotPasswordOtp"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ResetPassword"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.NavigationDrawer"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.OtpPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
+
+        <activity
+            android:name="com.cabily.app.TimerPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Transparent_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.TrackYourRide"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.TrackRideCancelTrip"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.EstimatePage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.EstimateDetailPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.cabily.app.ProfilePage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ChangePassword"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ProfileOtpPage"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.AboutUs"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.EmergencyContact"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.InviteAndEarn"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.RateCard"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.CabilyMoney"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.CabilyMoneyWebview"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.CabilyMoneyTransaction"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRides"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRidesDetail"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRideDetailTrackRide"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRideCancelTrip"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRidePaymentList"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.MyRidePaymentWebView"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+
+        <activity
+            android:name="com.cabily.app.MyRideRating"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.PushNotificationAlert"
+            android:screenOrientation="portrait"
+            android:theme="@style/PushNotificaton_NoActionBar_Transparent_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FareBreakUp"
+            android:screenOrientation="portrait"
+            android:theme="@style/PushNotificaton_NoActionBar_Payment_Transparent_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FareBreakUpPaymentList"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FareBreakUpPaymentWebView"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.LocationSearch"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FavoriteList"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FavoriteAdd"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+    </application>
+
+</manifest>
