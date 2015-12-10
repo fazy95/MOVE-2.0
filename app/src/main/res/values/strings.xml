@@ -417,6 +417,6 @@
     <string name="favorite_add_label_no_address">Cannot get Address!</string>
     <string name="favorite_add_label_invalid_address">Invalid Address</string>
     <string name="favorite_add_label_name_empty">Name of your favourites can\'t be empty</string>
-
+    <string name="crash_toast_text">Crash - Send Reports to androiddev@teamtweaks.com</string>
 
 </resources>
