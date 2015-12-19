@@ -5,11 +5,11 @@
     <string name="action_signingUp">Signing Up</string>
     <string name="action_updating">Updating</string>
     <string name="action_logging_out">Logging Out</string>
-    <string name="action_pleasewait">Please Wait...</string>
     <string name="action_sending_invoice">Sending Invoice</string>
     <string name="action_processing">Processing</string>
     <string name="action_deleting">Deleting</string>
     <string name="action_success">Success</string>
+    <string name="action_pleasewait">Please Wait...</string>
     <string name="action_loading">Loading</string>
     <string name="action_saving">Saving</string>
     <string name="action_error">Error</string>
@@ -355,6 +355,11 @@
     <string name="my_rides_detail_cancel_ride_alert_yes">YES</string>
     <string name="my_rides_detail_cancel_ride_alert_no">NO</string>
     <string name="my_rides_detail_cancel_ride_alert_title">CANCEL RIDE</string>
+    <string name="my_rides_detail_tip_label">Enter Tip Amount</string>
+    <string name="my_rides_detail_tip_apply_label">APPLY</string>
+    <string name="my_rides_detail_tip_remove_label">REMOVE</string>
+    <string name="my_rides_detail_tip_empty_label">Tip amount can\'t be empty</string>
+    <string name="my_rides_detail_tip_amount_label">Tip Amount :</string>
 
     <!--MyRides cancel Trip -->
     <string name="my_rides_cancel_trip_header_textview">CANCEL RIDE</string>
@@ -417,6 +422,5 @@
     <string name="favorite_add_label_no_address">Cannot get Address!</string>
     <string name="favorite_add_label_invalid_address">Invalid Address</string>
     <string name="favorite_add_label_name_empty">Name of your favourites can\'t be empty</string>
-    <string name="crash_toast_text">Crash - Send Reports to androiddev@teamtweaks.com</string>
 
 </resources>

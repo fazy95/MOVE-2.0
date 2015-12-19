@@ -184,6 +184,7 @@ public class NavigationDrawer extends ActionBarActivityHockeyApp {
                 ft.commit();
                 mDrawerList.setItemChecked(position, true);
                 drawerLayout.closeDrawer(mDrawer);
+
             }
         });
     }

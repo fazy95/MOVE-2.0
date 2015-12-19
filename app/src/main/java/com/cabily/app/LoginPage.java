@@ -350,6 +350,12 @@ public class LoginPage extends ActivityHockeyApp {
 
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+
+                System.out.println("--------------Login url-------------------" + Url);
+                System.out.println("--------------Login email-------------------" + username.getText().toString());
+                System.out.println("--------------Login password-------------------" + password.getText().toString());
+                System.out.println("--------------Login gcm_id-------------------" + GCM_Id);
+
                 Map<String, String> jsonParams = new HashMap<String, String>();
                 jsonParams.put("email", username.getText().toString());
                 jsonParams.put("password", password.getText().toString());

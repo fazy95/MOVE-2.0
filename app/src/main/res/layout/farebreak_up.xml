@@ -141,6 +141,65 @@
                 android:textSize="15dp"/>
 
 
+            <RelativeLayout
+                android:id="@+id/fare_breakup_tip_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="100dp"
+                android:layout_below="@+id/fare_breakup_timetravel_label"
+                android:visibility="visible">
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="20dp"
+                    android:visibility="visible">
+
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/fare_breakup_tip_amount_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/my_rides_detail_tip_amount_label"
+                        android:textColor="#4e4e4e"
+                        android:textSize="17sp"/>
+
+
+                    <EditText
+                        android:id="@+id/fare_breakup_tip_editText"
+                        android:layout_width="100dp"
+                        android:layout_height="40dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/fare_breakup_tip_amount_label"
+                        android:background="@xml/edittext_border_grey_background"
+                        android:digits="0123456789."
+                        android:hint="@string/my_rides_detail_tip_label"
+                        android:imeOptions="actionDone"
+                        android:inputType="textImeMultiLine"
+                        android:paddingLeft="5dp"
+                        android:textColor="#3f3e3e"
+                        android:textColorHint="#918e8e"
+                        android:textCursorDrawable="@drawable/edittext_cursor_color"
+                        android:textSize="13sp"/>
+
+                    <Button
+                        android:id="@+id/fare_breakup_tip_apply_button"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/fare_breakup_tip_editText"
+                        android:background="#01A7CD"
+                        android:text="@string/my_rides_detail_tip_apply_label"
+                        android:textColor="#ffffff"
+                        android:textSize="13sp"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+
         </RelativeLayout>
 
     </ScrollView>

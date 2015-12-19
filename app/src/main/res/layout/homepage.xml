@@ -25,11 +25,11 @@
 
         <ImageView
             android:id="@+id/book_my_ride_center_marker"
-            android:layout_width="43dp"
-            android:layout_height="45dp"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
             android:layout_above="@+id/book_my_ride_center_view1"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/user_marker_icon2"
+            android:src="@drawable/pickup_map_pointer"
             android:visibility="visible"/>
 
         <RelativeLayout

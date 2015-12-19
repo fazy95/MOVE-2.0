@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -98,15 +99,20 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
     public static MyRidesDetail myrideDetail_class;
 
-    String Str_LocationLatitude = "", Str_LocationLongitude = "";
+    private String Str_LocationLatitude = "", Str_LocationLongitude = "";
 
     //------Invoice Dialog Declaration-----
-    EditText Et_dialog_InvoiceEmail;
-    MaterialDialog invoice_dialog;
+    private EditText Et_dialog_InvoiceEmail;
+    private MaterialDialog invoice_dialog;
 
     //------Favourite Dialog Declaration-----
-    EditText Et_dialog_FavouriteTitle;
-    MaterialDialog favourite_dialog;
+    private EditText Et_dialog_FavouriteTitle;
+    private MaterialDialog favourite_dialog;
+
+    //------Tip Declaration-----
+    private EditText Et_tip_Amount;
+    private Button Bt_tip_Apply;
+    private RelativeLayout Rl_tip;
 
     public class RefreshReceiver extends BroadcastReceiver {
         @Override
@@ -236,6 +242,35 @@ public class MyRidesDetail extends ActivityHockeyApp {
             }
         });
 
+
+        Bt_tip_Apply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cd = new ConnectionDetector(MyRidesDetail.this);
+                isInternetPresent = cd.isConnectingToInternet();
+
+                if(Et_tip_Amount.getText().toString().length()>0)
+                {
+                    if (isInternetPresent) {
+                        if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_apply_label)))
+                        {
+                            postRequest_Tip(Iconstant.tip_add_url,"Apply");
+                        }
+                        else if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_remove_label)))
+                        {
+                            postRequest_Tip(Iconstant.tip_remove_url,"Remove");
+                        }
+                    } else {
+                        Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                    }
+                }
+                else {
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.my_rides_detail_tip_empty_label));
+                }
+
+            }
+        });
+
     }
 
     private void initializeMap() {
@@ -302,6 +337,9 @@ public class MyRidesDetail extends ActivityHockeyApp {
         Ll_reportIssue = (LinearLayout) findViewById(R.id.my_rides_detail_report_issue_layout);
         Ll_trackRide = (LinearLayout) findViewById(R.id.my_rides_detail_track_ride_layout);
 
+        Et_tip_Amount =(EditText)findViewById(R.id.my_rides_detail_tip_editText);
+        Bt_tip_Apply =(Button)findViewById(R.id.my_rides_detail_tip_apply_button);
+        Rl_tip =(RelativeLayout)findViewById(R.id.my_rides_detail_tip_layout);
 
         // -----code to refresh drawer using broadcast receiver-----
         refreshReceiver = new RefreshReceiver();
@@ -601,6 +639,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                                 pojo.setTotalPaid(fare_object.getString("total_paid"));
                                                 pojo.setCouponDiscount(fare_object.getString("coupon_discount"));
                                                 pojo.setWalletUsuage(fare_object.getString("wallet_usage"));
+                                                pojo.setTip_amount(fare_object.getString("tips_amount"));
 
                                                 isFareAvailable = true;
                                             } else {
@@ -612,6 +651,8 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                     }
                                 }
                             }
+
+
 
 
                             //------------OnPost Execute------------
@@ -690,6 +731,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                         Ll_mailInvoice.setVisibility(View.GONE);
                                         Ll_reportIssue.setVisibility(View.GONE);
                                         Rl_favorite.setVisibility(View.GONE);
+                                        Rl_tip.setVisibility(View.VISIBLE);
                                     }
 
                                     if (itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1")) {
@@ -698,6 +740,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                         Ll_mailInvoice.setVisibility(View.GONE);
                                         Ll_reportIssue.setVisibility(View.GONE);
                                         Rl_favorite.setVisibility(View.GONE);
+                                        Rl_tip.setVisibility(View.GONE);
                                     }
 
                                     if (itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
@@ -706,6 +749,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                         Ll_mailInvoice.setVisibility(View.VISIBLE);
                                         Ll_reportIssue.setVisibility(View.VISIBLE);
                                         Rl_favorite.setVisibility(View.VISIBLE);
+                                        Rl_tip.setVisibility(View.GONE);
 
                                         //Programmatically making textView to left of layout
                                         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -738,6 +782,23 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                     } else {
                                         Ll_trackRide.setVisibility(View.GONE);
                                     }
+
+                                    //------Show and Hide Tip Layout------
+                                    if(itemlist.get(0).getTip_amount().equalsIgnoreCase("0"))
+                                    {
+                                        Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_apply_label));
+                                        Bt_tip_Apply.setBackgroundColor(0xFF01A7CD);
+                                        Et_tip_Amount.setFocusable(true);
+                                        Et_tip_Amount.setText("");
+                                    }
+                                    else
+                                    {
+                                        Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_remove_label));
+                                        Bt_tip_Apply.setBackgroundColor(0xFFCC0000);
+                                        Et_tip_Amount.setFocusable(false);
+                                        Et_tip_Amount.setText(itemlist.get(0).getTip_amount());
+                                    }
+
                                 }
                             } else {
                                 String Sresponse = object.getString("response");
@@ -1155,6 +1216,99 @@ public class MyRidesDetail extends ActivityHockeyApp {
         postrequest.setShouldCache(false);
         AppController.getInstance().addToRequestQueue(postrequest);
     }
+
+
+
+    //-----------------------Tip Post Request-----------------
+    private void postRequest_Tip(String Url, final String tipStatus) {
+        dialog = new Dialog(MyRidesDetail.this);
+        dialog.getWindow();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.custom_loading);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
+        dialog_title.setText(getResources().getString(R.string.action_pleasewait));
+
+
+        System.out.println("-------------tip Url----------------" + Url);
+
+        postrequest = new StringRequest(Request.Method.POST, Url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        System.out.println("-------------tip Response----------------" + response);
+                        String Sstatus = "", Sresponse = "";
+                        try {
+
+                            JSONObject object = new JSONObject(response);
+                            Sstatus = object.getString("status");
+                            if (Sstatus.equalsIgnoreCase("1")) {
+
+                                JSONObject response_Object=object.getJSONObject("response");
+                                Sresponse = response_Object.getString("msg");
+
+                                if(tipStatus.equalsIgnoreCase("Apply"))
+                                {
+                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_remove_label));
+                                    Bt_tip_Apply.setBackgroundColor(0xFFCC0000);
+                                    Et_tip_Amount.setEnabled(false);
+                                }
+                                else
+                                {
+                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_apply_label));
+                                    Bt_tip_Apply.setBackgroundColor(0xFF01A7CD);
+                                    Et_tip_Amount.setEnabled(true);
+                                    Et_tip_Amount.setText("");
+                                }
+                                Alert(getResources().getString(R.string.action_success), Sresponse);
+                            } else {
+                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        dialog.dismiss();
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dialog.dismiss();
+                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("User-agent", Iconstant.cabily_userAgent);
+                return headers;
+            }
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> jsonParams = new HashMap<String, String>();
+                jsonParams.put("ride_id", SrideId_intent);
+
+                if(tipStatus.equalsIgnoreCase("Apply"))
+                {
+                    jsonParams.put("tips_amount", Et_tip_Amount.getText().toString());
+                }
+                return jsonParams;
+            }
+        };
+        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        postrequest.setShouldCache(false);
+        AppController.getInstance().addToRequestQueue(postrequest);
+    }
+
 
 
     //-----------------Move Back on pressed phone back button------------------

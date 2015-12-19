@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -51,8 +52,20 @@ import com.cabily.app.EstimatePage;
 import com.cabily.app.FavoriteList;
 import com.cabily.app.LocationSearch;
 import com.cabily.app.NavigationDrawer;
+import com.cabily.app.SingUpAndSignIn;
 import com.cabily.app.TimerPage;
 import com.cabily.adapter.BookMyRide_Adapter;
+import com.cabily.app.TrackYourRide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.mylibrary.gps.GPSTracker;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.HomePojo;
@@ -95,7 +108,8 @@ import java.util.Map;
 import me.drakeet.materialdialog.MaterialDialog;
 
 
-public class Fragment_HomePage extends FragmentHockeyApp {
+public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
     private RelativeLayout drawer_layout;
     private RelativeLayout address_layout, favorite_layout, bottom_layout;
     private RelativeLayout loading_layout;
@@ -168,6 +182,14 @@ public class Fragment_HomePage extends FragmentHockeyApp {
     BroadcastReceiver logoutReciver;
     private boolean ratecard_clicked = true;
 
+
+    //-----Declaration For Enabling Gps-------
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+    PendingResult<LocationSettingsResult> result;
+    final static int REQUEST_LOCATION = 299;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (rootview != null) {
@@ -183,7 +205,16 @@ public class Fragment_HomePage extends FragmentHockeyApp {
 
         context = getActivity();
         initialize(rootview);
-        initilizeMap();
+        initializeMap();
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
+
+
 
         //Start XMPP Chat Service
         ChatService.startUserAction(getActivity());
@@ -464,7 +495,8 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                     googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 } else {
-                    Toast.makeText(getActivity(), "GPS not Enabled !!!", Toast.LENGTH_LONG).show();
+                    enableGpsService();
+                    //Toast.makeText(getActivity(), "GPS not Enabled !!!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -507,7 +539,6 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
                     String tittle = marker.getTitle();
-                    Log.e("tittle--on_camera_change---->", "" + tittle);
                     return true;
                 }
             });
@@ -518,7 +549,7 @@ public class Fragment_HomePage extends FragmentHockeyApp {
         return rootview;
     }
 
-    private void initilizeMap() {
+    private void initializeMap() {
         if (googleMap == null) {
             googleMap = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.book_my_ride_mapview)).getMap();
 
@@ -559,8 +590,10 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         } else {
-            alert_layout.setVisibility(View.VISIBLE);
-            alert_textview.setText(getResources().getString(R.string.alert_gpsEnable));
+
+            enableGpsService();
+           /* alert_layout.setVisibility(View.VISIBLE);
+            alert_textview.setText(getResources().getString(R.string.alert_gpsEnable));*/
         }
     }
 
@@ -569,7 +602,6 @@ public class Fragment_HomePage extends FragmentHockeyApp {
         isInternetPresent = cd.isConnectingToInternet();
         session = new SessionManager(getActivity());
         gps = new GPSTracker(getActivity());
-
         drawer_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_layout);
         address_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_address_layout);
         favorite_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_favorite_layout);
@@ -580,13 +612,11 @@ public class Fragment_HomePage extends FragmentHockeyApp {
         alert_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_alert_layout);
         alert_textview = (TextView) rooView.findViewById(R.id.book_my_ride_alert_textView);
         currentLocation_image = (ImageView) rooView.findViewById(R.id.book_current_location_imageview);
-
         rideLater_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_rideLater_layout);
         rideNow_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_rideNow_layout);
         rideLater_textview = (TextView) rooView.findViewById(R.id.book_my_ride_rideLater_textView);
         rideNow_textview = (TextView) rooView.findViewById(R.id.book_my_ride_rideNow_textview);
         listview = (HorizontalListView) rooView.findViewById(R.id.book_my_ride_listview);
-
         ridenow_option_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_ridenow_option_layout);
         carType_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_cabtype_layout);
         pickTime_layout = (RelativeLayout) rooView.findViewById(R.id.book_my_ride_pickup_layout);
@@ -620,9 +650,7 @@ public class Fragment_HomePage extends FragmentHockeyApp {
 
         coupon_apply_layout.setVisibility(View.VISIBLE);
         coupon_loading_layout.setVisibility(View.GONE);
-
         coupon_edittext.addTextChangedListener(EditorWatcher);
-
         coupon_edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -632,7 +660,6 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 return false;
             }
         });
-
         tv_cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -640,7 +667,6 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
-
         tv_apply.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -666,7 +692,6 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 }
             }
         });
-
         coupon_dialog.setView(view).show();
     }
 
@@ -1248,6 +1273,9 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                 System.out.println("--------------Confirm Ride reponse-------------------" + response);
 
                 String selected_type = "",Sacceptance="";
+                String Str_driver_id="",Str_driver_name="",Str_driver_email="",Str_driver_image="",Str_driver_review="",
+                        Str_driver_lat="",Str_driver_lon="",Str_min_pickup_duration="",Str_ride_id="",Str_phone_number="",
+                        Str_vehicle_number="",Str_vehicle_model="";
                 try {
                     JSONObject object = new JSONObject(response);
                     if (object.length() > 0) {
@@ -1262,6 +1290,26 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                                 response_time = response_object.getString("response_time");
                             }
                             riderId = response_object.getString("ride_id");
+
+
+                            if(Sacceptance.equalsIgnoreCase("Yes"))
+                            {
+                                JSONObject driverObject=response_object.getJSONObject("driver_profile");
+
+                                Str_driver_id=driverObject.getString("driver_id");
+                                Str_driver_name=driverObject.getString("driver_name");
+                                Str_driver_email=driverObject.getString("driver_email");
+                                Str_driver_image=driverObject.getString("driver_image");
+                                Str_driver_review=driverObject.getString("driver_review");
+                                Str_driver_lat=driverObject.getString("driver_lat");
+                                Str_driver_lon=driverObject.getString("driver_lon");
+                                Str_min_pickup_duration=driverObject.getString("min_pickup_duration");
+                                Str_ride_id=driverObject.getString("ride_id");
+                                Str_phone_number=driverObject.getString("phone_number");
+                                Str_vehicle_number=driverObject.getString("vehicle_number");
+                                Str_vehicle_model=driverObject.getString("vehicle_model");
+                            }
+
 
                             if (selected_type.equalsIgnoreCase("1"))
                             {
@@ -1296,6 +1344,22 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                                 if(Sacceptance.equalsIgnoreCase("Yes"))
                                 {
                                     //Move to ride Detail page
+                                    Intent i=new Intent(getActivity(),TrackYourRide.class);
+                                    i.putExtra("driverID", Str_driver_id);
+                                    i.putExtra("driverName",Str_driver_name);
+                                    i.putExtra("driverImage",Str_driver_image);
+                                    i.putExtra("driverRating",Str_driver_review);
+                                    i.putExtra("driverLat",Str_driver_lat);
+                                    i.putExtra("driverLong",Str_driver_lon);
+                                    i.putExtra("driverTime",Str_min_pickup_duration);
+                                    i.putExtra("rideID",Str_ride_id);
+                                    i.putExtra("driverMobile",Str_phone_number);
+                                    i.putExtra("driverCar_no",Str_vehicle_number);
+                                    i.putExtra("driverCar_model",Str_vehicle_model);
+                                    i.putExtra("userLat", pickup_lat);
+                                    i.putExtra("userLong", pickup_lon);
+                                    startActivity(i);
+                                    getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                                 }
                                 else
                                 {
@@ -1408,7 +1472,7 @@ public class Fragment_HomePage extends FragmentHockeyApp {
                             riderId="";
                             Alert(getActivity().getResources().getString(R.string.alert_label_title), response_value);
                         } else {
-                            Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_servererror));
+                            Alert(getActivity().getResources().getString(R.string.alert_label_title), response_value);
                         }
 
 
@@ -1677,6 +1741,9 @@ public class Fragment_HomePage extends FragmentHockeyApp {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+
+        System.out.println("--------------onActivityResult requestCode----------------"+requestCode);
+
         // code to get country name
         if (requestCode == timer_request_code && resultCode == Activity.RESULT_OK && data != null) {
             String ride_accepted = data.getStringExtra("Accepted_or_Not");
@@ -1759,7 +1826,28 @@ public class Fragment_HomePage extends FragmentHockeyApp {
             CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Double.parseDouble(SselectedLatitude), Double.parseDouble(SselectedLongitude))).zoom(17).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+        else if(requestCode == REQUEST_LOCATION)
+        {
+            System.out.println("----------inside request location------------------");
 
+            switch (resultCode)
+            {
+                case Activity.RESULT_OK:
+                {
+                    Toast.makeText(getActivity(), "Location enabled!", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case Activity.RESULT_CANCELED:
+                {
+                    enableGpsService();
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -1769,4 +1857,66 @@ public class Fragment_HomePage extends FragmentHockeyApp {
         getActivity().unregisterReceiver(logoutReciver);
         super.onDestroy();
     }
+
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
+
+
+    //Enabling Gps Service
+    private void enableGpsService()
+    {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(30 * 1000);
+        mLocationRequest.setFastestInterval(5 * 1000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        builder.setAlwaysShow(true);
+
+        result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                //final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+                        //...
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(getActivity(),REQUEST_LOCATION);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        //...
+                        break;
+                }
+            }
+        });
+    }
+
 }

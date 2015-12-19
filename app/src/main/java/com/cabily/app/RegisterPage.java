@@ -74,8 +74,6 @@ public class RegisterPage extends FragmentActivityHockeyApp {
     Handler mHandler;
     //------------------GCM Initialization------------------
     private GoogleCloudMessaging gcm;
-    private static final String REG_ID = "regId";
-    private static final String APP_VERSION = "appVersion";
     private String GCM_Id = "";
 
     CountryPicker picker;

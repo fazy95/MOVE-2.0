@@ -6,15 +6,7 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.casperon.app.cabily.R;
-
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
-
-@ReportsCrashes(
-        mailTo = "androiddev@teamtweaks.com ",
-        mode = ReportingInteractionMode.TOAST,
-        resToastText = R.string.crash_toast_text)
+ 
 public class AppController extends Application {
  
     public static final String TAG = AppController.class.getSimpleName();

@@ -4,12 +4,13 @@ public interface Iconstant
 {
     /*Local Url*/
 
-        /*String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/api/v1/";
-        String XMPP_HOST_URL = "192.168.1.148";
+       /* String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/api/v1/";
+        String XMPP_HOST_URL = "192.168.1.150";
         String XMPP_SERVICE_NAME = "casp83";*/
 
 
     /*Live Url*/
+
         String BaseUrl="http://project.dectar.com/fortaxi/api/v1/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";
@@ -69,6 +70,9 @@ public interface Iconstant
         String favoritelist_add_url= BaseUrl+"app/favourite/add";
         String favoritelist_edit_url= BaseUrl+"app/favourite/edit";
         String favoritelist_delete_url= BaseUrl+"app/favourite/remove";
+
+        String tip_add_url= BaseUrl+"app/apply-tips";
+        String tip_remove_url= BaseUrl+"app/remove-tips";
 
 
 

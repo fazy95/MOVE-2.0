@@ -11,7 +11,7 @@ import net.hockeyapp.android.UpdateManager;
  */
 public class ActivityHockeyApp extends Activity
 {
-    private static  String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+   private static  String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

@@ -5,7 +5,7 @@ package com.cabily.pojo;
  */
 public class MyRideDetailPojo {
     private String carType, carNo, rideStatus, address, pickup, drop,
-            rideDistance, timeTaken, waitTime, totalBill, totalPaid, couponDiscount, walletUsuage;
+            rideDistance, timeTaken, waitTime, totalBill, totalPaid, couponDiscount, walletUsuage, tip_amount;
     private String currrencySymbol, rideId, displayStatus, doCancelAction, pay_status, LocationLat, LocationLong;
     private String doTrackAction, isFavLocation;
 
@@ -183,5 +183,13 @@ public class MyRideDetailPojo {
 
     public void setIsFavLocation(String isFavLocation) {
         this.isFavLocation = isFavLocation;
+    }
+
+    public String getTip_amount() {
+        return tip_amount;
+    }
+
+    public void setTip_amount(String tip_amount) {
+        this.tip_amount = tip_amount;
     }
 }
