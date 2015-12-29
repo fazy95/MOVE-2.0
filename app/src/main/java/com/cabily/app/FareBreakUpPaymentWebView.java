@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,10 +16,10 @@ import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
 
 import java.util.HashMap;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/7/2015.
@@ -35,6 +34,7 @@ public class FareBreakUpPaymentWebView extends ActivityHockeyApp {
     private SessionManager session;
     private String UserID = "";
     private String SrideId_intent = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,33 +46,30 @@ public class FareBreakUpPaymentWebView extends ActivityHockeyApp {
             @Override
             public void onClick(View v) {
 
-                final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentWebView.this);
-                dialog.setTitle(getResources().getString(R.string.cabily_webview_lable_cancel_transaction))
-                        .setMessage(getResources().getString(R.string.cabily_webview_lable_cancel_transaction_proceed))
-                        .setPositiveButton(
-                                "OK", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        // close keyboard
-                                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                        mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
+                final PkDialog mDialog = new PkDialog(FareBreakUpPaymentWebView.this);
+                mDialog.setDialogTitle(getResources().getString(R.string.cabily_webview_lable_cancel_transaction));
+                mDialog.setDialogMessage(getResources().getString(R.string.cabily_webview_lable_cancel_transaction_proceed));
+                mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
 
-                                        onBackPressed();
-                                        overridePendingTransition(R.anim.enter, R.anim.exit);
-                                        finish();
-                                    }
-                                }
-                        )
-                        .setNegativeButton(
-                                "CANCEL", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                    }
-                                }
-                        )
-                        .show();
+                        // close keyboard
+                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
+
+                        onBackPressed();
+                        overridePendingTransition(R.anim.enter, R.anim.exit);
+                        finish();
+                    }
+                });
+                mDialog.setNegativeButton(getResources().getString(R.string.action_cancel_alert), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
+                    }
+                });
+                mDialog.show();
 
             }
         });
@@ -94,8 +91,7 @@ public class FareBreakUpPaymentWebView extends ActivityHockeyApp {
 
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         session = new SessionManager(FareBreakUpPaymentWebView.this);
 
         back = (RelativeLayout) findViewById(R.id.myride_payment_webview_header_back_layout);
@@ -160,62 +156,61 @@ public class FareBreakUpPaymentWebView extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentWebView.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentWebView.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     //--------------Alert Pay Transaction Method-----------
     private void AlertPay(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentWebView.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
 
-                                finish();
-                                onBackPressed();
-                                overridePendingTransition(R.anim.enter, R.anim.exit);
-                            }
-                        }
-                )
-                .show();
+        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentWebView.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+                finish();
+                onBackPressed();
+                overridePendingTransition(R.anim.enter, R.anim.exit);
+            }
+        });
+        mDialog.show();
+
     }
 
     //--------------Alert Pay Transaction Success Method-----------
     private void AlertPaySuccess(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentWebView.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                                Intent intent=new Intent(FareBreakUpPaymentWebView.this,MyRideRating.class);
-                                intent.putExtra("RideID", SrideId_intent);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.enter, R.anim.exit);
 
-                                finish();
-                                FareBreakUp.farebreakup_class.finish();
-                                FareBreakUpPaymentList.myride_paymentList_class.finish();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentWebView.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+                Intent intent = new Intent(FareBreakUpPaymentWebView.this, MyRideRating.class);
+                intent.putExtra("RideID", SrideId_intent);
+                startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
+
+                finish();
+                FareBreakUp.farebreakup_class.finish();
+                FareBreakUpPaymentList.myride_paymentList_class.finish();
+            }
+        });
+        mDialog.show();
     }
 
     @Override
@@ -234,33 +229,30 @@ public class FareBreakUpPaymentWebView extends ActivityHockeyApp {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)) {
 
-            final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentWebView.this);
-            dialog.setTitle(getResources().getString(R.string.cabily_webview_lable_cancel_transaction))
-                    .setMessage(getResources().getString(R.string.cabily_webview_lable_cancel_transaction_proceed))
-                    .setPositiveButton(
-                            "OK", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    dialog.dismiss();
-                                    // close keyboard
-                                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
+            final PkDialog mDialog = new PkDialog(FareBreakUpPaymentWebView.this);
+            mDialog.setDialogTitle(getResources().getString(R.string.cabily_webview_lable_cancel_transaction));
+            mDialog.setDialogMessage(getResources().getString(R.string.cabily_webview_lable_cancel_transaction_proceed));
+            mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDialog.dismiss();
 
-                                    onBackPressed();
-                                    finish();
-                                    overridePendingTransition(R.anim.enter, R.anim.exit);
-                                }
-                            }
-                    )
-                    .setNegativeButton(
-                            "CANCEL", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    dialog.dismiss();
-                                }
-                            }
-                    )
-                    .show();
+                    // close keyboard
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
+
+                    onBackPressed();
+                    finish();
+                    overridePendingTransition(R.anim.enter, R.anim.exit);
+                }
+            });
+            mDialog.setNegativeButton(getResources().getString(R.string.action_cancel_alert), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDialog.dismiss();
+                }
+            });
+            mDialog.show();
 
             return true;
         }

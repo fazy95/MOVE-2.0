@@ -32,6 +32,7 @@ import com.cabily.pojo.FavoriteListPojo;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.volley.AppController;
 import com.mylibrary.volley.VolleyErrorResponse;
 
@@ -43,7 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/12/2015.
@@ -241,18 +241,17 @@ public class FavoriteList extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FavoriteList.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FavoriteList.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //-----------------------Favourite List Display Post Request-----------------
@@ -337,7 +336,7 @@ public class FavoriteList extends ActivityHockeyApp {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
+                headers.put("User-agent", Iconstant.cabily_userAgent);
                 return headers;
             }
 
@@ -384,8 +383,7 @@ public class FavoriteList extends ActivityHockeyApp {
                             Sstatus = object.getString("status");
                             Smessage = object.getString("message");
 
-                            if (Sstatus.equalsIgnoreCase("1"))
-                            {
+                            if (Sstatus.equalsIgnoreCase("1")) {
                                 //removing the deleted position from listView
                                 itemList.remove(position);
                                 adapter.notifyDataSetChanged();
@@ -396,18 +394,8 @@ public class FavoriteList extends ActivityHockeyApp {
                                     Rl_empty.setVisibility(View.VISIBLE);
                                 }
 
-                                final MaterialDialog dialog = new MaterialDialog(FavoriteList.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(Smessage)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                                Alert(getResources().getString(R.string.action_success), Smessage);
+
                             } else {
                                 Alert(getResources().getString(R.string.alert_label_title), Smessage);
                             }
@@ -431,7 +419,7 @@ public class FavoriteList extends ActivityHockeyApp {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
+                headers.put("User-agent", Iconstant.cabily_userAgent);
                 return headers;
             }
 

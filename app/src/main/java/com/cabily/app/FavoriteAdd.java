@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,12 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
@@ -37,10 +31,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.gps.GPSTracker;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,26 +41,23 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/13/2015.
  */
-public class FavoriteAdd extends ActivityHockeyApp
-{
+public class FavoriteAdd extends ActivityHockeyApp {
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private SessionManager session;
     private String UserID = "";
-    private String SselectedAddress="",Slatitude="",Slongitude="",Stitle="",SlocationKey="",SidentityKey="";
+    private String SselectedAddress = "", Slatitude = "", Slongitude = "", Stitle = "", SlocationKey = "", SidentityKey = "";
 
     private RelativeLayout Rl_back, Rl_save;
     private EditText Et_name;
     private TextView Tv_address;
     private ImageView currentLocation_image;
-    private StringRequest postrequest,editRequest;
+    private ServiceRequest mRequest, editRequest;
     private GoogleMap googleMap;
     GPSTracker gps;
     static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
@@ -75,7 +65,7 @@ public class FavoriteAdd extends ActivityHockeyApp
 
     private RelativeLayout Rl_alert;
     private TextView Tv_alert;
-    private boolean isAddressAvailable=false;
+    private boolean isAddressAvailable = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,33 +116,21 @@ public class FavoriteAdd extends ActivityHockeyApp
                 cd = new ConnectionDetector(FavoriteAdd.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if (isInternetPresent)
-                {
-                    if(Et_name.getText().toString().length()==0)
-                    {
+                if (isInternetPresent) {
+                    if (Et_name.getText().toString().length() == 0) {
                         Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.favorite_add_label_name_empty));
-                    }
-                    else
-                    {
-                        if(Tv_address.getText().length()>0 && !Tv_address.getText().toString().equalsIgnoreCase(getResources().getString(R.string.favorite_add_label_gettingAddress)))
-                        {
-                            if(SidentityKey.equalsIgnoreCase("Edit"))
-                            {
+                    } else {
+                        if (Tv_address.getText().length() > 0 && !Tv_address.getText().toString().equalsIgnoreCase(getResources().getString(R.string.favorite_add_label_gettingAddress))) {
+                            if (SidentityKey.equalsIgnoreCase("Edit")) {
                                 postRequest_FavoriteEdit(Iconstant.favoritelist_edit_url);
-                            }
-                            else
-                            {
+                            } else {
                                 postRequest_FavoriteSave(Iconstant.favoritelist_add_url);
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.favorite_add_label_invalid_address));
                         }
                     }
-                }
-                else
-                {
+                } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                 }
 
@@ -179,13 +157,10 @@ public class FavoriteAdd extends ActivityHockeyApp
 
                     if (isInternetPresent) {
 
-                        if(Slatitude!=null&&Slongitude!=null)
-                        {
-                            GetCompleteAddressAsyncTask asyncTask=new GetCompleteAddressAsyncTask();
+                        if (Slatitude != null && Slongitude != null) {
+                            GetCompleteAddressAsyncTask asyncTask = new GetCompleteAddressAsyncTask();
                             asyncTask.execute();
-                        }
-                        else
-                        {
+                        } else {
                             Rl_alert.setVisibility(View.VISIBLE);
                             Tv_alert.setText(getResources().getString(R.string.favorite_add_label_no_address));
                         }
@@ -222,8 +197,7 @@ public class FavoriteAdd extends ActivityHockeyApp
         });
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         session = new SessionManager(FavoriteAdd.this);
         cd = new ConnectionDetector(FavoriteAdd.this);
         isInternetPresent = cd.isConnectingToInternet();
@@ -231,32 +205,30 @@ public class FavoriteAdd extends ActivityHockeyApp
 
         Rl_back = (RelativeLayout) findViewById(R.id.favorite_add_header_back_layout);
         Rl_save = (RelativeLayout) findViewById(R.id.favorite_add_header_save_layout);
-        Et_name = (EditText)findViewById(R.id.favorite_add_name_edittext);
-        Tv_address = (TextView)findViewById(R.id.favorite_add_address);
+        Et_name = (EditText) findViewById(R.id.favorite_add_name_edittext);
+        Tv_address = (TextView) findViewById(R.id.favorite_add_address);
         Rl_alert = (RelativeLayout) findViewById(R.id.favorite_add_alert_layout);
-        Tv_alert = (TextView)findViewById(R.id.favorite_add_alert_textView);
-        currentLocation_image = (ImageView)findViewById(R.id.favorite_add_current_location_imageview);
+        Tv_alert = (TextView) findViewById(R.id.favorite_add_alert_textView);
+        currentLocation_image = (ImageView) findViewById(R.id.favorite_add_current_location_imageview);
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
 
-        Intent intent=getIntent();
-        SselectedAddress=intent.getStringExtra("Intent_Address");
-        Slatitude=intent.getStringExtra("Intent_Latitude");
-        Slongitude=intent.getStringExtra("Intent_Longitude");
-        SidentityKey=intent.getStringExtra("Intent_IdentityKey");
-        if(SidentityKey.equalsIgnoreCase("Edit"))
-        {
-            Stitle=intent.getStringExtra("Intent_Title");
-            SlocationKey=intent.getStringExtra("Intent_LocationKey");
+        Intent intent = getIntent();
+        SselectedAddress = intent.getStringExtra("Intent_Address");
+        Slatitude = intent.getStringExtra("Intent_Latitude");
+        Slongitude = intent.getStringExtra("Intent_Longitude");
+        SidentityKey = intent.getStringExtra("Intent_IdentityKey");
+        if (SidentityKey.equalsIgnoreCase("Edit")) {
+            Stitle = intent.getStringExtra("Intent_Title");
+            SlocationKey = intent.getStringExtra("Intent_LocationKey");
 
             Et_name.setText(Stitle);
         }
     }
 
-    private void initializeMap()
-    {
+    private void initializeMap() {
         if (googleMap == null) {
             googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.favorite_add_mapview)).getMap();
 
@@ -295,18 +267,17 @@ public class FavoriteAdd extends ActivityHockeyApp
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FavoriteAdd.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FavoriteAdd.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //-----------Check Google Play Service--------
@@ -333,14 +304,14 @@ public class FavoriteAdd extends ActivityHockeyApp
 
 
     //-------------AsyncTask to get Complete Address------------
-    public class GetCompleteAddressAsyncTask extends AsyncTask<Void, Void, String>
-    {
+    public class GetCompleteAddressAsyncTask extends AsyncTask<Void, Void, String> {
         String strAdd = "";
 
         @Override
         protected void onPreExecute() {
             Tv_address.setText(getResources().getString(R.string.favorite_add_label_gettingAddress));
         }
+
         @Override
         protected String doInBackground(Void... params) {
 
@@ -355,15 +326,15 @@ public class FavoriteAdd extends ActivityHockeyApp
                         strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
                     }
                     strAdd = strReturnedAddress.toString();
-                    isAddressAvailable=true;
+                    isAddressAvailable = true;
                 } else {
                     Log.e("My Current loction address", "No Address returned!");
-                    isAddressAvailable=false;
+                    isAddressAvailable = false;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e("My Current loction address", "Canont get Address!");
-                isAddressAvailable=false;
+                isAddressAvailable = false;
             }
 
             return strAdd;
@@ -372,13 +343,10 @@ public class FavoriteAdd extends ActivityHockeyApp
         @Override
         protected void onPostExecute(String address) {
 
-            if(isAddressAvailable)
-            {
+            if (isAddressAvailable) {
                 Rl_alert.setVisibility(View.GONE);
                 Tv_address.setText(address);
-            }
-            else
-            {
+            } else {
                 Rl_alert.setVisibility(View.VISIBLE);
                 Tv_alert.setText(getResources().getString(R.string.favorite_add_label_no_address));
                 Tv_address.setText("");
@@ -402,89 +370,64 @@ public class FavoriteAdd extends ActivityHockeyApp
 
         System.out.println("-------------Favourite Save Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("title", Et_name.getText().toString());
+        jsonParams.put("latitude", Slatitude);
+        jsonParams.put("longitude", Slongitude);
+        jsonParams.put("address", Tv_address.getText().toString());
 
-                        System.out.println("-------------Favourite Save Response----------------" + response);
-                        String Sstatus = "",Smessage="";
+        mRequest = new ServiceRequest(FavoriteAdd.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("message");
+                System.out.println("-------------Favourite Save Response----------------" + response);
+                String Sstatus = "", Smessage = "";
 
-                            // close keyboard
-                            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            mgr.hideSoftInputFromWindow(Et_name.getWindowToken(), 0);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("message");
 
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                Intent local = new Intent();
-                                local.setAction("com.favoriteList.refresh");
-                                sendBroadcast(local);
+                    // close keyboard
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.hideSoftInputFromWindow(Et_name.getWindowToken(), 0);
 
-                                final MaterialDialog dialog = new MaterialDialog(FavoriteAdd.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(Smessage)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        onBackPressed();
-                                                        overridePendingTransition(R.anim.enter, R.anim.exit);
-                                                        finish();
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        Intent local = new Intent();
+                        local.setAction("com.favoriteList.refresh");
+                        sendBroadcast(local);
+
+                        final PkDialog mDialog = new PkDialog(FavoriteAdd.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(Smessage);
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else
-                            {
-                                Alert(getResources().getString(R.string.alert_label_title), Smessage);
-                            }
+                        });
+                        mDialog.show();
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
-
+                    } else {
+                        Alert(getResources().getString(R.string.alert_label_title), Smessage);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FavoriteAdd.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("title", Et_name.getText().toString());
-                jsonParams.put("latitude", Slatitude);
-                jsonParams.put("longitude", Slongitude);
-                jsonParams.put("address", Tv_address.getText().toString());
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -502,90 +445,65 @@ public class FavoriteAdd extends ActivityHockeyApp
 
         System.out.println("-------------Favourite Edit Url----------------" + Url);
 
-        editRequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("title", Et_name.getText().toString());
+        jsonParams.put("latitude", Slatitude);
+        jsonParams.put("longitude", Slongitude);
+        jsonParams.put("address", Tv_address.getText().toString());
+        jsonParams.put("location_key", SlocationKey);
 
-                        System.out.println("-------------Favourite Edit Response----------------" + response);
+        editRequest = new ServiceRequest(FavoriteAdd.this);
+        editRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "", Smessage = "";
+                System.out.println("-------------Favourite Edit Response----------------" + response);
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("message");
+                String Sstatus = "", Smessage = "";
 
-                            // close keyboard
-                            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            mgr.hideSoftInputFromWindow(Et_name.getWindowToken(), 0);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("message");
 
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                Intent local = new Intent();
-                                local.setAction("com.favoriteList.refresh");
-                                sendBroadcast(local);
+                    // close keyboard
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.hideSoftInputFromWindow(Et_name.getWindowToken(), 0);
 
-                                final MaterialDialog dialog = new MaterialDialog(FavoriteAdd.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(Smessage)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        onBackPressed();
-                                                        overridePendingTransition(R.anim.enter, R.anim.exit);
-                                                        finish();
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        Intent local = new Intent();
+                        local.setAction("com.favoriteList.refresh");
+                        sendBroadcast(local);
+
+                        final PkDialog mDialog = new PkDialog(FavoriteAdd.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(Smessage);
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else
-                            {
-                                Alert(getResources().getString(R.string.alert_label_title), Smessage);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
+                        });
+                        mDialog.show();
+                    } else {
+                        Alert(getResources().getString(R.string.alert_label_title), Smessage);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FavoriteAdd.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("title", Et_name.getText().toString());
-                jsonParams.put("latitude", Slatitude);
-                jsonParams.put("longitude", Slongitude);
-                jsonParams.put("address", Tv_address.getText().toString());
-                jsonParams.put("location_key", SlocationKey);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        editRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        editRequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(editRequest);
+        });
     }
 
     //-----------------Move Back on pressed phone back button------------------

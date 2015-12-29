@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -13,28 +12,21 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 10/12/2015.
@@ -47,7 +39,7 @@ public class EmergencyContact extends ActivityHockeyApp {
     private EditText Et_name, Et_code, Et_phoneNo, Et_emailId;
     private RelativeLayout Rl_save;
     private RelativeLayout Rl_deleteContact;
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     private String UserID = "";
 
@@ -165,11 +157,11 @@ public class EmergencyContact extends ActivityHockeyApp {
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
 
-            if (isInternetPresent) {
-                displayContact_Request(Iconstant.emergencycontact_view_url);
-            } else {
-                Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
-            }
+        if (isInternetPresent) {
+            displayContact_Request(Iconstant.emergencycontact_view_url);
+        } else {
+            Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+        }
     }
 
     //--------------Close KeyBoard Method-----------
@@ -180,18 +172,17 @@ public class EmergencyContact extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(EmergencyContact.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(EmergencyContact.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     // validating Phone Number
@@ -209,7 +200,6 @@ public class EmergencyContact extends ActivityHockeyApp {
     }
 
 
-
     //-----------------------Display Emergency Contact Post Request-----------------
     private void displayContact_Request(String Url) {
         dialog = new Dialog(EmergencyContact.this);
@@ -224,77 +214,58 @@ public class EmergencyContact extends ActivityHockeyApp {
 
         System.out.println("-------------displayContact_Request Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
 
-                        System.out.println("-------------displayContact_Request Response----------------" + response);
+        mRequest = new ServiceRequest(EmergencyContact.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "", Smessage = "", Sname = "", Smobilnumber = "", Semail = "", Scountry_code = "";
-                        try {
+                System.out.println("-------------displayContact_Request Response----------------" + response);
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("response");
+                String Sstatus = "", Smessage = "", Sname = "", Smobilnumber = "", Semail = "", Scountry_code = "";
+                try {
 
-                            JSONObject jobject = object.getJSONObject("emergency_contact");
-                            Sname = jobject.getString("name");
-                            Smobilnumber = jobject.getString("mobile");
-                            Semail = jobject.getString("email");
-                            Scountry_code = jobject.getString("code");
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("response");
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                    JSONObject jobject = object.getJSONObject("emergency_contact");
+                    Sname = jobject.getString("name");
+                    Smobilnumber = jobject.getString("mobile");
+                    Semail = jobject.getString("email");
+                    Scountry_code = jobject.getString("code");
 
-                        if (Sstatus.equalsIgnoreCase("1")) {
-                            Et_name.setText(Sname);
-                            Et_emailId.setText(Semail);
-                            Et_code.setText(Scountry_code);
-                            Et_phoneNo.setText(Smobilnumber);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 
-                            if (Sname.length() == 0) {
-                                Rl_deleteContact.setVisibility(View.INVISIBLE);
-                            } else {
-                                Rl_deleteContact.setVisibility(View.VISIBLE);
-                            }
-                        } else {
-                            Rl_deleteContact.setVisibility(View.INVISIBLE);
-                            //Alert(getResources().getString(R.string.action_error), Smessage);
-                        }
+                if (Sstatus.equalsIgnoreCase("1")) {
+                    Et_name.setText(Sname);
+                    Et_emailId.setText(Semail);
+                    Et_code.setText(Scountry_code);
+                    Et_phoneNo.setText(Smobilnumber);
 
-                        dialog.dismiss();
+                    if (Sname.length() == 0) {
+                        Rl_deleteContact.setVisibility(View.INVISIBLE);
+                    } else {
+                        Rl_deleteContact.setVisibility(View.VISIBLE);
                     }
-                }, new Response.ErrorListener() {
+                } else {
+                    Rl_deleteContact.setVisibility(View.INVISIBLE);
+                    //Alert(getResources().getString(R.string.action_error), Smessage);
+                }
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(EmergencyContact.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -312,65 +283,46 @@ public class EmergencyContact extends ActivityHockeyApp {
 
         System.out.println("-------------updateContact Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("em_name", Et_name.getText().toString());
+        jsonParams.put("em_email", Et_emailId.getText().toString());
+        jsonParams.put("em_mobile_code", Et_code.getText().toString());
+        jsonParams.put("em_mobile", Et_phoneNo.getText().toString());
 
-                        System.out.println("-------------updateContact Response----------------" + response);
-                        String Sstatus = "", Smessage = "";
-                        try {
-
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("response");
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                        if (Sstatus.equalsIgnoreCase("1")) {
-                            Rl_deleteContact.setVisibility(View.VISIBLE);
-                            Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.emergencycontact_lable_saved_emergencycontacts));
-                        } else {
-                            Alert(getResources().getString(R.string.action_error), Smessage);
-                        }
-
-                        dialog.dismiss();
-                    }
-                }, new Response.ErrorListener() {
-
+        mRequest = new ServiceRequest(EmergencyContact.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------updateContact Response----------------" + response);
+                String Sstatus = "", Smessage = "";
+                try {
+
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("response");
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                if (Sstatus.equalsIgnoreCase("1")) {
+                    Rl_deleteContact.setVisibility(View.VISIBLE);
+                    Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.emergencycontact_lable_saved_emergencycontacts));
+                } else {
+                    Alert(getResources().getString(R.string.action_error), Smessage);
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(EmergencyContact.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("em_name", Et_name.getText().toString());
-                jsonParams.put("em_email", Et_emailId.getText().toString());
-                jsonParams.put("em_mobile_code", Et_code.getText().toString());
-                jsonParams.put("em_mobile", Et_phoneNo.getText().toString());
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -388,66 +340,47 @@ public class EmergencyContact extends ActivityHockeyApp {
 
         System.out.println("-------------deleteContact Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
 
-                        System.out.println("-------------deleteContact Response----------------" + response);
-                        String Sstatus = "", Smessage = "";
-                        try {
-
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("response");
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                        if (Sstatus.equalsIgnoreCase("1")) {
-                            Et_name.setText("");
-                            Et_emailId.setText("");
-                            Et_code.setText("");
-                            Et_phoneNo.setText("");
-                            Rl_deleteContact.setVisibility(View.INVISIBLE);
-
-                            Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.emergencycontact_lable_deletesuccess_textview));
-                        } else {
-                            Alert(getResources().getString(R.string.action_error), Smessage);
-                        }
-
-                        dialog.dismiss();
-                    }
-                }, new Response.ErrorListener() {
-
+        mRequest = new ServiceRequest(EmergencyContact.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------deleteContact Response----------------" + response);
+                String Sstatus = "", Smessage = "";
+                try {
+
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("response");
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                if (Sstatus.equalsIgnoreCase("1")) {
+                    Et_name.setText("");
+                    Et_emailId.setText("");
+                    Et_code.setText("");
+                    Et_phoneNo.setText("");
+                    Rl_deleteContact.setVisibility(View.INVISIBLE);
+
+                    Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.emergencycontact_lable_deletesuccess_textview));
+                } else {
+                    Alert(getResources().getString(R.string.action_error), Smessage);
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(EmergencyContact.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 

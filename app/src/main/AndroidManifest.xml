@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
 
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
@@ -318,6 +319,12 @@
 
         <activity
             android:name="com.cabily.app.FavoriteAdd"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+       <activity
+            android:name="com.cabily.app.UpdateUserLocation"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar_Theme"
             android:windowSoftInputMode="stateHidden|adjustPan"/>

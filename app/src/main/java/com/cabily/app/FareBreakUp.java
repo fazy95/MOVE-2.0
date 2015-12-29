@@ -7,23 +7,22 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
+import com.mylibrary.widgets.RoundedImageView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,21 +31,20 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/7/2015.
  */
-public class FareBreakUp extends ActivitySubClass
-{
-    private TextView Tv_totalAmount,Tv_duration,Tv_waiting,Tv_timeTravel;
+public class FareBreakUp extends ActivitySubClass {
+    private TextView Tv_baseFare, Tv_duration, Tv_waiting, Tv_timeTravel;
     private RelativeLayout Rl_payment;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
-    private String SrideId_intent="",ScurrencyCode="",StotalAmount="",Sduation="",SwaitingTime="",StravelDistance="";
+    private String SrideId_intent = "", ScurrencyCode = "", StotalAmount = "", Sduation = "", SwaitingTime = "", StravelDistance = "";
     Currency currencycode = null;
+    private RoundedImageView Im_DriverImage;
+    private TextView Tv_DriverName, Tv_SubTotal, Tv_TripTotal;
 
     public static FareBreakUp farebreakup_class;
 
@@ -54,15 +52,26 @@ public class FareBreakUp extends ActivitySubClass
     private EditText Et_tip_Amount;
     private Button Bt_tip_Apply;
     private RelativeLayout Rl_tip;
+    private TextView Tv_tip;
+    private LinearLayout Ll_TipAmount;
+    private LinearLayout Ll_RemoveTip;
+    private RelativeLayout Rl_TipMain;
+    private String sSelectedTipAmount = "";
+    private RatingBar Rb_driver;
+    private TextView Tv_serviceTax;
 
-    private StringRequest postrequest;
+    private String sDriverName = "", sDriverImage = "", sDriverRating = "", sDriverLat = "", sDriverLong = "",
+            sUserLat = "", sUserLong = "", sSubTotal = "", sServiceTax = "", sTotalPayment = "";
+
+    private ServiceRequest mRequest;
+    private CheckBox Cb_tip;
     Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.farebreak_up);
-        farebreakup_class=FareBreakUp.this;
+        farebreakup_class = FareBreakUp.this;
         initialize();
 
         Rl_payment.setOnClickListener(new View.OnClickListener() {
@@ -89,71 +98,124 @@ public class FareBreakUp extends ActivitySubClass
                 cd = new ConnectionDetector(FareBreakUp.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if(Et_tip_Amount.getText().toString().length()>0)
-                {
+                if (Et_tip_Amount.getText().toString().length() > 0) {
                     if (isInternetPresent) {
-                        if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_apply_label)))
-                        {
-                            postRequest_Tip(Iconstant.tip_add_url,"Apply");
-                        }
-                        else if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_remove_label)))
-                        {
-                            postRequest_Tip(Iconstant.tip_remove_url,"Remove");
-                        }
+                        postRequest_Tip(Iconstant.tip_add_url, "Apply");
                     } else {
                         Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                     }
-                }
-                else {
+                } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.my_rides_detail_tip_empty_label));
                 }
 
+            }
+        });
+
+
+        Ll_RemoveTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                cd = new ConnectionDetector(FareBreakUp.this);
+                isInternetPresent = cd.isConnectingToInternet();
+
+                if (isInternetPresent) {
+                    postRequest_Tip(Iconstant.tip_remove_url, "Remove");
+                } else {
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                }
+            }
+        });
+
+
+        Cb_tip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (((CheckBox) v).isChecked()) {
+                    Rl_tip.setVisibility(View.VISIBLE);
+                } else {
+                    Rl_tip.setVisibility(View.GONE);
+                }
             }
         });
     }
 
     private void initialize() {
 
-        Tv_totalAmount=(TextView)findViewById(R.id.fare_breakup_total_amount_textview);
-        Tv_duration=(TextView)findViewById(R.id.fare_breakup_duration_textview);
-        Tv_waiting=(TextView)findViewById(R.id.fare_breakup_waiting_textview);
-        Tv_timeTravel=(TextView)findViewById(R.id.fare_breakup_timetravel_textview);
-        Rl_payment=(RelativeLayout)findViewById(R.id.fare_breakup_payment_layout);
+        Tv_baseFare = (TextView) findViewById(R.id.fare_breakup_total_amount_textview);
+        Tv_duration = (TextView) findViewById(R.id.fare_breakup_duration_textview);
+        Tv_waiting = (TextView) findViewById(R.id.fare_breakup_waiting_textview);
+        Tv_timeTravel = (TextView) findViewById(R.id.fare_breakup_timetravel_textview);
+        Rl_payment = (RelativeLayout) findViewById(R.id.fare_breakup_payment_layout);
 
-        Et_tip_Amount =(EditText)findViewById(R.id.fare_breakup_tip_editText);
-        Bt_tip_Apply =(Button)findViewById(R.id.fare_breakup_tip_apply_button);
-        Rl_tip =(RelativeLayout)findViewById(R.id.fare_breakup_tip_layout);
+        Im_DriverImage = (RoundedImageView) findViewById(R.id.fare_breakup_imageview);
+        Tv_DriverName = (TextView) findViewById(R.id.fare_breakup_driver_name_textView);
+        Tv_SubTotal = (TextView) findViewById(R.id.fare_breakup_subtotal_textView);
+        Tv_TripTotal = (TextView) findViewById(R.id.fare_breakup_trip_total_textView);
 
-        Intent intent=getIntent();
-        SrideId_intent=intent.getStringExtra("RideID");
-        ScurrencyCode=intent.getStringExtra("CurrencyCode");
-        StotalAmount=intent.getStringExtra("TotalAmount");
-        StravelDistance=intent.getStringExtra("TravelDistance");
-        Sduation=intent.getStringExtra("Duation");
-        SwaitingTime=intent.getStringExtra("WaitingTime");
+        Et_tip_Amount = (EditText) findViewById(R.id.fare_breakup_tip_editText);
+        Bt_tip_Apply = (Button) findViewById(R.id.fare_breakup_tip_apply_button);
+        Rl_tip = (RelativeLayout) findViewById(R.id.fare_breakup_tip_layout);
+        Cb_tip = (CheckBox) findViewById(R.id.fare_breakup_tip_checkBox);
+
+        Tv_tip = (TextView) findViewById(R.id.fare_breakup_tip_amount_textView);
+        Ll_TipAmount = (LinearLayout) findViewById(R.id.fare_breakup_tip_amount_layout);
+        Ll_RemoveTip = (LinearLayout) findViewById(R.id.fare_breakup_tip_amount_remove_layout);
+        Rl_TipMain = (RelativeLayout) findViewById(R.id.fare_breakup_tip_top_layout);
+        Rb_driver =(RatingBar) findViewById(R.id.fare_breakup_driver_ratingBar);
+        Tv_serviceTax =(TextView) findViewById(R.id.fare_breakup_serviceTax_textView);
+
+        Intent intent = getIntent();
+        SrideId_intent = intent.getStringExtra("RideID");
+        ScurrencyCode = intent.getStringExtra("CurrencyCode");
+        StotalAmount = intent.getStringExtra("TotalAmount");
+        StravelDistance = intent.getStringExtra("TravelDistance");
+        Sduation = intent.getStringExtra("Duration");
+        SwaitingTime = intent.getStringExtra("WaitingTime");
+        sDriverName = intent.getStringExtra("DriverName");
+        sDriverImage = intent.getStringExtra("DriverImage");
+        sDriverRating = intent.getStringExtra("DriverRating");
+        sDriverLat = intent.getStringExtra("DriverLatitude");
+        sDriverLong = intent.getStringExtra("DriverLongitude");
+        sUserLat = intent.getStringExtra("UserLatitude");
+        sUserLong = intent.getStringExtra("UserLongitude");
+        sSubTotal = intent.getStringExtra("SubTotal");
+        sServiceTax = intent.getStringExtra("ServiceTax");
+        sTotalPayment = intent.getStringExtra("TotalPayment");
 
         currencycode = Currency.getInstance(getLocale(ScurrencyCode));
 
-        Tv_totalAmount.setText(currencycode.getSymbol()+StotalAmount);
+        Picasso.with(FareBreakUp.this).invalidate(sDriverImage);
+        Picasso.with(FareBreakUp.this).load(sDriverImage).into(Im_DriverImage);
+        Tv_DriverName.setText(sDriverName);
+        if(sDriverRating.length()>0)
+        {
+            Rb_driver.setRating(Float.parseFloat(sDriverRating));
+        }
+
+        Tv_baseFare.setText(currencycode.getSymbol() + StotalAmount);
         Tv_duration.setText(Sduation);
         Tv_waiting.setText(SwaitingTime);
         Tv_timeTravel.setText(StravelDistance);
+        Tv_SubTotal.setText(currencycode.getSymbol() + sSubTotal);
+        Tv_serviceTax.setText(currencycode.getSymbol() + sServiceTax);
+        Tv_TripTotal.setText(currencycode.getSymbol() + sTotalPayment);
+
     }
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FareBreakUp.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FareBreakUp.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //method to convert currency code to currency symbol
@@ -166,7 +228,6 @@ public class FareBreakUp extends ActivitySubClass
         }
         return null;
     }
-
 
 
     //-----------------------Tip Post Request-----------------
@@ -182,81 +243,59 @@ public class FareBreakUp extends ActivitySubClass
         dialog_title.setText(getResources().getString(R.string.action_pleasewait));
 
 
-        System.out.println("-------------tip Url----------------" + Url);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("ride_id", SrideId_intent);
+        if (tipStatus.equalsIgnoreCase("Apply")) {
+            jsonParams.put("tips_amount", Et_tip_Amount.getText().toString());
+        }
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        mRequest = new ServiceRequest(FareBreakUp.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        System.out.println("-------------tip Response----------------" + response);
-                        String Sstatus = "", Sresponse = "";
-                        try {
+                String sStatus = "", sResponse = "",sTipAmount="";
+                try {
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
+                    JSONObject object = new JSONObject(response);
+                    sStatus = object.getString("status");
+                    if (sStatus.equalsIgnoreCase("1")) {
 
-                                JSONObject response_Object=object.getJSONObject("response");
-                                Sresponse = response_Object.getString("msg");
-
-                                if(tipStatus.equalsIgnoreCase("Apply"))
-                                {
-                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_remove_label));
-                                    Bt_tip_Apply.setBackgroundColor(0xFFCC0000);
-                                    Et_tip_Amount.setEnabled(false);
-                                }
-                                else
-                                {
-                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_apply_label));
-                                    Bt_tip_Apply.setBackgroundColor(0xFF01A7CD);
-                                    Et_tip_Amount.setEnabled(true);
-                                    Et_tip_Amount.setText("");
-                                }
-                                Alert(getResources().getString(R.string.action_success), Sresponse);
-                            } else {
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        JSONObject response_Object = object.getJSONObject("response");
+                        sTipAmount = response_Object.getString("tips_amount");
+                        sTotalPayment = response_Object.getString("total");
+                        if (tipStatus.equalsIgnoreCase("Apply")) {
+                            sSelectedTipAmount = sTipAmount;
+                            Tv_tip.setText(currencycode.getSymbol() + sTipAmount);
+                            Tv_TripTotal.setText(currencycode.getSymbol() + sTotalPayment);
+                            Rl_TipMain.setVisibility(View.GONE);
+                            Rl_tip.setVisibility(View.GONE);
+                            Ll_TipAmount.setVisibility(View.VISIBLE);
+                        } else {
+                            Tv_TripTotal.setText(currencycode.getSymbol() + sTotalPayment);
+                            Cb_tip.setChecked(false);
+                            Et_tip_Amount.setText("");
+                            Rl_TipMain.setVisibility(View.VISIBLE);
+                            Ll_TipAmount.setVisibility(View.GONE);
                         }
 
-                        dialog.dismiss();
+                    } else {
+                         sResponse = object.getString("response");
+                         Alert(getResources().getString(R.string.alert_label_title), sResponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUp.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("ride_id", SrideId_intent);
-
-                if(tipStatus.equalsIgnoreCase("Apply"))
-                {
-                    jsonParams.put("tips_amount", Et_tip_Amount.getText().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                return jsonParams;
+
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+
+            @Override
+            public void onErrorListener() {
+                dialog.dismiss();
+            }
+        });
     }
 
 

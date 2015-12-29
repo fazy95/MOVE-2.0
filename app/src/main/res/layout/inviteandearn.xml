@@ -41,11 +41,18 @@
             android:textSize="18sp"/>
     </RelativeLayout>
 
+    <View
+        android:id="@+id/invite_earn_toolbar_shadow_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/invite_earn_layout_header"
+        android:background="@xml/toolbar_shadow"/>
+
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/invite_earn_layout_header"
+        android:layout_below="@+id/invite_earn_toolbar_shadow_layout"
         android:fillViewport="true">
 
         <RelativeLayout

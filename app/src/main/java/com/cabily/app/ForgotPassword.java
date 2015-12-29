@@ -15,26 +15,19 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/18/2015.
@@ -43,13 +36,13 @@ public class ForgotPassword extends ActivityHockeyApp {
     private RelativeLayout back;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
-    StringRequest postRequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
 
     private EditText Et_email;
     private Button Bt_submit;
 
-    String Sstatus = "", Smessage = "",Ssms_status="",SverificationCode="",SemailAddress="";
+    String Sstatus = "", Smessage = "", Ssms_status = "", SverificationCode = "", SemailAddress = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,18 +117,17 @@ public class ForgotPassword extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(ForgotPassword.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(ForgotPassword.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
 
@@ -153,10 +145,13 @@ public class ForgotPassword extends ActivityHockeyApp {
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_verifying));
 
-        postRequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("email", Et_email.getText().toString());
 
+        mRequest = new ServiceRequest(ForgotPassword.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Forgot Password reponse-------------------" + response);
 
@@ -173,25 +168,25 @@ public class ForgotPassword extends ActivityHockeyApp {
 
 
                     if (Sstatus.equalsIgnoreCase("1")) {
-                        final MaterialDialog dialog = new MaterialDialog(ForgotPassword.this);
-                        dialog.setTitle(getResources().getString(R.string.action_success))
-                                .setMessage(getResources().getString(R.string.forgot_password_email_label_success))
-                                .setPositiveButton(
-                                        "OK", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                Intent i = new Intent(ForgotPassword.this, ForgotPasswordOtp.class);
-                                                i.putExtra("Intent_Otp_Status",Ssms_status);
-                                                i.putExtra("Intent_verificationCode",SverificationCode);
-                                                i.putExtra("Intent_email",SemailAddress);
-                                                startActivity(i);
-                                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                finish();
-                                            }
-                                        }
-                                )
-                                .show();
+
+                        final PkDialog mDialog = new PkDialog(ForgotPassword.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.forgot_password_email_label_success));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                Intent i = new Intent(ForgotPassword.this, ForgotPasswordOtp.class);
+                                i.putExtra("Intent_Otp_Status", Ssms_status);
+                                i.putExtra("Intent_verificationCode", SverificationCode);
+                                i.putExtra("Intent_email", SemailAddress);
+                                startActivity(i);
+                                finish();
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            }
+                        });
+                        mDialog.show();
+                     
                     } else {
                         Alert(getResources().getString(R.string.action_error), Smessage);
                     }
@@ -205,36 +200,13 @@ public class ForgotPassword extends ActivityHockeyApp {
                 mgr.hideSoftInputFromWindow(Et_email.getWindowToken(), 0);
 
                 dialog.dismiss();
-
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ForgotPassword.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("email", Et_email.getText().toString());
-                return jsonParams;
-            }
-
-        };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postRequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postRequest);
+        });
     }
 
     //-----------------Move Back on pressed phone back button------------------

@@ -1,8 +1,6 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -12,24 +10,17 @@ import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.cabily.HockeyApp.ActivityHockeyApp;
-import com.cabily.adapter.MyRideCancelTripAdapter;
 import com.cabily.adapter.MyRidePaymentListAdapter;
 import com.cabily.iconstant.Iconstant;
-import com.cabily.pojo.CancelTripPojo;
 import com.cabily.pojo.PaymentListPojo;
+import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,28 +31,26 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/2/2015.
  */
-public class MyRidePaymentList extends ActivityHockeyApp {
+public class MyRidePaymentList extends ActivitySubClass {
     private RelativeLayout back;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private SessionManager session;
     private String UserID = "";
 
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     ArrayList<PaymentListPojo> itemlist;
     MyRidePaymentListAdapter adapter;
     private ExpandableHeightListView listview;
     private String SrideId_intent = "";
-    private boolean isPaymentAvailable=false;
-    private String SpaymentCode="";
+    private boolean isPaymentAvailable = false;
+    private String SpaymentCode = "";
 
     public static MyRidePaymentList myride_paymentList_class;
 
@@ -69,7 +58,7 @@ public class MyRidePaymentList extends ActivityHockeyApp {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myride_payment_list);
-        myride_paymentList_class=MyRidePaymentList.this;
+        myride_paymentList_class = MyRidePaymentList.this;
         initialize();
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +85,7 @@ public class MyRidePaymentList extends ActivityHockeyApp {
                         MakePayment_Stripe(Iconstant.makepayment_autoDetect_url);
                     } else {
                         MakePayment_WebView_MobileID(Iconstant.makepayment_Get_webview_mobileId_url);
-                        SpaymentCode=itemlist.get(position).getPaymentCode();
+                        SpaymentCode = itemlist.get(position).getPaymentCode();
                     }
                 } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
@@ -110,7 +99,7 @@ public class MyRidePaymentList extends ActivityHockeyApp {
         session = new SessionManager(MyRidePaymentList.this);
         cd = new ConnectionDetector(MyRidePaymentList.this);
         isInternetPresent = cd.isConnectingToInternet();
-        itemlist =new ArrayList<PaymentListPojo>();
+        itemlist = new ArrayList<PaymentListPojo>();
 
         back = (RelativeLayout) findViewById(R.id.my_rides_payment_header_back_layout);
         listview = (ExpandableHeightListView) findViewById(R.id.my_rides_payment_listView);
@@ -124,25 +113,24 @@ public class MyRidePaymentList extends ActivityHockeyApp {
 
         if (isInternetPresent) {
             postRequest_PaymentList(Iconstant.paymentList_url);
-        }else {
+        } else {
             Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
         }
     }
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(MyRidePaymentList.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //method to convert currency code to currency symbol
@@ -158,8 +146,7 @@ public class MyRidePaymentList extends ActivityHockeyApp {
 
 
     //-----------------------PaymentList Post Request-----------------
-    private void postRequest_PaymentList(String Url)
-    {
+    private void postRequest_PaymentList(String Url) {
         dialog = new Dialog(MyRidePaymentList.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -167,97 +154,71 @@ public class MyRidePaymentList extends ActivityHockeyApp {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_pleasewait));
 
 
         System.out.println("-------------PaymentList Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        System.out.println("-------------PaymentList Response----------------"+response);
+        mRequest = new ServiceRequest(MyRidePaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONArray payment_array = response_object.getJSONArray("payment");
-                                    if (payment_array.length() > 0) {
-                                        itemlist.clear();
-                                        for(int i=0;i<payment_array.length();i++)
-                                        {
-                                            JSONObject reason_object = payment_array.getJSONObject(i);
-                                            PaymentListPojo pojo=new PaymentListPojo();
-                                            pojo.setPaymentName(reason_object.getString("name"));
-                                            pojo.setPaymentCode(reason_object.getString("code"));
+                System.out.println("-------------PaymentList Response----------------" + response);
 
-                                            itemlist.add(pojo);
-                                        }
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            JSONArray payment_array = response_object.getJSONArray("payment");
+                            if (payment_array.length() > 0) {
+                                itemlist.clear();
+                                for (int i = 0; i < payment_array.length(); i++) {
+                                    JSONObject reason_object = payment_array.getJSONObject(i);
+                                    PaymentListPojo pojo = new PaymentListPojo();
+                                    pojo.setPaymentName(reason_object.getString("name"));
+                                    pojo.setPaymentCode(reason_object.getString("code"));
 
-                                        isPaymentAvailable=true;
-                                    }
-                                    else
-                                    {
-                                        isPaymentAvailable=false;
-                                    }
+                                    itemlist.add(pojo);
                                 }
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
 
-                            if(Sstatus.equalsIgnoreCase("1") && isPaymentAvailable)
-                            {
-                                adapter = new MyRidePaymentListAdapter(MyRidePaymentList.this, itemlist);
-                                listview.setAdapter(adapter);
-                                listview.setExpanded(true);
+                                isPaymentAvailable = true;
+                            } else {
+                                isPaymentAvailable = false;
                             }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                    if (Sstatus.equalsIgnoreCase("1") && isPaymentAvailable) {
+                        adapter = new MyRidePaymentListAdapter(MyRidePaymentList.this, itemlist);
+                        listview.setAdapter(adapter);
+                        listview.setExpanded(true);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidePaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
 
 
     //-----------------------MakePayment Cash Post Request-----------------
@@ -274,85 +235,58 @@ public class MyRidePaymentList extends ActivityHockeyApp {
 
 
         System.out.println("-------------MakePayment Cash Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        System.out.println("-------------MakePayment Cash Response----------------" + response);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
+        mRequest = new ServiceRequest(MyRidePaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                                View view = View.inflate(MyRidePaymentList.this, R.layout.material_alert_dialog, null);
-                                final MaterialDialog mdialog = new MaterialDialog(MyRidePaymentList.this);
-                                mdialog.setContentView(view)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        mdialog.dismiss();
-                                                        finish();
-                                                        MyRidesDetail.myrideDetail_class.finish();
-                                                        MyRides.myride_class.finish();
-                                                        onBackPressed();
-                                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                                TextView alert_title=(TextView)view.findViewById(R.id.material_alert_message_label);
-                                TextView alert_message=(TextView)view.findViewById(R.id.material_alert_message_textview);
-                                alert_title.setText(getResources().getString(R.string.my_rides_payment_cash_success));
-                                alert_message.setText(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
+                System.out.println("-------------MakePayment Cash Response----------------" + response);
 
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+
+                        final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                MyRidesDetail.myrideDetail_class.finish();
+                                MyRides.myride_class.finish();
+                                onBackPressed();
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
+                        });
+                        mDialog.show();
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidePaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
-
-
 
 
     //-----------------------MakePayment Wallet Post Request-----------------
@@ -369,134 +303,94 @@ public class MyRidePaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment Wallet Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        System.out.println("-------------MakePayment Wallet Response----------------" + response);
+        mRequest = new ServiceRequest(MyRidePaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "",Scurrency_code="",Scurrent_wallet_balance="";
-                        Currency currencycode = null;
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("0")) {
+                System.out.println("-------------MakePayment Wallet Response----------------" + response);
 
-                                final MaterialDialog dialog = new MaterialDialog(MyRidePaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.my_rides_payment_empty_wallet_sorry))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_empty_wallet))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                String Sstatus = "", Scurrency_code = "", Scurrent_wallet_balance = "";
+                Currency currencycode = null;
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("0")) {
+                        Alert(getResources().getString(R.string.my_rides_payment_empty_wallet_sorry), getResources().getString(R.string.my_rides_payment_empty_wallet));
+                    } else if (Sstatus.equalsIgnoreCase("1")) {
+
+                        //Updating wallet amount on Navigation Drawer Slide
+                        Scurrency_code = object.getString("currency");
+                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        Scurrent_wallet_balance = object.getString("wallet_amount");
+
+                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        NavigationDrawer.navigationNotifyChange();
+
+                        final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_wallet_success));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                MyRidesDetail.myrideDetail_class.finish();
+                                MyRides.myride_class.finish();
+                                Intent intent = new Intent(MyRidePaymentList.this, MyRideRating.class);
+                                intent.putExtra("RideID", SrideId_intent);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else if(Sstatus.equalsIgnoreCase("1"))
-                            {
+                        });
+                        mDialog.show();
 
-                                //Updating wallet amount on Navigation Drawer Slide
-                                Scurrency_code = object.getString("currency");
-                                currencycode = Currency.getInstance(getLocale(Scurrency_code));
-                                Scurrent_wallet_balance = object.getString("wallet_amount");
+                    } else if (Sstatus.equalsIgnoreCase("2")) {
+                        //Updating wallet amount on Navigation Drawer Slide
+                        Scurrency_code = object.getString("currency");
+                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        Scurrent_wallet_balance = object.getString("wallet_amount");
 
-                                session.createWalletAmount(currencycode.getSymbol()+Scurrent_wallet_balance);
-                                NavigationDrawer.navigationNotifyChange();
+                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        NavigationDrawer.navigationNotifyChange();
 
-                                final MaterialDialog dialog = new MaterialDialog(MyRidePaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_wallet_success))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        finish();
-                                                        MyRidesDetail.myrideDetail_class.finish();
-                                                        MyRides.myride_class.finish();
-                                                        Intent intent=new Intent(MyRidePaymentList.this,MyRideRating.class);
-                                                        intent.putExtra("RideID",SrideId_intent);
-                                                        startActivity(intent);
-                                                        overridePendingTransition(R.anim.enter,R.anim.exit);
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction("com.package.ACTION_CLASS_REFRESH");
+                        sendBroadcast(broadcastIntent);
+
+                        final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                postRequest_PaymentList(Iconstant.paymentList_url);
                             }
-                            else if(Sstatus.equalsIgnoreCase("2"))
-                            {
-                                //Updating wallet amount on Navigation Drawer Slide
-                                Scurrency_code = object.getString("currency");
-                                currencycode = Currency.getInstance(getLocale(Scurrency_code));
-                                Scurrent_wallet_balance = object.getString("wallet_amount");
-
-                                session.createWalletAmount(currencycode.getSymbol()+Scurrent_wallet_balance);
-                                NavigationDrawer.navigationNotifyChange();
-
-                                Intent broadcastIntent = new Intent();
-                                broadcastIntent.setAction("com.package.ACTION_CLASS_REFRESH");
-                                sendBroadcast(broadcastIntent);
-
-                                final MaterialDialog dialog = new MaterialDialog(MyRidePaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.my_rides_payment_cash_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        postRequest_PaymentList(Iconstant.paymentList_url);
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                            }
-                            else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        });
+                        mDialog.show();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidePaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
 
 
     //-----------------------MakePayment Auto-Detect Post Request-----------------
@@ -513,83 +407,59 @@ public class MyRidePaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment Auto-Detect Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        System.out.println("-------------MakePayment Auto-Detect Response----------------" + response);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                final MaterialDialog dialog = new MaterialDialog(MyRidePaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_cash_success))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        finish();
-                                                        MyRidesDetail.myrideDetail_class.finish();
-                                                        MyRides.myride_class.finish();
-                                                        Intent intent=new Intent(MyRidePaymentList.this,MyRideRating.class);
-                                                        intent.putExtra("RideID",SrideId_intent);
-                                                        startActivity(intent);
-                                                        overridePendingTransition(R.anim.enter, R.anim.exit);
-                                                    }
-                                                }
-                                        )
-                                        .show();
+        mRequest = new ServiceRequest(MyRidePaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------MakePayment Auto-Detect Response----------------" + response);
+
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+
+                        final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                MyRidesDetail.myrideDetail_class.finish();
+                                MyRides.myride_class.finish();
+                                Intent intent = new Intent(MyRidePaymentList.this, MyRideRating.class);
+                                intent.putExtra("RideID", SrideId_intent);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        });
+                        mDialog.show();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidePaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
-
-
 
 
     //-----------------------MakePayment WebView-MobileID Post Request-----------------
@@ -606,67 +476,48 @@ public class MyRidePaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment WebView-MobileID Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        System.out.println("-------------MakePayment WebView-MobileID Response----------------" + response);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
+        jsonParams.put("gateway", SpaymentCode);
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                String mobileId=object.getString("mobile_id");
-                                Intent intent=new Intent(MyRidePaymentList.this,MyRidePaymentWebView.class);
-                                intent.putExtra("MobileID",mobileId);
-                                intent.putExtra("RideID",SrideId_intent);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.enter, R.anim.exit);
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
+        mRequest = new ServiceRequest(MyRidePaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                System.out.println("-------------MakePayment WebView-MobileID Response----------------" + response);
+
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        String mobileId = object.getString("mobile_id");
+                        Intent intent = new Intent(MyRidePaymentList.this, MyRidePaymentWebView.class);
+                        intent.putExtra("MobileID", mobileId);
+                        intent.putExtra("RideID", SrideId_intent);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.enter, R.anim.exit);
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidePaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                jsonParams.put("gateway", SpaymentCode);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
+
     }
 
 

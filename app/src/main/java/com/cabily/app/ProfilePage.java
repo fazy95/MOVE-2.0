@@ -16,12 +16,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.FragmentActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
@@ -29,17 +24,15 @@ import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.countrycodepicker.CountryPicker;
 import com.countrycodepicker.CountryPickerListener;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar on 10/7/2015.
@@ -57,8 +50,8 @@ public class ProfilePage extends FragmentActivityHockeyApp {
     private static EditText Et_mobileno;
     private static RelativeLayout Rl_country_code;
     private static TextView Tv_countryCode;
-    private String UserID = "", UserName = "", UserMobileno = "",UserCountyCode = "", UserEmail = "";
-    private StringRequest postrequest;
+    private String UserID = "", UserName = "", UserMobileno = "", UserCountyCode = "", UserEmail = "";
+    private ServiceRequest mRequest;
     Dialog dialog;
     CountryPicker picker;
 
@@ -88,37 +81,27 @@ public class ProfilePage extends FragmentActivityHockeyApp {
                 cd = new ConnectionDetector(ProfilePage.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if(isInternetPresent)
-                {
-                    View view = View.inflate(ProfilePage.this, R.layout.material_alert_dialog, null);
-                    final MaterialDialog mdialog = new MaterialDialog(ProfilePage.this);
-                    mdialog.setContentView(view)
-                            .setPositiveButton(
-                                    getResources().getString(R.string.profile_lable_logout_yes), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            mdialog.dismiss();
-                                            postRequest_Logout(Iconstant.logout_url);
-                                        }
-                                    }
-                            )
-                            .setNegativeButton(
-                                    getResources().getString(R.string.profile_lable_logout_no), new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            mdialog.dismiss();
-                                        }
-                                    }
-                            )
-                            .show();
+                if (isInternetPresent) {
 
-                    TextView alert_title=(TextView)view.findViewById(R.id.material_alert_message_label);
-                    TextView alert_message=(TextView)view.findViewById(R.id.material_alert_message_textview);
-                    alert_title.setText(getResources().getString(R.string.profile_lable_logout_title));
-                    alert_message.setText(getResources().getString(R.string.profile_lable_logout_message));
-                }
-                else
-                {
+                    final PkDialog mDialog = new PkDialog(ProfilePage.this);
+                    mDialog.setDialogTitle(getResources().getString(R.string.profile_lable_logout_title));
+                    mDialog.setDialogMessage(getResources().getString(R.string.profile_lable_logout_message));
+                    mDialog.setPositiveButton(getResources().getString(R.string.profile_lable_logout_yes), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mDialog.dismiss();
+                            postRequest_Logout(Iconstant.logout_url);
+                        }
+                    });
+                    mDialog.setNegativeButton(getResources().getString(R.string.profile_lable_logout_no), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mDialog.dismiss();
+                        }
+                    });
+                    mDialog.show();
+
+                } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                 }
             }
@@ -138,8 +121,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
 
-                if (actionId == EditorInfo.IME_ACTION_SEND)
-                {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
                     cd = new ConnectionDetector(ProfilePage.this);
                     isInternetPresent = cd.isConnectingToInternet();
                     CloseKeyboard(Et_name);
@@ -192,8 +174,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEND )
-                {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
                     cd = new ConnectionDetector(ProfilePage.this);
                     isInternetPresent = cd.isConnectingToInternet();
                     CloseKeyboard(Et_name);
@@ -217,8 +198,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
 
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         session = new SessionManager(ProfilePage.this);
         picker = CountryPicker.newInstance("Select Country");
 
@@ -229,7 +209,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
         Et_mobileno = (EditText) findViewById(R.id.myprofile_edit_phoneno_editText);
         Et_name = (EditText) findViewById(R.id.myprofile_username_editText);
         layout_changePassword = (RelativeLayout) findViewById(R.id.myprofile_changepassword_layout);
-        logout= (Button) findViewById(R.id.myprofile_logout_button);
+        logout = (Button) findViewById(R.id.myprofile_logout_button);
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
@@ -253,28 +233,25 @@ public class ProfilePage extends FragmentActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(ProfilePage.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(ProfilePage.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     // validating Phone Number
-    public static final boolean isValidPhoneNumber(CharSequence target)
-    {
-        if (target == null || TextUtils.isEmpty(target) || target.length()<=9) {
+    public static final boolean isValidPhoneNumber(CharSequence target) {
+        if (target == null || TextUtils.isEmpty(target) || target.length() <= 9) {
             return false;
-        }
-        else
-        {
+        } else {
             return android.util.Patterns.PHONE.matcher(target).matches();
         }
     }
@@ -299,7 +276,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
     }
 
     //--------------Update Mobile Number From Profile OTP Page Method-----------
-    public static void updateMobileDialog(String code,String phone) {
+    public static void updateMobileDialog(String code, String phone) {
         Et_mobileno.setText(phone);
         Tv_countryCode.setText(code.replace("+", ""));
     }
@@ -307,10 +284,16 @@ public class ProfilePage extends FragmentActivityHockeyApp {
     //-----------------------Edit UserName Request-----------------
     private void postRequest_editUserName(String Url) {
         showDialog(getResources().getString(R.string.action_updating));
-        System.out.println("---------------Edit Username Url-----------------"+Url);
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        System.out.println("---------------Edit Username Url-----------------" + Url);
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("user_name", Et_name.getText().toString());
+
+        mRequest = new ServiceRequest(ProfilePage.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("---------------Edit Username Response-----------------" + response);
                 String Sstatus = "", Smessage = "";
@@ -330,71 +313,42 @@ public class ProfilePage extends FragmentActivityHockeyApp {
                     session.setUserNameUpdate(Et_name.getText().toString());
                     Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.profile_lable_username_success));
                 } else {
-                    final MaterialDialog alertDialog = new MaterialDialog(ProfilePage.this);
-                    alertDialog.setTitle(getResources().getString(R.string.action_error));
-                    alertDialog
-                            .setMessage(Smessage)
-                            .setCanceledOnTouchOutside(false)
-                            .setPositiveButton(
-                                    "OK", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dismiss();
-                                        }
-                                    }
-                            ).show();
+                    Alert(getResources().getString(R.string.action_error), Smessage);
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
+            @Override
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ProfilePage.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("user_name", Et_name.getText().toString());
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
-
 
 
     //-----------------------Edit MobileNumber Request-----------------
     private void postRequest_editMobileNumber(String Url) {
         showDialog(getResources().getString(R.string.action_updating));
-        System.out.println("---------------Edit MobileNumber Url-----------------"+Url);
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        System.out.println("---------------Edit MobileNumber Url-----------------" + Url);
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("country_code", "+" + Tv_countryCode.getText().toString());
+        jsonParams.put("phone_number", Et_mobileno.getText().toString());
+        jsonParams.put("otp", "");
+
+        mRequest = new ServiceRequest(ProfilePage.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("---------------Edit MobileNumber Response-----------------" + response);
-                String Sstatus = "", Smessage = "",Sotp="",Sotp_status="",Scountry_code="",Sphone_number="";
+                String Sstatus = "", Smessage = "", Sotp = "", Sotp_status = "", Scountry_code = "", Sphone_number = "";
                 try {
 
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     Smessage = object.getString("response");
-                    if(Sstatus.equalsIgnoreCase("1"))
-                    {
+                    if (Sstatus.equalsIgnoreCase("1")) {
                         Sotp = object.getString("otp");
                         Sotp_status = object.getString("otp_status");
                         Scountry_code = object.getString("country_code");
@@ -406,78 +360,41 @@ public class ProfilePage extends FragmentActivityHockeyApp {
                 }
 
                 dialog.dismiss();
-                if (Sstatus.equalsIgnoreCase("1"))
-                {
-                    Intent intent=new Intent(ProfilePage.this,ProfileOtpPage.class);
-                    intent.putExtra("Otp",Sotp);
-                    intent.putExtra("Otp_Status",Sotp_status);
-                    intent.putExtra("CountryCode",Scountry_code);
-                    intent.putExtra("Phone",Sphone_number);
-                    intent.putExtra("UserID",UserID);
+                if (Sstatus.equalsIgnoreCase("1")) {
+                    Intent intent = new Intent(ProfilePage.this, ProfileOtpPage.class);
+                    intent.putExtra("Otp", Sotp);
+                    intent.putExtra("Otp_Status", Sotp_status);
+                    intent.putExtra("CountryCode", Scountry_code);
+                    intent.putExtra("Phone", Sphone_number);
+                    intent.putExtra("UserID", UserID);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                }
-                else
-                {
-                    final MaterialDialog alertDialog = new MaterialDialog(ProfilePage.this);
-                    alertDialog.setTitle(getResources().getString(R.string.action_error));
-                    alertDialog
-                            .setMessage(Smessage)
-                            .setCanceledOnTouchOutside(false)
-                            .setPositiveButton(
-                                    "OK", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dismiss();
-                                        }
-                                    }
-                            ).show();
+                } else {
+                    Alert(getResources().getString(R.string.action_error), Smessage);
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
+            @Override
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ProfilePage.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                System.out.println("--------country_code-------------"+"+"+Tv_countryCode.getText().toString());
-
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("country_code", "+"+Tv_countryCode.getText().toString());
-                jsonParams.put("phone_number", Et_mobileno.getText().toString());
-                jsonParams.put("otp", "");
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
 
 
     //-----------------------Logout Request-----------------
     private void postRequest_Logout(String Url) {
         showDialog(getResources().getString(R.string.action_logging_out));
-        System.out.println("---------------LogOut Url-----------------"+Url);
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        System.out.println("---------------LogOut Url-----------------" + Url);
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("device", "ANDROID");
+
+        mRequest = new ServiceRequest(ProfilePage.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("---------------LogOut Response-----------------" + response);
                 String Sstatus = "", Sresponse = "";
@@ -491,8 +408,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
                 }
 
                 dialog.dismiss();
-                if (Sstatus.equalsIgnoreCase("1"))
-                {
+                if (Sstatus.equalsIgnoreCase("1")) {
                     session.logoutUser();
                     Intent local = new Intent();
                     local.setAction("com.app.logout");
@@ -501,51 +417,16 @@ public class ProfilePage extends FragmentActivityHockeyApp {
                     onBackPressed();
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
-                }
-                else
-                {
-                    final MaterialDialog alertDialog = new MaterialDialog(ProfilePage.this);
-                    alertDialog.setTitle(getResources().getString(R.string.action_error));
-                    alertDialog
-                            .setMessage(Sresponse)
-                            .setCanceledOnTouchOutside(false)
-                            .setPositiveButton(
-                                    "OK", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dismiss();
-                                        }
-                                    }
-                            ).show();
+                } else {
+                    Alert(getResources().getString(R.string.action_error), Sresponse);
                 }
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ProfilePage.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("device", "ANDROID");
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
     //-----------------Move Back on pressed phone back button------------------

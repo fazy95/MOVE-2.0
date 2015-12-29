@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.text.style.ForegroundColorSpan;
@@ -29,20 +30,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.pushnotification.GCMInitializer;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONException;
@@ -52,9 +48,6 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-
-import me.drakeet.materialdialog.MaterialDialog;
 
 public class LoginPage extends ActivityHockeyApp {
     private RelativeLayout back;
@@ -66,7 +59,7 @@ public class LoginPage extends ActivityHockeyApp {
     private ConnectionDetector cd;
     private Context context;
 
-    StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     private SessionManager session;
     Handler mHandler;
@@ -106,6 +99,8 @@ public class LoginPage extends ActivityHockeyApp {
 
                 if (username.getText().toString().length() == 0) {
                     erroredit(username, getResources().getString(R.string.login_label_alert_username));
+                } else if (!isValidEmail(username.getText().toString())) {
+                    erroredit(username, getResources().getString(R.string.login_label_alert_email_invalid));
                 } else if (password.getText().toString().length() == 0) {
                     erroredit(password, getResources().getString(R.string.login_label_alert_password));
                 } else {
@@ -134,7 +129,7 @@ public class LoginPage extends ActivityHockeyApp {
                         initializer.init();
 
                     } else {
-                        Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                        Alert(getResources().getString(R.string.alert_nointernet), getResources().getString(R.string.alert_nointernet_message));
                     }
                 }
             }
@@ -183,25 +178,30 @@ public class LoginPage extends ActivityHockeyApp {
     }
 
 
+    //-------------------------code to Check Email Validation-----------------------
+    public final static boolean isValidEmail(CharSequence target) {
+        return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
+
+
     private void CloseKeyboard(EditText edittext) {
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(edittext.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     //--------------Alert Method-----------
-    private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(LoginPage.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+    private void Alert(String title, String alert)
+    {
+        final PkDialog mDialog = new PkDialog(LoginPage.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //----------------------Code for TextWatcher-------------------------
@@ -267,9 +267,16 @@ public class LoginPage extends ActivityHockeyApp {
 
     private void PostRequest(final String Url) {
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("email", username.getText().toString());
+        jsonParams.put("password", password.getText().toString());
+        jsonParams.put("gcm_id", GCM_Id);
+
+        mRequest = new ServiceRequest(LoginPage.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Login reponse-------------------" + response);
 
@@ -308,24 +315,12 @@ public class LoginPage extends ActivityHockeyApp {
                     //starting XMPP service
                     ChatService.startUserAction(LoginPage.this);
                     SingUpAndSignIn.activty.finish();
-                    Intent intent = new Intent(context, NavigationDrawer.class);
+                    Intent intent = new Intent(context, UpdateUserLocation.class);
                     startActivity(intent);
-                    overridePendingTransition(R.anim.enter, R.anim.exit);
                     finish();
+                    overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                 } else {
-                    final MaterialDialog alertDialog = new MaterialDialog(LoginPage.this);
-                    alertDialog.setTitle("Error");
-                    alertDialog
-                            .setMessage(Smessage)
-                            .setCanceledOnTouchOutside(false)
-                            .setPositiveButton(
-                                    "OK", new OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dismiss();
-                                        }
-                                    }
-                            ).show();
+                    Alert(getResources().getString(R.string.login_label_alert_signIn_failed), Smessage);
                 }
 
                 // close keyboard
@@ -333,43 +328,13 @@ public class LoginPage extends ActivityHockeyApp {
                 mgr.hideSoftInputFromWindow(username.getWindowToken(), 0);
                 dialog.dismiss();
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(LoginPage.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                System.out.println("--------------Login url-------------------" + Url);
-                System.out.println("--------------Login email-------------------" + username.getText().toString());
-                System.out.println("--------------Login password-------------------" + password.getText().toString());
-                System.out.println("--------------Login gcm_id-------------------" + GCM_Id);
-
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("email", username.getText().toString());
-                jsonParams.put("password", password.getText().toString());
-                jsonParams.put("gcm_id", GCM_Id);
-                return jsonParams;
-            }
-
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
 
 
     //-----------------Move Back on pressed phone back button------------------

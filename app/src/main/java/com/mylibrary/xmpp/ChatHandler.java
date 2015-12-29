@@ -54,7 +54,6 @@ public class ChatHandler {
                 else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_Key))
                 {
                     requestPayment(messageObject);
-                    System.out.println("-----------payment request---------------"+messageObject);
                 }
                 else if (action.equalsIgnoreCase(Iconstant.PushNotification_PaymentPaid_Key))
                 {
@@ -139,10 +138,21 @@ public class ChatHandler {
         i1.putExtra("CurrencyCode", messageObject.getString(Iconstant.CurrencyCode_Request_Payment));
         i1.putExtra("TotalAmount", messageObject.getString(Iconstant.TotalAmount_Request_Payment));
         i1.putExtra("TravelDistance", messageObject.getString(Iconstant.TravelDistance_Request_Payment));
-        i1.putExtra("Duation", messageObject.getString(Iconstant.Duration_Request_Payment));
+        i1.putExtra("Duration", messageObject.getString(Iconstant.Duration_Request_Payment));
         i1.putExtra("WaitingTime", messageObject.getString(Iconstant.WaitingTime_Request_Payment));
         i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Request_Payment));
         i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Request_Payment));
+        i1.putExtra("DriverName", messageObject.getString(Iconstant.DriverName_Request_Payment));
+        i1.putExtra("DriverImage", messageObject.getString(Iconstant.DriverImage_Request_Payment));
+        i1.putExtra("DriverRating", messageObject.getString(Iconstant.DriverRating_Request_Payment));
+        i1.putExtra("DriverLatitude", messageObject.getString(Iconstant.Driver_Latitude_Request_Payment));
+        i1.putExtra("DriverLongitude", messageObject.getString(Iconstant.Driver_Longitude_Request_Payment));
+        i1.putExtra("UserName", messageObject.getString(Iconstant.UserName_Request_Payment));
+        i1.putExtra("UserLatitude", messageObject.getString(Iconstant.User_Latitude_Request_Payment));
+        i1.putExtra("UserLongitude", messageObject.getString(Iconstant.User_Longitude_Request_Payment));
+        i1.putExtra("SubTotal", messageObject.getString(Iconstant.subTotal_Request_Payment));
+        i1.putExtra("ServiceTax", messageObject.getString(Iconstant.serviceTax_Request_Payment));
+        i1.putExtra("TotalPayment", messageObject.getString(Iconstant.Total_Request_Payment));
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);
     }
@@ -150,6 +160,15 @@ public class ChatHandler {
     private void paymentPaid(JSONObject messageObject) throws Exception
     {
         refreshMethod();
+
+        Intent finish_fareBreakUp = new Intent();
+        finish_fareBreakUp.setAction("com.pushnotification.finish.FareBreakUpPaymentList");
+        context.sendBroadcast(finish_fareBreakUp);
+
+        Intent finish_MyRidePaymentList = new Intent();
+        finish_fareBreakUp.setAction("com.pushnotification.finish.MyRidePaymentList");
+        context.sendBroadcast(finish_MyRidePaymentList);
+
         Intent i1=new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Payment_paid));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Payment_paid));

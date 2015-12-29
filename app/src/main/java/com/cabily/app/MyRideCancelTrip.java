@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +11,7 @@ import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.adapter.MyRideCancelTripAdapter;
 import com.cabily.iconstant.Iconstant;
@@ -26,17 +20,15 @@ import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/2/2015.
@@ -49,7 +41,7 @@ public class MyRideCancelTrip extends ActivityHockeyApp {
     private SessionManager session;
     private String UserID = "";
 
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     ArrayList<CancelTripPojo> itemlist;
     MyRideCancelTripAdapter adapter;
@@ -115,21 +107,20 @@ public class MyRideCancelTrip extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(MyRideCancelTrip.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(MyRideCancelTrip.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
-    //-----------------------Cancel Myride Post Request-----------------
+    //-----------------------Cancel MyRide Post Request-----------------
     private void cancel_MyRide(String Url, final String reasonId) {
         dialog = new Dialog(MyRideCancelTrip.this);
         dialog.getWindow();
@@ -142,88 +133,68 @@ public class MyRideCancelTrip extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.my_rides_cancel_trip_action_cancel));
 
 
-        System.out.println("-------------Cancel Myride Url----------------" + Url);
+        System.out.println("-------------Cancel MyRide Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
+        jsonParams.put("reason", reasonId);
 
-                        System.out.println("-------------Cancel Myride Response----------------" + response);
+        mRequest = new ServiceRequest(MyRideCancelTrip.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
+                System.out.println("-------------Cancel MyRide Response----------------" + response);
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    String message = response_object.getString("message");
-                                    final MaterialDialog dialog = new MaterialDialog(MyRideCancelTrip.this);
-                                    dialog.setTitle(getResources().getString(R.string.action_success))
-                                            .setMessage(message)
-                                            .setPositiveButton(
-                                                    "OK", new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View v) {
-                                                            dialog.dismiss();
-                                                            finish();
+                String Sstatus = "";
 
-                                                            Intent broadcastIntent = new Intent();
-                                                            broadcastIntent.setAction("com.pushnotification.updateBottom_view");
-                                                            sendBroadcast(broadcastIntent);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            String message = response_object.getString("message");
 
-                                                            MyRidesDetail.myrideDetail_class.finish();
-                                                            MyRides.myride_class.finish();
-                                                            onBackPressed();
-                                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                        }
-                                                    }
-                                            )
-                                            .show();
+                            final PkDialog mDialog = new PkDialog(MyRideCancelTrip.this);
+                            mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                            mDialog.setDialogMessage(message);
+                            mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDialog.dismiss();
+                                    finish();
+
+                                    Intent broadcastIntent = new Intent();
+                                    broadcastIntent.setAction("com.pushnotification.updateBottom_view");
+                                    sendBroadcast(broadcastIntent);
+
+                                    MyRidesDetail.myrideDetail_class.finish();
+                                    MyRides.myride_class.finish();
+                                    onBackPressed();
+                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 }
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            });
+                            mDialog.show();
                         }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRideCancelTrip.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                jsonParams.put("reason", reasonId);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
     //-----------------Move Back on pressed phone back button------------------

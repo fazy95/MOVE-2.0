@@ -22,7 +22,7 @@
 
 
     <!-- Transparent theme -->
-    <color name="custom_theme_color">#ccffffff</color>
+    <color name="custom_theme_color">#E6ffffff</color>
     <color name="pushnotification_custom_theme_color">#80000000</color>
     <color name="pushnotification_custom_payment_theme_color">#F2ffffff</color>
 
@@ -59,6 +59,12 @@
         <item name="android:progressDrawable">@drawable/custom_ratingbar</item>
         <item name="android:minHeight">23dip</item>
         <item name="android:maxHeight">23dip</item>
+    </style>
+
+    <style name="FareBreakUp_CustomRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/fare_breakup_custom_ratingbar</item>
+        <!--<item name="android:minHeight">10dip</item>
+        <item name="android:maxHeight">10dip</item>-->
     </style>
 
 

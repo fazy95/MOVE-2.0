@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,23 +39,26 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.FragmentHockeyApp;
+import com.cabily.adapter.BookMyRide_Adapter;
 import com.cabily.adapter.SelectCarTypeAdapter;
 import com.cabily.app.EstimatePage;
 import com.cabily.app.FavoriteList;
 import com.cabily.app.LocationSearch;
 import com.cabily.app.NavigationDrawer;
-import com.cabily.app.SingUpAndSignIn;
 import com.cabily.app.TimerPage;
-import com.cabily.adapter.BookMyRide_Adapter;
 import com.cabily.app.TrackYourRide;
+import com.cabily.iconstant.Iconstant;
+import com.cabily.pojo.HomePojo;
+import com.cabily.utils.ConnectionDetector;
+import com.cabily.utils.HorizontalListView;
+import com.cabily.utils.SessionManager;
+import com.casperon.app.cabily.R;
+import com.github.jjobes.slidedatetimepicker.SlideDateTimeListener;
+import com.github.jjobes.slidedatetimepicker.SlideDateTimePicker;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -66,17 +68,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.mylibrary.gps.GPSTracker;
-import com.cabily.iconstant.Iconstant;
-import com.cabily.pojo.HomePojo;
-import com.mylibrary.volley.AppController;
-import com.cabily.utils.ConnectionDetector;
-import com.cabily.utils.HorizontalListView;
-import com.cabily.utils.SessionManager;
-import com.casperon.app.cabily.R;
-import com.github.jjobes.slidedatetimepicker.SlideDateTimeListener;
-import com.github.jjobes.slidedatetimepicker.SlideDateTimePicker;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -87,7 +78,10 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.gps.GPSTracker;
+import com.mylibrary.materialprogresswheel.ProgressWheel;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONArray;
@@ -103,13 +97,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import me.drakeet.materialdialog.MaterialDialog;
 
 
 public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener {
     private RelativeLayout drawer_layout;
     private RelativeLayout address_layout, favorite_layout, bottom_layout;
     private RelativeLayout loading_layout;
@@ -119,7 +112,10 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private TextView map_address;
     private RelativeLayout rideLater_layout, rideNow_layout;
     private TextView rideLater_textview, rideNow_textview;
+    private RelativeLayout Rl_Confirm_Back;
     Context context;
+    private ProgressWheel progressWheel;
+    private TextView Tv_walletAmount;
 
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -128,15 +124,15 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     MarkerOptions marker;
     static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 
-    StringRequest postrequest;
+    private ServiceRequest mRequest;
     private SessionManager session;
     private String UserID = "", CategoryID = "";
     private String CarAvailable = "";
     private String ScarType = "";
     private String selectedType = "";
     GPSTracker gps;
-    String SselectedAddress="";
-    String Sselected_latitude="",Sselected_longitude="";
+    String SselectedAddress = "";
+    String Sselected_latitude = "", Sselected_longitude = "";
 
     ArrayList<HomePojo> driver_list = new ArrayList<HomePojo>();
     ArrayList<HomePojo> category_list = new ArrayList<HomePojo>();
@@ -207,15 +203,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         initialize(rootview);
         initializeMap();
 
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).build();
-        mGoogleApiClient.connect();
-
-
-
         //Start XMPP Chat Service
         ChatService.startUserAction(getActivity());
 
@@ -228,11 +215,10 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("com.app.logout")) {
                     getActivity().finish();
-                }
-                else if(intent.getAction().equals("com.pushnotification.updateBottom_view"))
-                {
+                } else if (intent.getAction().equals("com.pushnotification.updateBottom_view")) {
                     googleMap.getUiSettings().setAllGesturesEnabled(true);
                     ridenow_option_layout.setVisibility(View.GONE);
+                    center_marker.setImageResource(R.drawable.pickup_map_pointer);
                     listview.setVisibility(View.VISIBLE);
                     rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
                     rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
@@ -274,17 +260,14 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             @Override
             public void onClick(View v) {
 
-                if(map_address.getText().toString().length()>0)
-                {
+                if (map_address.getText().toString().length() > 0) {
                     Intent intent = new Intent(getActivity(), FavoriteList.class);
-                    intent.putExtra("SelectedAddress",SselectedAddress);
-                    intent.putExtra("SelectedLatitude",Sselected_latitude);
-                    intent.putExtra("SelectedLongitude",Sselected_longitude);
+                    intent.putExtra("SelectedAddress", SselectedAddress);
+                    intent.putExtra("SelectedLatitude", Sselected_latitude);
+                    intent.putExtra("SelectedLongitude", Sselected_longitude);
                     startActivityForResult(intent, favoriteList_request_code);
                     getActivity().overridePendingTransition(R.anim.enter, R.anim.exit);
-                }
-                else
-                {
+                } else {
                     Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.favorite_list_label_select_location));
                 }
 
@@ -345,6 +328,28 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             }
         });
 
+        Rl_Confirm_Back.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
+                ridenow_option_layout.startAnimation(animFadeOut);
+                ridenow_option_layout.setVisibility(View.GONE);
+                center_marker.setImageResource(R.drawable.pickup_map_pointer);
+
+                googleMap.getUiSettings().setAllGesturesEnabled(true);
+                listview.setVisibility(View.VISIBLE);
+                rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
+                rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
+                currentLocation_image.setClickable(true);
+                pickTime_layout.setEnabled(true);
+                drawer_layout.setEnabled(true);
+                address_layout.setEnabled(true);
+                favorite_layout.setEnabled(true);
+                NavigationDrawer.enableSwipeDrawer();
+            }
+        });
+
         coupon_layout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -375,8 +380,13 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                 .show();
                     }
                 } else if (rideLater_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_cancel))) {
-                    googleMap.getUiSettings().setAllGesturesEnabled(true);
+
+                    Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
+                    ridenow_option_layout.startAnimation(animFadeOut);
                     ridenow_option_layout.setVisibility(View.GONE);
+                    center_marker.setImageResource(R.drawable.pickup_map_pointer);
+
+                    googleMap.getUiSettings().setAllGesturesEnabled(true);
                     listview.setVisibility(View.VISIBLE);
                     rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
                     rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
@@ -411,7 +421,11 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         googleMap.getUiSettings().setAllGesturesEnabled(false);
                         currentLocation_image.setClickable(false);
 
+                        Animation animFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in);
+                        ridenow_option_layout.startAnimation(animFadeIn);
                         ridenow_option_layout.setVisibility(View.VISIBLE);
+                        center_marker.setImageResource(R.drawable.pickup_map_pointer_pin);
+
                         listview.setVisibility(View.GONE);
                         rideLater_textview.setText(getResources().getString(R.string.home_label_cancel));
                         rideNow_textview.setText(getResources().getString(R.string.home_label_confirm));
@@ -459,8 +473,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     googleMap.clear();
 
                     if (isInternetPresent) {
-                        if (postrequest != null) {
-                            postrequest.cancel();
+                        if (mRequest != null) {
+                            mRequest.cancelRequest();
                         }
 
                         PostRequest(Iconstant.BookMyRide_url, Recent_lat, Recent_long);
@@ -483,11 +497,11 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 if (gps.canGetLocation() && gps.isgpsenabled()) {
 
-                     MyCurrent_lat = gps.getLatitude();
-                     MyCurrent_long = gps.getLongitude();
+                    MyCurrent_lat = gps.getLatitude();
+                    MyCurrent_long = gps.getLongitude();
 
-                    if (postrequest != null) {
-                        postrequest.cancel();
+                    if (mRequest != null) {
+                        mRequest.cancelRequest();
                     }
 
                     // Move the camera to last position with a zoom level
@@ -520,8 +534,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     Recent_long = longitude;
 
                     if (isInternetPresent) {
-                        if (postrequest != null) {
-                            postrequest.cancel();
+                        if (mRequest != null) {
+                            mRequest.cancelRequest();
                         }
                         PostRequest(Iconstant.BookMyRide_url, latitude, longitude);
                     } else {
@@ -579,15 +593,15 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             double Dlatitude = gps.getLatitude();
             double Dlongitude = gps.getLongitude();
 
-                MyCurrent_lat = Dlatitude;
-                MyCurrent_long = Dlongitude;
+            MyCurrent_lat = Dlatitude;
+            MyCurrent_long = Dlongitude;
 
-                Recent_lat = Dlatitude;
-                Recent_long = Dlongitude;
+            Recent_lat = Dlatitude;
+            Recent_long = Dlongitude;
 
-                // Move the camera to last position with a zoom level
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(17).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            // Move the camera to last position with a zoom level
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(17).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         } else {
 
@@ -602,6 +616,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         isInternetPresent = cd.isConnectingToInternet();
         session = new SessionManager(getActivity());
         gps = new GPSTracker(getActivity());
+
         drawer_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_layout);
         address_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_address_layout);
         favorite_layout = (RelativeLayout) rooView.findViewById(R.id.book_navigation_favorite_layout);
@@ -626,12 +641,27 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         tv_carType = (TextView) rooView.findViewById(R.id.cartype_textview);
         tv_pickuptime = (TextView) rooView.findViewById(R.id.pickup_textview);
         tv_coupon_label = (TextView) rooView.findViewById(R.id.applycoupon_label);
-
+        progressWheel = (ProgressWheel) rooView.findViewById(R.id.book_my_ride_progress_wheel);
+        Tv_walletAmount = (TextView) rootview.findViewById(R.id.book_my_ride_wallet_amount_textView);
+        Rl_Confirm_Back = (RelativeLayout) rootview.findViewById(R.id.book_my_ride_confirm_header_back_layout);
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
-        CategoryID = user.get(SessionManager.KEY_CATEGORY);
+
+        HashMap<String, String> wallet = session.getWalletAmount();
+        String sWalletAmount = wallet.get(SessionManager.KEY_WALLET_AMOUNT);
+
+        Tv_walletAmount.setText(sWalletAmount);
+
+        HashMap<String, String> cat = session.getCategoryID();
+        String sCategoryId = cat.get(SessionManager.KEY_CATEGORY_ID);
+
+        if (sCategoryId.length() > 0) {
+            CategoryID = cat.get(SessionManager.KEY_CATEGORY_ID);
+        } else {
+            CategoryID = user.get(SessionManager.KEY_CATEGORY);
+        }
 
     }
 
@@ -737,8 +767,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     }
 
     //-------------------Show CarType Method--------------------
-    private void select_carType_Dialog()
-    {
+    private void select_carType_Dialog() {
         final MaterialDialog dialog = new MaterialDialog(getActivity());
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.home_cartype_dialog, null);
 
@@ -850,18 +879,18 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(getActivity());
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(getActivity());
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
 
@@ -897,7 +926,12 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 drawer_layout.setEnabled(false);
                 address_layout.setEnabled(false);
                 favorite_layout.setEnabled(false);
+
+                Animation animFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in);
+                ridenow_option_layout.startAnimation(animFadeIn);
                 ridenow_option_layout.setVisibility(View.VISIBLE);
+                center_marker.setImageResource(R.drawable.pickup_map_pointer_pin);
+
                 listview.setVisibility(View.GONE);
                 rideLater_textview.setText(getResources().getString(R.string.home_label_cancel));
                 rideNow_textview.setText(getResources().getString(R.string.home_label_confirm));
@@ -954,118 +988,144 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
     //-------------------AsynTask To get the current Address----------------
     private void PostRequest(String Url, final double latitude, final double longitude) {
-        loading_layout.setVisibility(View.VISIBLE);
-        center_marker.setVisibility(View.GONE);
+        //loading_layout.setVisibility(View.VISIBLE);
+        progressWheel.setVisibility(View.VISIBLE);
+        //center_marker.setVisibility(View.GONE);
         rideNow_layout.setEnabled(false);
         rideLater_layout.setEnabled(false);
 
         System.out.println("--------------Book My ride url-------------------" + Url);
 
-        Sselected_latitude=String.valueOf(latitude);
-        Sselected_longitude=String.valueOf(longitude);
+        Sselected_latitude = String.valueOf(latitude);
+        Sselected_longitude = String.valueOf(longitude);
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        System.out.println("--------------Book My ride UserID-------------------" + UserID);
+        System.out.println("--------------Book My ride latitude-------------------" + latitude);
+        System.out.println("--------------Book My ride longitude-------------------" + longitude);
+        System.out.println("--------------Book My ride CategoryID-------------------" + CategoryID);
 
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("lat", String.valueOf(latitude));
+        jsonParams.put("lon", String.valueOf(longitude));
+        jsonParams.put("category", CategoryID);
+
+        mRequest = new ServiceRequest(getActivity());
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Book My ride reponse-------------------" + response);
                 String fail_response = "";
-
                 try {
                     JSONObject object = new JSONObject(response);
 
                     if (object.length() > 0) {
                         if (object.getString("status").equalsIgnoreCase("1")) {
+
                             JSONObject jobject = object.getJSONObject("response");
                             if (jobject.length() > 0) {
                                 for (int i = 0; i < jobject.length(); i++) {
-                                    JSONArray driver_array = jobject.getJSONArray("drivers");
-                                    if (driver_array.length() > 0) {
-                                        driver_list.clear();
 
-                                        for (int j = 0; j < driver_array.length(); j++) {
-                                            JSONObject driver_object = driver_array.getJSONObject(j);
+                                    Object check_driver_object = jobject.get("drivers");
+                                    if (check_driver_object instanceof JSONArray) {
 
-                                            HomePojo pojo = new HomePojo();
-                                            pojo.setDriver_lat(driver_object.getString("lat"));
-                                            pojo.setDriver_long(driver_object.getString("lon"));
+                                        JSONArray driver_array = jobject.getJSONArray("drivers");
+                                        if (driver_array.length() > 0) {
+                                            driver_list.clear();
 
-                                            driver_list.add(pojo);
+                                            for (int j = 0; j < driver_array.length(); j++) {
+                                                JSONObject driver_object = driver_array.getJSONObject(j);
+
+                                                HomePojo pojo = new HomePojo();
+                                                pojo.setDriver_lat(driver_object.getString("lat"));
+                                                pojo.setDriver_long(driver_object.getString("lon"));
+
+                                                driver_list.add(pojo);
+                                            }
+                                            driver_status = true;
+                                        } else {
+                                            driver_list.clear();
+                                            driver_status = false;
                                         }
-                                        driver_status = true;
-                                    } else {
-                                        driver_list.clear();
-                                        driver_status = false;
                                     }
 
 
-                                    JSONObject ratecard_object = jobject.getJSONObject("ratecard");
-                                    if (ratecard_object.length() > 0) {
-                                        ratecard_list.clear();
-                                        HomePojo pojo = new HomePojo();
+                                    Object check_ratecard_object = jobject.get("ratecard");
+                                    if (check_ratecard_object instanceof JSONObject) {
 
-                                        pojo.setRate_cartype(ratecard_object.getString("category"));
-                                        pojo.setRate_note(ratecard_object.getString("note"));
-                                        pojo.setCurrencyCode(jobject.getString("currency"));
+                                        JSONObject ratecard_object = jobject.getJSONObject("ratecard");
+                                        if (ratecard_object.length() > 0) {
+                                            ratecard_list.clear();
+                                            HomePojo pojo = new HomePojo();
 
-                                        JSONObject farebreakup_object = ratecard_object.getJSONObject("farebreakup");
-                                        if (farebreakup_object.length() > 0) {
-                                            JSONObject minfare_object = farebreakup_object.getJSONObject("min_fare");
-                                            if (minfare_object.length() > 0) {
-                                                pojo.setMinfare_amt(minfare_object.getString("amount"));
-                                                pojo.setMinfare_km(minfare_object.getString("text"));
+                                            pojo.setRate_cartype(ratecard_object.getString("category"));
+                                            pojo.setRate_note(ratecard_object.getString("note"));
+                                            pojo.setCurrencyCode(jobject.getString("currency"));
+
+                                            JSONObject farebreakup_object = ratecard_object.getJSONObject("farebreakup");
+                                            if (farebreakup_object.length() > 0) {
+                                                JSONObject minfare_object = farebreakup_object.getJSONObject("min_fare");
+                                                if (minfare_object.length() > 0) {
+                                                    pojo.setMinfare_amt(minfare_object.getString("amount"));
+                                                    pojo.setMinfare_km(minfare_object.getString("text"));
+                                                }
+
+                                                JSONObject afterfare_object = farebreakup_object.getJSONObject("after_fare");
+                                                if (afterfare_object.length() > 0) {
+                                                    pojo.setAfterfare_amt(afterfare_object.getString("amount"));
+                                                    pojo.setAfterfare_km(afterfare_object.getString("text"));
+                                                }
+
+                                                JSONObject otherfare_object = farebreakup_object.getJSONObject("other_fare");
+                                                if (otherfare_object.length() > 0) {
+                                                    pojo.setOtherfare_amt(otherfare_object.getString("amount"));
+                                                    pojo.setOtherfare_km(otherfare_object.getString("text"));
+                                                }
                                             }
 
-                                            JSONObject afterfare_object = farebreakup_object.getJSONObject("after_fare");
-                                            if (afterfare_object.length() > 0) {
-                                                pojo.setAfterfare_amt(afterfare_object.getString("amount"));
-                                                pojo.setAfterfare_km(afterfare_object.getString("text"));
-                                            }
-
-                                            JSONObject otherfare_object = farebreakup_object.getJSONObject("other_fare");
-                                            if (otherfare_object.length() > 0) {
-                                                pojo.setOtherfare_amt(otherfare_object.getString("amount"));
-                                                pojo.setOtherfare_km(otherfare_object.getString("text"));
-                                            }
+                                            ratecard_list.add(pojo);
+                                            ratecard_status = true;
+                                        } else {
+                                            ratecard_list.clear();
+                                            ratecard_status = false;
                                         }
-
-                                        ratecard_list.add(pojo);
-                                        ratecard_status = true;
-                                    } else {
-                                        ratecard_list.clear();
-                                        ratecard_status = false;
                                     }
 
 
-                                    JSONArray cat_array = jobject.getJSONArray("category");
-                                    if (cat_array.length() > 0) {
-                                        category_list.clear();
+                                    Object check_category_object = jobject.get("category");
+                                    if (check_category_object instanceof JSONArray) {
 
-                                        for (int k = 0; k < cat_array.length(); k++) {
+                                        JSONArray cat_array = jobject.getJSONArray("category");
+                                        if (cat_array.length() > 0) {
+                                            category_list.clear();
 
-                                            JSONObject cat_object = cat_array.getJSONObject(k);
+                                            for (int k = 0; k < cat_array.length(); k++) {
 
-                                            HomePojo pojo = new HomePojo();
-                                            pojo.setCat_name(cat_object.getString("name"));
-                                            pojo.setCat_time(cat_object.getString("eta"));
-                                            pojo.setCat_id(cat_object.getString("id"));
-                                            pojo.setIcon_normal(cat_object.getString("icon_normal"));
-                                            pojo.setIcon_active(cat_object.getString("icon_active"));
-                                            pojo.setSelected_Cat(jobject.getString("selected_category"));
+                                                JSONObject cat_object = cat_array.getJSONObject(k);
 
-                                            if (cat_object.getString("id").equals(jobject.getString("selected_category"))) {
-                                                CarAvailable = cat_object.getString("eta");
-                                                ScarType = cat_object.getString("name");
+                                                HomePojo pojo = new HomePojo();
+                                                pojo.setCat_name(cat_object.getString("name"));
+                                                pojo.setCat_time(cat_object.getString("eta"));
+                                                pojo.setCat_id(cat_object.getString("id"));
+                                                pojo.setIcon_normal(cat_object.getString("icon_normal"));
+                                                pojo.setIcon_active(cat_object.getString("icon_active"));
+                                                pojo.setSelected_Cat(jobject.getString("selected_category"));
+
+                                                if (cat_object.getString("id").equals(jobject.getString("selected_category"))) {
+                                                    CarAvailable = cat_object.getString("eta");
+                                                    ScarType = cat_object.getString("name");
+                                                }
+
+                                                category_list.add(pojo);
                                             }
 
-                                            category_list.add(pojo);
+                                            category_status = true;
+                                        } else {
+                                            category_list.clear();
+                                            category_status = false;
                                         }
-
-                                        category_status = true;
-                                    } else {
-                                        category_list.clear();
-                                        category_status = false;
                                     }
                                 }
                             }
@@ -1102,6 +1162,20 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     }
 
                     if (category_status) {
+
+                        //Enable and Disable RideNow Button
+                        if (CarAvailable.equalsIgnoreCase("no cabs")) {
+                            rideNow_textview.setTextColor(Color.parseColor("#848484"));
+                            rideLater_textview.setTextColor(Color.parseColor("#848484"));
+                            rideNow_layout.setClickable(false);
+                            rideLater_layout.setClickable(false);
+                        } else {
+                            rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                            rideLater_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                            rideNow_layout.setClickable(true);
+                            rideLater_layout.setClickable(true);
+                        }
+
                         listview.setVisibility(View.VISIBLE);
 
                         adapter = new BookMyRide_Adapter(getActivity(), category_list);
@@ -1118,52 +1192,27 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 String address = getCompleteAddressString(latitude, longitude);
                 map_address.setText(address);
-                SselectedAddress=address;
+                SselectedAddress = address;
 
-                loading_layout.setVisibility(View.GONE);
-                center_marker.setVisibility(View.VISIBLE);
+                progressWheel.setVisibility(View.GONE);
+                //loading_layout.setVisibility(View.GONE);
+                //center_marker.setVisibility(View.VISIBLE);
                 rideNow_layout.setEnabled(true);
                 rideLater_layout.setEnabled(true);
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
-
-                loading_layout.setVisibility(View.GONE);
-                center_marker.setVisibility(View.VISIBLE);
+            public void onErrorListener() {
+                progressWheel.setVisibility(View.GONE);
+                //loading_layout.setVisibility(View.GONE);
+                //center_marker.setVisibility(View.VISIBLE);
                 rideNow_layout.setEnabled(true);
                 rideLater_layout.setEnabled(true);
 
                 alert_layout.setVisibility(View.VISIBLE);
                 bottom_layout.setVisibility(View.GONE);
-                alert_textview.setText(error.getMessage());
-
-                VolleyErrorResponse.volleyError(getActivity(), error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("lat", String.valueOf(latitude));
-                jsonParams.put("lon", String.valueOf(longitude));
-                jsonParams.put("category", CategoryID);
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -1175,10 +1224,16 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         coupon_apply_layout.setVisibility(View.GONE);
         coupon_loading_layout.setVisibility(View.VISIBLE);
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
 
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("code", code);
+        jsonParams.put("pickup_date", pickpudate);
+
+        mRequest = new ServiceRequest(getActivity());
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------coupon code reponse-------------------" + response);
 
@@ -1214,38 +1269,14 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 coupon_apply_layout.setVisibility(View.VISIBLE);
                 coupon_loading_layout.setVisibility(View.GONE);
                 coupon_dialog.dismiss();
-                VolleyErrorResponse.volleyError(getActivity(), error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("code", code);
-                jsonParams.put("pickup_date", pickpudate);
-                return jsonParams;
-            }
-
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -1265,17 +1296,43 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
         System.out.println("--------------Confirm Ride url-------------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
 
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("code", code);
+        jsonParams.put("pickup_date", pickpudate);
+        jsonParams.put("pickup_time", pickup_time);
+        jsonParams.put("type", type);
+        jsonParams.put("category", category);
+        jsonParams.put("pickup", pickup_location);
+        jsonParams.put("pickup_lat", pickup_lat);
+        jsonParams.put("pickup_lon", pickup_lon);
+        jsonParams.put("ride_id", riderId);
+
+
+        System.out.println("---------------user_id----------" + UserID);
+        System.out.println("---------------code----------" + code);
+        System.out.println("---------------pickpudate----------" + pickpudate);
+        System.out.println("---------------pickup_time----------" + pickup_time);
+        System.out.println("---------------type----------" + type);
+        System.out.println("---------------category----------" + category);
+        System.out.println("---------------pickup----------" + pickup_location);
+        System.out.println("---------------pickup_lat----------" + pickup_lat);
+        System.out.println("---------------pickup_lon----------" + pickup_lon);
+        System.out.println("---------------try----------" + try_value);
+        System.out.println("---------------riderId----------" + riderId);
+
+        mRequest = new ServiceRequest(getActivity());
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Confirm Ride reponse-------------------" + response);
 
-                String selected_type = "",Sacceptance="";
-                String Str_driver_id="",Str_driver_name="",Str_driver_email="",Str_driver_image="",Str_driver_review="",
-                        Str_driver_lat="",Str_driver_lon="",Str_min_pickup_duration="",Str_ride_id="",Str_phone_number="",
-                        Str_vehicle_number="",Str_vehicle_model="";
+                String selected_type = "", Sacceptance = "";
+                String Str_driver_id = "", Str_driver_name = "", Str_driver_email = "", Str_driver_image = "", Str_driver_review = "",
+                        Str_driver_lat = "", Str_driver_lon = "", Str_min_pickup_duration = "", Str_ride_id = "", Str_phone_number = "",
+                        Str_vehicle_number = "", Str_vehicle_model = "";
                 try {
                     JSONObject object = new JSONObject(response);
                     if (object.length() > 0) {
@@ -1285,87 +1342,86 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                             selected_type = response_object.getString("type");
                             Sacceptance = object.getString("acceptance");
-                            if(Sacceptance.equalsIgnoreCase("No"))
-                            {
+                            if (Sacceptance.equalsIgnoreCase("No")) {
                                 response_time = response_object.getString("response_time");
                             }
                             riderId = response_object.getString("ride_id");
 
 
-                            if(Sacceptance.equalsIgnoreCase("Yes"))
-                            {
-                                JSONObject driverObject=response_object.getJSONObject("driver_profile");
+                            if (Sacceptance.equalsIgnoreCase("Yes")) {
+                                JSONObject driverObject = response_object.getJSONObject("driver_profile");
 
-                                Str_driver_id=driverObject.getString("driver_id");
-                                Str_driver_name=driverObject.getString("driver_name");
-                                Str_driver_email=driverObject.getString("driver_email");
-                                Str_driver_image=driverObject.getString("driver_image");
-                                Str_driver_review=driverObject.getString("driver_review");
-                                Str_driver_lat=driverObject.getString("driver_lat");
-                                Str_driver_lon=driverObject.getString("driver_lon");
-                                Str_min_pickup_duration=driverObject.getString("min_pickup_duration");
-                                Str_ride_id=driverObject.getString("ride_id");
-                                Str_phone_number=driverObject.getString("phone_number");
-                                Str_vehicle_number=driverObject.getString("vehicle_number");
-                                Str_vehicle_model=driverObject.getString("vehicle_model");
+                                Str_driver_id = driverObject.getString("driver_id");
+                                Str_driver_name = driverObject.getString("driver_name");
+                                Str_driver_email = driverObject.getString("driver_email");
+                                Str_driver_image = driverObject.getString("driver_image");
+                                Str_driver_review = driverObject.getString("driver_review");
+                                Str_driver_lat = driverObject.getString("driver_lat");
+                                Str_driver_lon = driverObject.getString("driver_lon");
+                                Str_min_pickup_duration = driverObject.getString("min_pickup_duration");
+                                Str_ride_id = driverObject.getString("ride_id");
+                                Str_phone_number = driverObject.getString("phone_number");
+                                Str_vehicle_number = driverObject.getString("vehicle_number");
+                                Str_vehicle_model = driverObject.getString("vehicle_model");
                             }
 
 
-                            if (selected_type.equalsIgnoreCase("1"))
-                            {
-                                final MaterialDialog dialog = new MaterialDialog(getActivity());
-                                dialog.setTitle(getActivity().getResources().getString(R.string.action_success))
-                                        .setMessage(getActivity().getResources().getString(R.string.ridenow_label_confirm_success))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
+                            if (selected_type.equalsIgnoreCase("1")) {
 
-                                                        //---------Hiding the bottom layout after success request--------
-                                                        googleMap.getUiSettings().setAllGesturesEnabled(true);
-                                                        ridenow_option_layout.setVisibility(View.GONE);
-                                                        listview.setVisibility(View.VISIBLE);
-                                                        rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
-                                                        rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
-                                                        currentLocation_image.setClickable(true);
-                                                        pickTime_layout.setEnabled(true);
-                                                        drawer_layout.setEnabled(true);
-                                                        address_layout.setEnabled(true);
-                                                        favorite_layout.setEnabled(true);
-                                                        NavigationDrawer.enableSwipeDrawer();
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                            }
-                            else if (selected_type.equalsIgnoreCase("0"))
-                            {
-                                if(Sacceptance.equalsIgnoreCase("Yes"))
-                                {
+
+                                final PkDialog mDialog = new PkDialog(getActivity());
+                                mDialog.setDialogTitle(getActivity().getResources().getString(R.string.action_success));
+                                mDialog.setDialogMessage(getActivity().getResources().getString(R.string.ridenow_label_confirm_success));
+                                mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        mDialog.dismiss();
+
+                                        //---------Hiding the bottom layout after success request--------
+                                        googleMap.getUiSettings().setAllGesturesEnabled(true);
+
+                                        Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
+                                        ridenow_option_layout.startAnimation(animFadeOut);
+                                        ridenow_option_layout.setVisibility(View.GONE);
+                                        center_marker.setImageResource(R.drawable.pickup_map_pointer);
+
+                                        listview.setVisibility(View.VISIBLE);
+                                        rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
+                                        rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
+                                        currentLocation_image.setClickable(true);
+                                        pickTime_layout.setEnabled(true);
+                                        drawer_layout.setEnabled(true);
+                                        address_layout.setEnabled(true);
+                                        favorite_layout.setEnabled(true);
+                                        NavigationDrawer.enableSwipeDrawer();
+                                    }
+                                });
+                                mDialog.show();
+
+                            } else if (selected_type.equalsIgnoreCase("0")) {
+                                if (Sacceptance.equalsIgnoreCase("Yes")) {
                                     //Move to ride Detail page
-                                    Intent i=new Intent(getActivity(),TrackYourRide.class);
+                                    Intent i = new Intent(getActivity(), TrackYourRide.class);
                                     i.putExtra("driverID", Str_driver_id);
-                                    i.putExtra("driverName",Str_driver_name);
-                                    i.putExtra("driverImage",Str_driver_image);
-                                    i.putExtra("driverRating",Str_driver_review);
-                                    i.putExtra("driverLat",Str_driver_lat);
-                                    i.putExtra("driverLong",Str_driver_lon);
-                                    i.putExtra("driverTime",Str_min_pickup_duration);
-                                    i.putExtra("rideID",Str_ride_id);
-                                    i.putExtra("driverMobile",Str_phone_number);
-                                    i.putExtra("driverCar_no",Str_vehicle_number);
-                                    i.putExtra("driverCar_model",Str_vehicle_model);
+                                    i.putExtra("driverName", Str_driver_name);
+                                    i.putExtra("driverImage", Str_driver_image);
+                                    i.putExtra("driverRating", Str_driver_review);
+                                    i.putExtra("driverLat", Str_driver_lat);
+                                    i.putExtra("driverLong", Str_driver_lon);
+                                    i.putExtra("driverTime", Str_min_pickup_duration);
+                                    i.putExtra("rideID", Str_ride_id);
+                                    i.putExtra("driverMobile", Str_phone_number);
+                                    i.putExtra("driverCar_no", Str_vehicle_number);
+                                    i.putExtra("driverCar_model", Str_vehicle_model);
                                     i.putExtra("userLat", pickup_lat);
                                     i.putExtra("userLong", pickup_lon);
                                     startActivity(i);
                                     getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                                }
-                                else
-                                {
+                                } else {
                                     Intent intent = new Intent(getActivity(), TimerPage.class);
                                     intent.putExtra("Time", response_time);
                                     intent.putExtra("retry_count", try_value);
+                                    intent.putExtra("ride_ID", riderId);
                                     startActivityForResult(intent, timer_request_code);
                                     getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 }
@@ -1382,61 +1438,12 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 dialog.dismiss();
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
-
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(getActivity(), error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-
-
-                System.out.println("---------------user_id----------" + UserID);
-                System.out.println("---------------code----------" + code);
-                System.out.println("---------------pickpudate----------" + pickpudate);
-                System.out.println("---------------pickup_time----------" + pickup_time);
-                System.out.println("---------------type----------" + type);
-                System.out.println("---------------category----------" + category);
-                System.out.println("---------------pickup----------" + pickup_location);
-                System.out.println("---------------pickup_lat----------" + pickup_lat);
-                System.out.println("---------------pickup_lon----------" + pickup_lon);
-                System.out.println("---------------try----------" + try_value);
-                System.out.println("---------------riderId----------" + riderId);
-
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("code", code);
-                jsonParams.put("pickup_date", pickpudate);
-                jsonParams.put("pickup_time", pickup_time);
-                jsonParams.put("type", type);
-                jsonParams.put("category", category);
-                jsonParams.put("pickup", pickup_location);
-                jsonParams.put("pickup_lat", pickup_lat);
-                jsonParams.put("pickup_lon", pickup_lon);
-                jsonParams.put("ride_id", riderId);
-
-                //jsonParams.put("try", try_value);
-
-                return jsonParams;
-            }
-
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -1456,10 +1463,15 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
         System.out.println("--------------Delete Ride url-------------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
 
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", riderId);
+
+        mRequest = new ServiceRequest(getActivity());
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Delete Ride reponse-------------------" + response);
 
@@ -1469,8 +1481,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         String status = object.getString("status");
                         String response_value = object.getString("response");
                         if (status.equalsIgnoreCase("1")) {
-                            riderId="";
-                            Alert(getActivity().getResources().getString(R.string.alert_label_title), response_value);
+                            riderId = "";
+                            Alert(getActivity().getResources().getString(R.string.action_success), response_value);
                         } else {
                             Alert(getActivity().getResources().getString(R.string.alert_label_title), response_value);
                         }
@@ -1478,7 +1490,12 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                         //---------Hiding the bottom layout after cancel request--------
                         googleMap.getUiSettings().setAllGesturesEnabled(true);
+
+                        Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
+                        ridenow_option_layout.startAnimation(animFadeOut);
                         ridenow_option_layout.setVisibility(View.GONE);
+                        center_marker.setImageResource(R.drawable.pickup_map_pointer);
+
                         listview.setVisibility(View.VISIBLE);
                         rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
                         rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
@@ -1496,54 +1513,41 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 dialog.dismiss();
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(getActivity(), error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", riderId);
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
     //-------------------Select Car Type Request---------------
     private void SelectCar_Request(String Url, final double latitude, final double longitude) {
 
-      final Dialog mdialog = new Dialog(getActivity());
+        final Dialog mdialog = new Dialog(getActivity());
         mdialog.getWindow();
         mdialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         mdialog.setContentView(R.layout.custom_loading);
         mdialog.setCanceledOnTouchOutside(false);
         mdialog.show();
 
-        TextView dialog_title=(TextView)mdialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) mdialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_updating));
 
         System.out.println("--------------Select Car Type url-------------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("lat", String.valueOf(latitude));
+        jsonParams.put("lon", String.valueOf(longitude));
+        jsonParams.put("category", CategoryID);
+
+        mRequest = new ServiceRequest(getActivity());
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Select Car Type reponse-------------------" + response);
                 String fail_response = "";
@@ -1556,93 +1560,106 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                             JSONObject jobject = object.getJSONObject("response");
                             if (jobject.length() > 0) {
                                 for (int i = 0; i < jobject.length(); i++) {
-                                    JSONArray driver_array = jobject.getJSONArray("drivers");
-                                    if (driver_array.length() > 0) {
-                                        driver_list.clear();
 
-                                        for (int j = 0; j < driver_array.length(); j++) {
-                                            JSONObject driver_object = driver_array.getJSONObject(j);
+                                    Object check_driver_object = jobject.get("drivers");
+                                    if (check_driver_object instanceof JSONArray) {
+                                        JSONArray driver_array = jobject.getJSONArray("drivers");
+                                        if (driver_array.length() > 0) {
+                                            driver_list.clear();
 
+                                            for (int j = 0; j < driver_array.length(); j++) {
+                                                JSONObject driver_object = driver_array.getJSONObject(j);
+
+                                                HomePojo pojo = new HomePojo();
+                                                pojo.setDriver_lat(driver_object.getString("lat"));
+                                                pojo.setDriver_long(driver_object.getString("lon"));
+
+                                                driver_list.add(pojo);
+                                            }
+                                            driver_status = true;
+                                        } else {
+                                            driver_list.clear();
+                                            driver_status = false;
+                                        }
+                                    }
+
+
+                                    Object check_ratecard_object = jobject.get("ratecard");
+                                    if (check_ratecard_object instanceof JSONObject) {
+
+                                        JSONObject ratecard_object = jobject.getJSONObject("ratecard");
+                                        if (ratecard_object.length() > 0) {
+                                            ratecard_list.clear();
                                             HomePojo pojo = new HomePojo();
-                                            pojo.setDriver_lat(driver_object.getString("lat"));
-                                            pojo.setDriver_long(driver_object.getString("lon"));
 
-                                            driver_list.add(pojo);
+                                            pojo.setRate_cartype(ratecard_object.getString("category"));
+                                            pojo.setRate_note(ratecard_object.getString("note"));
+                                            pojo.setCurrencyCode(jobject.getString("currency"));
+
+                                            JSONObject farebreakup_object = ratecard_object.getJSONObject("farebreakup");
+                                            if (farebreakup_object.length() > 0) {
+                                                JSONObject minfare_object = farebreakup_object.getJSONObject("min_fare");
+                                                if (minfare_object.length() > 0) {
+                                                    pojo.setMinfare_amt(minfare_object.getString("amount"));
+                                                    pojo.setMinfare_km(minfare_object.getString("text"));
+                                                }
+
+                                                JSONObject afterfare_object = farebreakup_object.getJSONObject("after_fare");
+                                                if (afterfare_object.length() > 0) {
+                                                    pojo.setAfterfare_amt(afterfare_object.getString("amount"));
+                                                    pojo.setAfterfare_km(afterfare_object.getString("text"));
+                                                }
+
+                                                JSONObject otherfare_object = farebreakup_object.getJSONObject("other_fare");
+                                                if (otherfare_object.length() > 0) {
+                                                    pojo.setOtherfare_amt(otherfare_object.getString("amount"));
+                                                    pojo.setOtherfare_km(otherfare_object.getString("text"));
+                                                }
+                                            }
+
+                                            ratecard_list.add(pojo);
+                                            ratecard_status = true;
+                                        } else {
+                                            ratecard_list.clear();
+                                            ratecard_status = false;
                                         }
-                                        driver_status = true;
-                                    } else {
-                                        driver_list.clear();
-                                        driver_status = false;
                                     }
 
 
-                                    JSONObject ratecard_object = jobject.getJSONObject("ratecard");
-                                    if (ratecard_object.length() > 0) {
-                                        ratecard_list.clear();
-                                        HomePojo pojo = new HomePojo();
+                                    Object check_category_object = jobject.get("category");
+                                    if (check_category_object instanceof JSONArray) {
 
-                                        pojo.setRate_cartype(ratecard_object.getString("category"));
-                                        pojo.setRate_note(ratecard_object.getString("note"));
-                                        pojo.setCurrencyCode(jobject.getString("currency"));
+                                        JSONArray cat_array = jobject.getJSONArray("category");
+                                        if (cat_array.length() > 0) {
+                                            category_list.clear();
 
-                                        JSONObject farebreakup_object = ratecard_object.getJSONObject("farebreakup");
-                                        if (farebreakup_object.length() > 0) {
-                                            JSONObject minfare_object = farebreakup_object.getJSONObject("min_fare");
-                                            if (minfare_object.length() > 0) {
-                                                pojo.setMinfare_amt(minfare_object.getString("amount"));
-                                                pojo.setMinfare_km(minfare_object.getString("text"));
+                                            for (int k = 0; k < cat_array.length(); k++) {
+
+                                                JSONObject cat_object = cat_array.getJSONObject(k);
+
+                                                HomePojo pojo = new HomePojo();
+                                                pojo.setCat_name(cat_object.getString("name"));
+                                                pojo.setCat_time(cat_object.getString("eta"));
+                                                pojo.setCat_id(cat_object.getString("id"));
+                                                pojo.setIcon_normal(cat_object.getString("icon_normal"));
+                                                pojo.setIcon_active(cat_object.getString("icon_active"));
+                                                pojo.setSelected_Cat(jobject.getString("selected_category"));
+
+                                                if (cat_object.getString("id").equals(jobject.getString("selected_category"))) {
+                                                    CarAvailable = cat_object.getString("eta");
+                                                    ScarType = cat_object.getString("name");
+                                                }
+
+                                                category_list.add(pojo);
                                             }
 
-                                            JSONObject afterfare_object = farebreakup_object.getJSONObject("after_fare");
-                                            if (afterfare_object.length() > 0) {
-                                                pojo.setAfterfare_amt(afterfare_object.getString("amount"));
-                                                pojo.setAfterfare_km(afterfare_object.getString("text"));
-                                            }
-
-                                            JSONObject otherfare_object = farebreakup_object.getJSONObject("other_fare");
-                                            if (otherfare_object.length() > 0) {
-                                                pojo.setOtherfare_amt(otherfare_object.getString("amount"));
-                                                pojo.setOtherfare_km(otherfare_object.getString("text"));
-                                            }
+                                            category_status = true;
+                                        } else {
+                                            category_list.clear();
+                                            category_status = false;
                                         }
-
-                                        ratecard_list.add(pojo);
-                                        ratecard_status = true;
-                                    } else {
-                                        ratecard_list.clear();
-                                        ratecard_status = false;
                                     }
 
-
-                                    JSONArray cat_array = jobject.getJSONArray("category");
-                                    if (cat_array.length() > 0) {
-                                        category_list.clear();
-
-                                        for (int k = 0; k < cat_array.length(); k++) {
-
-                                            JSONObject cat_object = cat_array.getJSONObject(k);
-
-                                            HomePojo pojo = new HomePojo();
-                                            pojo.setCat_name(cat_object.getString("name"));
-                                            pojo.setCat_time(cat_object.getString("eta"));
-                                            pojo.setCat_id(cat_object.getString("id"));
-                                            pojo.setIcon_normal(cat_object.getString("icon_normal"));
-                                            pojo.setIcon_active(cat_object.getString("icon_active"));
-                                            pojo.setSelected_Cat(jobject.getString("selected_category"));
-
-                                            if (cat_object.getString("id").equals(jobject.getString("selected_category"))) {
-                                                CarAvailable = cat_object.getString("eta");
-                                                ScarType = cat_object.getString("name");
-                                            }
-
-                                            category_list.add(pojo);
-                                        }
-
-                                        category_status = true;
-                                    } else {
-                                        category_list.clear();
-                                        category_status = false;
-                                    }
                                 }
                             }
 
@@ -1659,8 +1676,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 }
 
 
-                if (main_response_status)
-                {
+                if (main_response_status) {
                     tv_carType.setText(ScarType);
                     if (driver_status) {
                         googleMap.clear();
@@ -1675,14 +1691,26 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                             // adding marker
                             googleMap.addMarker(marker);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         googleMap.clear();
                     }
 
 
                     if (category_status) {
+
+                        //Enable and Disable RideNow Button
+                        if (CarAvailable.equalsIgnoreCase("no cabs")) {
+                            rideNow_textview.setTextColor(Color.parseColor("#848484"));
+                            rideLater_textview.setTextColor(Color.parseColor("#848484"));
+                            rideNow_layout.setClickable(false);
+                            rideLater_layout.setClickable(false);
+                        } else {
+                            rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                            rideLater_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                            rideNow_layout.setClickable(true);
+                            rideLater_layout.setClickable(true);
+                        }
+
                         listview.setVisibility(View.GONE);
 
                         adapter = new BookMyRide_Adapter(getActivity(), category_list);
@@ -1696,53 +1724,22 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 } else {
                     mdialog.dismiss();
                 }
-
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 mdialog.dismiss();
-                VolleyErrorResponse.volleyError(getActivity(), error);
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-
-                Log.e("user_id on json---->", "" + UserID);
-                Log.e("CategoryID on json---->", "" + CategoryID);
-                Log.e("latitude on json---->", "" + latitude);
-                Log.e("longitude on json---->", "" + longitude);
-
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("lat", String.valueOf(latitude));
-                jsonParams.put("lon", String.valueOf(longitude));
-                jsonParams.put("category", CategoryID);
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
     }
-
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
-        System.out.println("--------------onActivityResult requestCode----------------"+requestCode);
+        System.out.println("--------------onActivityResult requestCode----------------" + requestCode);
 
         // code to get country name
         if (requestCode == timer_request_code && resultCode == Activity.RESULT_OK && data != null) {
@@ -1751,61 +1748,71 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
             if (retry_count.equalsIgnoreCase("1") && ride_accepted.equalsIgnoreCase("not")) {
 
-                View view = View.inflate(getActivity(), R.layout.material_alert_dialog, null);
-                final MaterialDialog mdialog = new MaterialDialog(getActivity());
-                mdialog.setContentView(view)
-                        .setPositiveButton(
-                                getResources().getString(R.string.timer_label_alert_retry), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        mdialog.dismiss();
 
-                                        cd = new ConnectionDetector(getActivity());
-                                        isInternetPresent = cd.isConnectingToInternet();
+                final PkDialog mDialog = new PkDialog(getActivity());
+                mDialog.setDialogTitle(getResources().getString(R.string.timer_label_alert_sorry));
+                mDialog.setDialogMessage(getResources().getString(R.string.timer_label_alert_content));
+                mDialog.setPositiveButton(getResources().getString(R.string.timer_label_alert_retry), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
 
-                                        if (isInternetPresent) {
-                                            HashMap<String, String> code = session.getCouponCode();
-                                            String coupon = code.get(SessionManager.KEY_COUPON_CODE);
+                        cd = new ConnectionDetector(getActivity());
+                        isInternetPresent = cd.isConnectingToInternet();
 
-                                            ConfirmRideRequest(Iconstant.confirm_ride_url, coupon, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "2");
-                                        } else {
-                                            Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
-                                        }
-                                    }
-                                }
-                        )
-                        .setNegativeButton(
-                                getResources().getString(R.string.timer_label_alert_cancel), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        mdialog.dismiss();
+                        if (isInternetPresent) {
+                            HashMap<String, String> code = session.getCouponCode();
+                            String coupon = code.get(SessionManager.KEY_COUPON_CODE);
 
-                                        cd = new ConnectionDetector(getActivity());
-                                        isInternetPresent = cd.isConnectingToInternet();
+                            ConfirmRideRequest(Iconstant.confirm_ride_url, coupon, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "2");
+                        } else {
+                            Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
+                        }
+                    }
+                });
+                mDialog.setNegativeButton(getResources().getString(R.string.timer_label_alert_cancel), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
 
-                                        if (isInternetPresent) {
-                                            DeleteRideRequest(Iconstant.delete_ride_url);
-                                        } else {
-                                            Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
-                                        }
-                                    }
-                                }
-                        )
-                        .show();
+                        cd = new ConnectionDetector(getActivity());
+                        isInternetPresent = cd.isConnectingToInternet();
 
-                TextView alert_title=(TextView)view.findViewById(R.id.material_alert_message_label);
-                TextView alert_message=(TextView)view.findViewById(R.id.material_alert_message_textview);
-                alert_title.setText(getResources().getString(R.string.timer_label_alert_sorry));
-                alert_message.setText(getResources().getString(R.string.timer_label_alert_content));
+                        if (isInternetPresent) {
+                            DeleteRideRequest(Iconstant.delete_ride_url);
+                        } else {
+                            Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
+                        }
+                    }
+                });
+                mDialog.show();
 
             } else if (retry_count.equalsIgnoreCase("2") && ride_accepted.equalsIgnoreCase("not")) {
                 DeleteRideRequest(Iconstant.delete_ride_url);
-            } else if ((retry_count.equalsIgnoreCase("1") || retry_count.equalsIgnoreCase("2")) && ride_accepted.equalsIgnoreCase("Accepted")) {
-                //want to write functionality
+            } else if ((retry_count.equalsIgnoreCase("1") || retry_count.equalsIgnoreCase("2")) && ride_accepted.equalsIgnoreCase("Cancelled")) {
+
+                riderId = "";
+
+                //---------Hiding the bottom layout after cancel request--------
+                googleMap.getUiSettings().setAllGesturesEnabled(true);
+
+                Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
+                ridenow_option_layout.startAnimation(animFadeOut);
+                ridenow_option_layout.setVisibility(View.GONE);
+                center_marker.setImageResource(R.drawable.pickup_map_pointer);
+
+                listview.setVisibility(View.VISIBLE);
+                rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
+                rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
+                currentLocation_image.setClickable(true);
+                pickTime_layout.setEnabled(true);
+                drawer_layout.setEnabled(true);
+                address_layout.setEnabled(true);
+                favorite_layout.setEnabled(true);
+                NavigationDrawer.enableSwipeDrawer();
             }
 
-        }
-        else if (requestCode == placeSearch_request_code && resultCode == Activity.RESULT_OK && data != null) {
+        } else if (requestCode == placeSearch_request_code && resultCode == Activity.RESULT_OK && data != null) {
 
             String SselectedLatitude = data.getStringExtra("Selected_Latitude");
             String SselectedLongitude = data.getStringExtra("Selected_Longitude");
@@ -1816,8 +1823,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             map_address.setText(SselectedLocation);
-        }
-        else if (requestCode == favoriteList_request_code && resultCode == Activity.RESULT_OK && data != null) {
+        } else if (requestCode == favoriteList_request_code && resultCode == Activity.RESULT_OK && data != null) {
 
             String SselectedLatitude = data.getStringExtra("Selected_Latitude");
             String SselectedLongitude = data.getStringExtra("Selected_Longitude");
@@ -1825,25 +1831,19 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             // Move the camera to last position with a zoom level
             CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Double.parseDouble(SselectedLatitude), Double.parseDouble(SselectedLongitude))).zoom(17).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
-        else if(requestCode == REQUEST_LOCATION)
-        {
+        } else if (requestCode == REQUEST_LOCATION) {
             System.out.println("----------inside request location------------------");
 
-            switch (resultCode)
-            {
-                case Activity.RESULT_OK:
-                {
+            switch (resultCode) {
+                case Activity.RESULT_OK: {
                     Toast.makeText(getActivity(), "Location enabled!", Toast.LENGTH_LONG).show();
                     break;
                 }
-                case Activity.RESULT_CANCELED:
-                {
+                case Activity.RESULT_CANCELED: {
                     enableGpsService();
                     break;
                 }
-                default:
-                {
+                default: {
                     break;
                 }
             }
@@ -1857,7 +1857,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         getActivity().unregisterReceiver(logoutReciver);
         super.onDestroy();
     }
-
 
 
     @Override
@@ -1874,8 +1873,14 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
 
     //Enabling Gps Service
-    private void enableGpsService()
-    {
+    private void enableGpsService() {
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
+
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(30 * 1000);
@@ -1904,7 +1909,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
-                            status.startResolutionForResult(getActivity(),REQUEST_LOCATION);
+                            status.startResolutionForResult(getActivity(), REQUEST_LOCATION);
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }

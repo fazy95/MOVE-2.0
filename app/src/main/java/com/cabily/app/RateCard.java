@@ -1,24 +1,16 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.adapter.RateCardAdapter;
 import com.cabily.adapter.RateCardStandardAdapter;
@@ -31,8 +23,8 @@ import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONArray;
@@ -44,39 +36,36 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 10/14/2015.
  */
-public class RateCard extends ActivityHockeyApp
-{
+public class RateCard extends ActivityHockeyApp {
     private RelativeLayout back;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private SessionManager session;
     private MaterialSpinner city_spinner;
     private MaterialSpinner carType_spinner;
-    private ExpandableHeightListView listview,standard_listview;
+    private ExpandableHeightListView listview, standard_listview;
     private RelativeLayout rate_display_layout;
 
-    private String Sselected_cityID="";
-    private StringRequest postrequest,car_postrequest,ratecard_postrequest;
+    private String Sselected_cityID = "";
+    private ServiceRequest mRequest, car_mRequest, rateCard_mRequest;
     Dialog dialog;
-    private boolean isCityAvailable=false;
-    private boolean isCarAvailable=false;
-    ArrayList<String> city_array=new ArrayList<String>();
-    ArrayList<String> car_array=new ArrayList<String>();
+    private boolean isCityAvailable = false;
+    private boolean isCarAvailable = false;
+    ArrayList<String> city_array = new ArrayList<String>();
+    ArrayList<String> car_array = new ArrayList<String>();
     ArrayList<RateCard_CityPojo> city_itemList;
     ArrayList<RateCard_CarPojo> car_itemList;
     ArrayList<RateCard_CardDisplayPojo> rate_itemList;
     ArrayList<RateCard_StdPojo> stdrate_itemList;
 
-    private String SfirstKm="",SafterKm="";
-    private String SfirstKm_fare="",SafterKm_fare="";
+    private String SfirstKm = "", SafterKm = "";
+    private String SfirstKm_fare = "", SafterKm_fare = "";
     RateCardAdapter adapter;
     RateCardStandardAdapter standardAdapter;
 
@@ -109,8 +98,8 @@ public class RateCard extends ActivityHockeyApp
 
                 if (!city_spinner.getSelectedItem().toString().equalsIgnoreCase("Select City")) {
                     if (isInternetPresent) {
-                        if (car_postrequest != null) {
-                            car_postrequest.cancel();
+                        if (car_mRequest != null) {
+                            car_mRequest.cancelRequest();
                         }
                         Sselected_cityID = city_itemList.get(position).getCity_id();
                         postRequest_CarSelect(Iconstant.ratecard_select_cartype_url, city_itemList.get(position).getCity_id());
@@ -134,28 +123,23 @@ public class RateCard extends ActivityHockeyApp
                 cd = new ConnectionDetector(RateCard.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if(!carType_spinner.getSelectedItem().toString().equalsIgnoreCase("Select Car Type"))
-                {
-                    if(isInternetPresent)
-                    {
-                        if(ratecard_postrequest!=null)
-                        {
-                            ratecard_postrequest.cancel();
+                if (!carType_spinner.getSelectedItem().toString().equalsIgnoreCase("Select Car Type")) {
+                    if (isInternetPresent) {
+                        if (rateCard_mRequest != null) {
+                            rateCard_mRequest.cancelRequest();
                         }
                         rateCard_displayRequest(Iconstant.ratecard_display_url, Sselected_cityID, car_itemList.get(position).getCar_id());
-                    }
-                    else
-                    {
+                    } else {
                         Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                     }
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
-
 
 
         listview.setExpanded(true);
@@ -167,42 +151,38 @@ public class RateCard extends ActivityHockeyApp
         session = new SessionManager(RateCard.this);
         cd = new ConnectionDetector(RateCard.this);
         isInternetPresent = cd.isConnectingToInternet();
-        city_itemList=new ArrayList<RateCard_CityPojo>();
-        car_itemList=new ArrayList<RateCard_CarPojo>();
-        rate_itemList=new ArrayList<RateCard_CardDisplayPojo>();
-        stdrate_itemList=new ArrayList<RateCard_StdPojo>();
+        city_itemList = new ArrayList<RateCard_CityPojo>();
+        car_itemList = new ArrayList<RateCard_CarPojo>();
+        rate_itemList = new ArrayList<RateCard_CardDisplayPojo>();
+        stdrate_itemList = new ArrayList<RateCard_StdPojo>();
 
-        city_spinner=(MaterialSpinner)findViewById(R.id.ratecard_city_spinner);
-        carType_spinner=(MaterialSpinner)findViewById(R.id.ratecard_cartype_spinner);
-        standard_listview=(ExpandableHeightListView)findViewById(R.id.ratecard_standardRate_listView);
-        listview=(ExpandableHeightListView)findViewById(R.id.ratecard_listView);
+        city_spinner = (MaterialSpinner) findViewById(R.id.ratecard_city_spinner);
+        carType_spinner = (MaterialSpinner) findViewById(R.id.ratecard_cartype_spinner);
+        standard_listview = (ExpandableHeightListView) findViewById(R.id.ratecard_standardRate_listView);
+        listview = (ExpandableHeightListView) findViewById(R.id.ratecard_listView);
         back = (RelativeLayout) findViewById(R.id.ratecard_header_back_layout);
-        rate_display_layout=(RelativeLayout)findViewById(R.id.ratecard_ratedisplay_layout);
+        rate_display_layout = (RelativeLayout) findViewById(R.id.ratecard_ratedisplay_layout);
 
-        if(isInternetPresent)
-        {
+        if (isInternetPresent) {
             postRequest_CitySelect(Iconstant.ratecard_select_city_url);
-        }
-        else
-        {
+        } else {
             Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
         }
     }
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(RateCard.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(RateCard.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //method to convert currency code to currency symbol
@@ -217,11 +197,8 @@ public class RateCard extends ActivityHockeyApp
     }
 
 
-
-
     //-----------------------City Select Post Request-----------------
-    private void postRequest_CitySelect(String Url)
-    {
+    private void postRequest_CitySelect(String Url) {
         dialog = new Dialog(RateCard.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -229,117 +206,85 @@ public class RateCard extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------CitySelect Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        mRequest = new ServiceRequest(RateCard.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, null, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        System.out.println("-------------CitySelect Response----------------"+response);
+                System.out.println("-------------CitySelect Response----------------" + response);
 
-                        String Sstatus = "";
-                        try {
+                String Sstatus = "";
+                try {
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                JSONObject response_object= object.getJSONObject("response");
-                                if(response_object.length()>0)
-                                {
-                                    JSONArray location_array = response_object.getJSONArray("locations");
-                                    if(location_array.length()>0)
-                                    {
-                                        city_array.clear();
-                                        city_itemList.clear();
-                                        for (int i = 0; i <location_array.length(); i++)
-                                        {
-                                            JSONObject location_object = location_array.getJSONObject(i);
-                                            RateCard_CityPojo city_pojo = new RateCard_CityPojo();
-                                            city_pojo.setCity_id(location_object.getString("id"));
-                                            city_pojo.setCity_name(location_object.getString("city"));
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
 
-                                            city_array.add(location_object.getString("city"));
+                            Object check_locations_object = response_object.get("locations");
+                            if (check_locations_object instanceof JSONArray) {
+                                JSONArray location_array = response_object.getJSONArray("locations");
+                                if (location_array.length() > 0) {
+                                    city_array.clear();
+                                    city_itemList.clear();
+                                    for (int i = 0; i < location_array.length(); i++) {
+                                        JSONObject location_object = location_array.getJSONObject(i);
+                                        RateCard_CityPojo city_pojo = new RateCard_CityPojo();
+                                        city_pojo.setCity_id(location_object.getString("id"));
+                                        city_pojo.setCity_name(location_object.getString("city"));
 
-                                            city_itemList.add(city_pojo);
-                                        }
+                                        city_array.add(location_object.getString("city"));
 
-                                        isCityAvailable=true;
+                                        city_itemList.add(city_pojo);
                                     }
-                                    else
-                                    {
-                                        isCityAvailable=false;
-                                    }
-                                }
-                                else
-                                {
-                                    isCityAvailable=false;
+
+                                    isCityAvailable = true;
+                                } else {
+                                    isCityAvailable = false;
                                 }
                             }
-                            else
-                            {
-                                isCityAvailable=false;
-                            }
-
-
-                            if (Sstatus.equalsIgnoreCase("1") && isCityAvailable)
-                            {
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(RateCard.this,
-                                        R.layout.ratecard_city_spinner_dropdown, city_array);
-                                city_spinner.setAdapter(adapter);
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                        } else {
+                            isCityAvailable = false;
                         }
-
-                        dialog.dismiss();
-
+                    } else {
+                        isCityAvailable = false;
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    if (Sstatus.equalsIgnoreCase("1") && isCityAvailable) {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(RateCard.this,
+                                R.layout.ratecard_city_spinner_dropdown, city_array);
+                        city_spinner.setAdapter(adapter);
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(RateCard.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("", "");
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
+
     }
 
 
     //-----------------------Car Type Select Post Request-----------------
-    private void postRequest_CarSelect(String Url, final String location_id)
-    {
+    private void postRequest_CarSelect(String Url, final String location_id) {
         dialog = new Dialog(RateCard.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -347,117 +292,86 @@ public class RateCard extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------CarSelect Url----------------" + Url);
 
-        car_postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("location_id", location_id);
 
-                        System.out.println("-------------CarSelect Response----------------"+response);
+        car_mRequest = new ServiceRequest(RateCard.this);
+        car_mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
+                System.out.println("-------------CarSelect Response----------------" + response);
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                JSONObject response_object= object.getJSONObject("response");
-                                if(response_object.length()>0)
-                                {
-                                    JSONArray location_array = response_object.getJSONArray("category");
-                                    if(location_array.length()>0)
-                                    {
-                                        car_array.clear();
-                                        car_itemList.clear();
-                                        for (int i = 0; i <location_array.length(); i++)
-                                        {
-                                            JSONObject location_object = location_array.getJSONObject(i);
-                                            RateCard_CarPojo car_pojo = new RateCard_CarPojo();
-                                            car_pojo.setCar_id(location_object.getString("id"));
-                                            car_pojo.setCat_type(location_object.getString("category"));
+                String Sstatus = "";
+                try {
 
-                                            car_array.add(location_object.getString("category"));
-                                            car_itemList.add(car_pojo);
-                                        }
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
 
-                                        isCarAvailable=true;
+                            Object check_category_object = response_object.get("category");
+                            if (check_category_object instanceof JSONArray) {
+                                JSONArray location_array = response_object.getJSONArray("category");
+                                if (location_array.length() > 0) {
+                                    car_array.clear();
+                                    car_itemList.clear();
+                                    for (int i = 0; i < location_array.length(); i++) {
+                                        JSONObject location_object = location_array.getJSONObject(i);
+                                        RateCard_CarPojo car_pojo = new RateCard_CarPojo();
+                                        car_pojo.setCar_id(location_object.getString("id"));
+                                        car_pojo.setCat_type(location_object.getString("category"));
+
+                                        car_array.add(location_object.getString("category"));
+                                        car_itemList.add(car_pojo);
                                     }
-                                    else
-                                    {
-                                        isCarAvailable=false;
-                                    }
-                                }
-                                else
-                                {
-                                    isCarAvailable=false;
+
+                                    isCarAvailable = true;
+                                } else {
+                                    isCarAvailable = false;
                                 }
                             }
-                            else
-                            {
-                                isCarAvailable=false;
-                            }
-
-
-
-                            if (Sstatus.equalsIgnoreCase("1") && isCarAvailable)
-                            {
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(RateCard.this,
-                                        R.layout.ratecard_city_spinner_dropdown, car_array);
-                                carType_spinner.setAdapter(adapter);
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                        } else {
+                            isCarAvailable = false;
                         }
-
-                        dialog.dismiss();
+                    } else {
+                        isCarAvailable = false;
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    if (Sstatus.equalsIgnoreCase("1") && isCarAvailable) {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(RateCard.this,
+                                R.layout.ratecard_city_spinner_dropdown, car_array);
+                        carType_spinner.setAdapter(adapter);
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(RateCard.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("location_id",location_id);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        car_postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        car_postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(car_postrequest);
+        });
     }
 
 
-
     //-----------------------Rate Card Display Post Request-----------------
-    private void rateCard_displayRequest(String Url, final String location_id,final String category_id)
-    {
+    private void rateCard_displayRequest(String Url, final String location_id, final String category_id) {
         dialog = new Dialog(RateCard.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -465,54 +379,65 @@ public class RateCard extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------Rate Card Url----------------" + Url);
 
-        ratecard_postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("location_id", location_id);
+        jsonParams.put("category_id", category_id);
 
-                        System.out.println("-------------Rate Card Response----------------"+response);
+        rateCard_mRequest = new ServiceRequest(RateCard.this);
+        rateCard_mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
+                System.out.println("-------------Rate Card Response----------------" + response);
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                JSONObject response_object= object.getJSONObject("response");
-                                if(response_object.length()>0)
-                                {
-                                    JSONObject ratecard_object= response_object.getJSONObject("ratecard");
-                                    if(ratecard_object.length()>0)
-                                    {
-                                        Currency currencycode = Currency.getInstance(getLocale(ratecard_object.getString("currency")));
+                String Sstatus = "";
+                try {
 
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+
+                            Object check_ratecard_object = response_object.get("ratecard");
+                            if (check_ratecard_object instanceof JSONObject) {
+
+                                JSONObject ratecard_object = response_object.getJSONObject("ratecard");
+                                if (ratecard_object.length() > 0) {
+                                    Currency currencycode = Currency.getInstance(getLocale(ratecard_object.getString("currency")));
+
+
+                                    Object check_standard_rate_object = ratecard_object.get("standard_rate");
+                                    if (check_standard_rate_object instanceof JSONArray) {
                                         JSONArray standard_array = ratecard_object.getJSONArray("standard_rate");
-                                        if(standard_array.length()>0)
-                                        {
+                                        if (standard_array.length() > 0) {
                                             stdrate_itemList.clear();
-                                            for (int i = 0; i <standard_array.length(); i++) {
+                                            for (int i = 0; i < standard_array.length(); i++) {
                                                 JSONObject standard_object = standard_array.getJSONObject(i);
                                                 RateCard_StdPojo stdrate_pojo = new RateCard_StdPojo();
                                                 stdrate_pojo.setStdrate_title(standard_object.getString("title"));
                                                 stdrate_pojo.setStdrate_sub_title(standard_object.getString("sub_title"));
-                                                stdrate_pojo.setStdrate_fare(currencycode.getSymbol()+standard_object.getString("fare"));
+                                                stdrate_pojo.setStdrate_fare(currencycode.getSymbol() + standard_object.getString("fare"));
                                                 stdrate_pojo.setStdrate_currencySymbol(currencycode.getSymbol());
 
                                                 stdrate_itemList.add(stdrate_pojo);
                                             }
                                         }
+                                    }
+
+
+                                    Object check_extra_charges_object = ratecard_object.get("extra_charges");
+                                    if (check_extra_charges_object instanceof JSONArray) {
 
                                         JSONArray extra_array = ratecard_object.getJSONArray("extra_charges");
-                                        if(extra_array.length()>0)
-                                        {
+                                        if (extra_array.length() > 0) {
                                             rate_itemList.clear();
-                                            for (int j = 0; j <extra_array.length(); j++) {
+                                            for (int j = 0; j < extra_array.length(); j++) {
                                                 JSONObject extra_object = extra_array.getJSONObject(j);
                                                 RateCard_CardDisplayPojo rate_pojo = new RateCard_CardDisplayPojo();
                                                 rate_pojo.setRate_title(extra_object.getString("title"));
@@ -523,83 +448,52 @@ public class RateCard extends ActivityHockeyApp
                                                 rate_itemList.add(rate_pojo);
                                             }
                                         }
-                                        isCarAvailable=true;
                                     }
-                                    else
-                                    {
-                                        isCarAvailable=false;
-                                    }
-                                }
-                                else
-                                {
-                                    isCarAvailable=false;
+
+                                    isCarAvailable = true;
+                                } else {
+                                    isCarAvailable = false;
                                 }
                             }
-                            else
-                            {
-                                isCarAvailable=false;
-                            }
+                        } else {
+                            isCarAvailable = false;
+                        }
+                    } else {
+                        isCarAvailable = false;
+                    }
 
 
-                            if (Sstatus.equalsIgnoreCase("1") && isCarAvailable)
-                            {
+                    if (Sstatus.equalsIgnoreCase("1") && isCarAvailable) {
 
-                                rate_display_layout.setVisibility(View.VISIBLE);
+                        rate_display_layout.setVisibility(View.VISIBLE);
 
-                                if(stdrate_itemList.size()>0)
-                                {
-                                    standardAdapter=new RateCardStandardAdapter(RateCard.this,stdrate_itemList);
-                                    standard_listview.setAdapter(standardAdapter);
-                                }
-
-                                if(rate_itemList.size()>0)
-                                {
-                                    adapter=new RateCardAdapter(RateCard.this,rate_itemList);
-                                    listview.setAdapter(adapter);
-                                }
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                        if (stdrate_itemList.size() > 0) {
+                            standardAdapter = new RateCardStandardAdapter(RateCard.this, stdrate_itemList);
+                            standard_listview.setAdapter(standardAdapter);
                         }
 
-                        dialog.dismiss();
+                        if (rate_itemList.size() > 0) {
+                            adapter = new RateCardAdapter(RateCard.this, rate_itemList);
+                            listview.setAdapter(adapter);
+                        }
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(RateCard.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("location_id",location_id);
-                jsonParams.put("category_id",category_id);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        ratecard_postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        ratecard_postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(ratecard_postrequest);
+        });
     }
 
 

@@ -41,11 +41,17 @@
             android:textSize="18sp"/>
     </RelativeLayout>
 
+    <View
+        android:id="@+id/cabily_money_toolbar_shadow_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/cabily_money_layout_header"
+        android:background="@xml/toolbar_shadow"/>
 
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/cabily_money_layout_header"
+        android:layout_below="@+id/cabily_money_toolbar_shadow_layout"
         android:background="#00000000"
         android:fillViewport="true">
 
@@ -152,11 +158,11 @@
                 android:background="@drawable/grey_border_background"
                 android:hint="@string/cabilymoney_lable_rechargemoney_edittext"
                 android:imeOptions="actionDone"
-                android:paddingLeft="8dp"
                 android:inputType="number"
+                android:maxLength="5"
+                android:paddingLeft="8dp"
                 android:textColor="#4e4e4e"
                 android:textColorHint="#9d9d99"
-                android:maxLength="5"
                 android:textCursorDrawable="@drawable/edittext_cursor_color"
                 android:textSize="14sp"/>
 
@@ -213,10 +219,10 @@
                 android:layout_height="45dp"
                 android:layout_below="@+id/cabily_money_balance_option_layout"
                 android:layout_centerInParent="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:layout_marginTop="50dp"
                 android:background="@color/app_color_button"
-                android:layout_marginRight="15dp"
-                android:layout_marginLeft="15dp"
                 android:text="@string/cabilymoney_lable_addcabilymoney"
                 android:textColor="#ffffff"
                 android:textSize="15sp"

@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -21,33 +20,25 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 10/8/2015.
  */
-public class ChangePassword extends ActivityHockeyApp
-{
+public class ChangePassword extends ActivityHockeyApp {
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private Context context;
@@ -55,7 +46,7 @@ public class ChangePassword extends ActivityHockeyApp
     private RelativeLayout back;
     private EditText Et_old_password, Et_new_password, Et_confirm_password;
     private String UserID = "";
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     private Button Bt_submit;
     Dialog dialog;
 
@@ -63,7 +54,7 @@ public class ChangePassword extends ActivityHockeyApp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.change_password);
-        context=getApplicationContext();
+        context = getApplicationContext();
         initialize();
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -88,19 +79,16 @@ public class ChangePassword extends ActivityHockeyApp
                 } else if (!isValidPassword(Et_new_password.getText().toString())) {
                     erroredit(Et_new_password, getResources().getString(R.string.changepassword_label_alert_newpassword));
                 } else if (!isValidPassword(Et_confirm_password.getText().toString())) {
-                    erroredit(Et_confirm_password, getResources().getString(R.string.changepassword_label_alert_confirmpassword));
-                }
-                else if(!Et_new_password.getText().toString().equals(Et_confirm_password.getText().toString()))
-                {
+                    erroredit(Et_confirm_password, getResources().getString(R.string.changepassword_label_alert_newpassword));
+                } else if (!Et_new_password.getText().toString().equals(Et_confirm_password.getText().toString())) {
                     erroredit(Et_confirm_password, getResources().getString(R.string.changepassword_lable_confirm_notmatch_edittext));
-                }
-                else {
+                } else {
 
                     cd = new ConnectionDetector(ChangePassword.this);
                     isInternetPresent = cd.isConnectingToInternet();
 
                     if (isInternetPresent) {
-                        postRequest_changepassword(Iconstant.changePassword_url);
+                        postRequest_changePassword(Iconstant.changePassword_url);
 
                     } else {
                         Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
@@ -140,8 +128,7 @@ public class ChangePassword extends ActivityHockeyApp
 
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         session = new SessionManager(ChangePassword.this);
 
         Bt_submit = (Button) findViewById(R.id.change_password_submitbutton);
@@ -180,44 +167,38 @@ public class ChangePassword extends ActivityHockeyApp
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(ChangePassword.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(ChangePassword.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //----------------------Code for TextWatcher-------------------------
-    private final TextWatcher EditorWatcher = new TextWatcher()
-    {
+    private final TextWatcher EditorWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after)
-        {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
+
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count)
-        {
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
         }
+
         @Override
-        public void afterTextChanged(Editable s)
-        {
-            if (Et_old_password.getText().length() > 0)
-            {
+        public void afterTextChanged(Editable s) {
+            if (Et_old_password.getText().length() > 0) {
                 Et_old_password.setError(null);
             }
-            if (Et_new_password.getText().length() > 0)
-            {
+            if (Et_new_password.getText().length() > 0) {
                 Et_new_password.setError(null);
             }
-            if (Et_confirm_password.getText().length() > 0)
-            {
+            if (Et_confirm_password.getText().length() > 0) {
                 Et_confirm_password.setError(null);
             }
         }
@@ -225,12 +206,11 @@ public class ChangePassword extends ActivityHockeyApp
 
 
     // ---validating password with retype password---
-    private boolean isValidPassword(String pass)
-    {
+    private boolean isValidPassword(String pass) {
         if (pass.length() < 6) {
             return false;
         }
-			/*
+            /*
 			 * else if(!pass.matches("(.*[A-Z].*)")) { return false; }
 			 */
         else if (!pass.matches("(.*[a-z].*)")) {
@@ -250,8 +230,7 @@ public class ChangePassword extends ActivityHockeyApp
     }
 
     //-----------------------Change Password Post Request-----------------
-    private void postRequest_changepassword(String Url)
-    {
+    private void postRequest_changePassword(String Url) {
         dialog = new Dialog(ChangePassword.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -259,101 +238,61 @@ public class ChangePassword extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_otp));
 
         System.out.println("-------------change password Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("password", Et_old_password.getText().toString());
+        jsonParams.put("new_password", Et_new_password.getText().toString());
 
-                        System.out.println("-------------change password Response----------------"+response);
-
-                        String Sstatus = "", Smessage = "";
-                        try {
-
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("response");
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
-                        if (Sstatus.equalsIgnoreCase("1"))
-                        {
-
-                            final MaterialDialog alertDialog = new MaterialDialog(ChangePassword.this);
-                            alertDialog.setTitle(getResources().getString(R.string.action_success));
-                            alertDialog
-                                    .setMessage(getResources().getString(R.string.changepassword_label_changed_success))
-                                    .setCanceledOnTouchOutside(false)
-                                    .setPositiveButton(
-                                            "OK", new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dismiss();
-                                                    onBackPressed();
-                                                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                    finish();
-                                                }
-                                            }
-                                    ).show();
-
-                        }
-                        else
-                        {
-                            final MaterialDialog alertDialog = new MaterialDialog(ChangePassword.this);
-                            alertDialog.setTitle(getResources().getString(R.string.action_error));
-                            alertDialog
-                                    .setMessage(Smessage)
-                                    .setCanceledOnTouchOutside(false)
-                                    .setPositiveButton(
-                                            "OK", new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    alertDialog.dismiss();
-                                                }
-                                            }
-                                    ).show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
+        mRequest = new ServiceRequest(ChangePassword.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------change password Response----------------" + response);
+
+                String Sstatus = "", Smessage = "";
+                try {
+
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("response");
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ChangePassword.this, error);
+                if (Sstatus.equalsIgnoreCase("1")) {
+
+                    final PkDialog mDialog = new PkDialog(ChangePassword.this);
+                    mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                    mDialog.setDialogMessage(getResources().getString(R.string.changepassword_label_changed_success));
+                    mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mDialog.dismiss();
+                            onBackPressed();
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            finish();
+                        }
+                    });
+                    mDialog.show();
+                } else {
+                    Alert(getResources().getString(R.string.action_error), Smessage);
+                }
             }
-        }) {
 
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("password", Et_old_password.getText().toString());
-                jsonParams.put("new_password", Et_new_password.getText().toString());
-
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
     //-----------------Move Back on pressed phone back button------------------

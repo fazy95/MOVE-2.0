@@ -1,17 +1,11 @@
 package com.cabily.app;
 
-/**
- * Created by Prem Kumar on 10/1/2015.
- */
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.cabily.iconstant.Iconstant;
@@ -31,7 +25,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.gps.GPSTracker;
 import com.mylibrary.volley.ServiceRequest;
-import com.mylibrary.xmpp.ChatService;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONException;
@@ -40,13 +33,13 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 
-public class SplashPage extends Activity implements GoogleApiClient.ConnectionCallbacks,
+/**
+ * Created by Prem Kumar and Anitha on 12/23/2015.
+ */
+public class UpdateUserLocation extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    // Splash screen timer
-    private static int SPLASH_TIME_OUT = 2000;
     SessionManager session;
-    Context context;
     GPSTracker gps;
 
     LocationRequest mLocationRequest;
@@ -62,36 +55,28 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash);
-        context = getApplicationContext();
-        cd = new ConnectionDetector(SplashPage.this);
-        isInternetPresent = cd.isConnectingToInternet();
-        avLoadingIndicatorView = (AVLoadingIndicatorView) findViewById(R.id.splash_avLoadingIndicatorView);
-
-        // Session class instance
-        session = new SessionManager(getApplicationContext());
-        gps = new GPSTracker(getApplicationContext());
-
-        mGoogleApiClient = new GoogleApiClient.Builder(SplashPage.this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).build();
-        mGoogleApiClient.connect();
-
-
-        //Enable WiFi Automatically
-        /*WifiManager wifiManager = (WifiManager) SplashPage.this.getSystemService(Context.WIFI_SERVICE);
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }*/
+        setContentView(R.layout.update_user_location);
+        initialize();
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 setLocation();
             }
-        }, SPLASH_TIME_OUT);
+        }, 2000);
 
+    }
+
+    private void initialize() {
+        cd = new ConnectionDetector(UpdateUserLocation.this);
+        session = new SessionManager(getApplicationContext());
+        gps = new GPSTracker(getApplicationContext());
+
+        mGoogleApiClient = new GoogleApiClient.Builder(UpdateUserLocation.this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -110,36 +95,25 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
 
 
     private void setLocation() {
-        cd = new ConnectionDetector(SplashPage.this);
+        cd = new ConnectionDetector(UpdateUserLocation.this);
         isInternetPresent = cd.isConnectingToInternet();
 
         if (isInternetPresent) {
             if (gps.isgpsenabled() && gps.canGetLocation()) {
-                if (session.isLoggedIn()) {
-                    //starting XMPP service
-                    ChatService.startUserAction(SplashPage.this);
 
-                    HashMap<String, String> user = session.getUserDetails();
-                    userID = user.get(SessionManager.KEY_USERID);
-                    sLatitude = String.valueOf(gps.getLatitude());
-                    sLongitude = String.valueOf(gps.getLongitude());
+                HashMap<String, String> user = session.getUserDetails();
+                userID = user.get(SessionManager.KEY_USERID);
+                sLatitude = String.valueOf(gps.getLatitude());
+                sLongitude = String.valueOf(gps.getLongitude());
 
-                    postRequest_SetUserLocation(Iconstant.setUserLocation);
-
-                } else {
-                    Intent i = new Intent(SplashPage.this, SingUpAndSignIn.class);
-                    startActivity(i);
-                    finish();
-                    overridePendingTransition(R.anim.enter, R.anim.exit);
-                }
+                postRequest_SetUserLocation(Iconstant.setUserLocation);
 
             } else {
                 enableGpsService();
             }
         } else {
 
-
-            final PkDialog mDialog = new PkDialog(SplashPage.this);
+            final PkDialog mDialog = new PkDialog(UpdateUserLocation.this);
             mDialog.setDialogTitle(getResources().getString(R.string.alert_nointernet));
             mDialog.setDialogMessage(getResources().getString(R.string.alert_nointernet_message));
             mDialog.setPositiveButton(getResources().getString(R.string.timer_label_alert_retry), new View.OnClickListener() {
@@ -147,13 +121,6 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
                 public void onClick(View v) {
                     mDialog.dismiss();
                     setLocation();
-                }
-            });
-            mDialog.setNegativeButton(getResources().getString(R.string.timer_label_alert_cancel), new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mDialog.dismiss();
-                    finish();
                 }
             });
             mDialog.show();
@@ -191,7 +158,7 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
-                            status.startResolutionForResult(SplashPage.this, REQUEST_LOCATION);
+                            status.startResolutionForResult(UpdateUserLocation.this, REQUEST_LOCATION);
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
@@ -207,46 +174,34 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
         });
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_LOCATION:
                 switch (resultCode) {
                     case Activity.RESULT_OK: {
-                        Toast.makeText(SplashPage.this, "Location enabled!", Toast.LENGTH_LONG).show();
-                        if (session.isLoggedIn()) {
-                            //starting XMPP service
-                            ChatService.startUserAction(SplashPage.this);
 
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
 
-                                    session = new SessionManager(getApplicationContext());
-                                    gps = new GPSTracker(SplashPage.this);
+                                session = new SessionManager(getApplicationContext());
+                                gps = new GPSTracker(UpdateUserLocation.this);
 
-                                    HashMap<String, String> user = session.getUserDetails();
-                                    userID = user.get(SessionManager.KEY_USERID);
-                                    sLatitude = String.valueOf(gps.getLatitude());
-                                    sLongitude = String.valueOf(gps.getLongitude());
+                                HashMap<String, String> user = session.getUserDetails();
+                                userID = user.get(SessionManager.KEY_USERID);
+                                sLatitude = String.valueOf(gps.getLatitude());
+                                sLongitude = String.valueOf(gps.getLongitude());
 
-                                    postRequest_SetUserLocation(Iconstant.setUserLocation);
+                                postRequest_SetUserLocation(Iconstant.setUserLocation);
 
-                                }
-                            }, 2000);
-
-                        } else {
-                            Intent i = new Intent(SplashPage.this, SingUpAndSignIn.class);
-                            startActivity(i);
-                            finish();
-                            overridePendingTransition(R.anim.enter, R.anim.exit);
-                        }
+                            }
+                        }, 2000);
 
                         break;
                     }
                     case Activity.RESULT_CANCELED: {
-                        finish();
+                        enableGpsService();
                         break;
                     }
                     default: {
@@ -270,13 +225,13 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
         jsonParams.put("latitude", sLatitude);
         jsonParams.put("longitude", sLongitude);
 
-        System.out.println("-------------Splash UserLocation Url----------------" + Url);
-        mRequest = new ServiceRequest(SplashPage.this);
+        System.out.println("-------------UpdateUserLocation UserLocation Url----------------" + Url);
+        mRequest = new ServiceRequest(UpdateUserLocation.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
 
-                System.out.println("-------------Splash UserLocation Response----------------" + response);
+                System.out.println("-------------UpdateUserLocation UserLocation Response----------------" + response);
 
                 String Str_status = "", sCategoryID = "";
                 try {
@@ -291,16 +246,16 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
                     e.printStackTrace();
                 }
 
-                Intent i = new Intent(SplashPage.this, NavigationDrawer.class);
-                startActivity(i);
+                Intent intent = new Intent(UpdateUserLocation.this, NavigationDrawer.class);
+                startActivity(intent);
                 finish();
                 overridePendingTransition(R.anim.enter, R.anim.exit);
             }
 
             @Override
             public void onErrorListener() {
-                Intent i = new Intent(SplashPage.this, NavigationDrawer.class);
-                startActivity(i);
+                Intent intent = new Intent(UpdateUserLocation.this, NavigationDrawer.class);
+                startActivity(intent);
                 finish();
                 overridePendingTransition(R.anim.enter, R.anim.exit);
             }
@@ -308,4 +263,3 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
     }
 
 }
-

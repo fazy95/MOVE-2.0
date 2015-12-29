@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -32,30 +34,30 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.FragmentActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
+import com.cabily.utils.CountryDialCode;
 import com.casperon.app.cabily.R;
 import com.countrycodepicker.CountryPicker;
 import com.countrycodepicker.CountryPickerListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.gps.GPSTracker;
 import com.mylibrary.pushnotification.GCMInitializer;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 
 import me.drakeet.materialdialog.MaterialDialog;
+
 
 public class RegisterPage extends FragmentActivityHockeyApp {
     private RelativeLayout back;
@@ -69,7 +71,7 @@ public class RegisterPage extends FragmentActivityHockeyApp {
     private ConnectionDetector cd;
     private Context context;
 
-    StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     Handler mHandler;
     //------------------GCM Initialization------------------
@@ -77,6 +79,7 @@ public class RegisterPage extends FragmentActivityHockeyApp {
     private String GCM_Id = "";
 
     CountryPicker picker;
+    private GPSTracker gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +167,7 @@ public class RegisterPage extends FragmentActivityHockeyApp {
                         initializer.init();
 
                     } else {
-                        Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                        Alert(getResources().getString(R.string.alert_nointernet), getResources().getString(R.string.alert_nointernet_message));
                     }
                 }
             }
@@ -243,6 +246,30 @@ public class RegisterPage extends FragmentActivityHockeyApp {
 
         Eusername.addTextChangedListener(loginEditorWatcher);
         Epassword.addTextChangedListener(loginEditorWatcher);
+
+
+        gpsTracker = new GPSTracker(RegisterPage.this);
+        if (gpsTracker.canGetLocation() && gpsTracker.isgpsenabled()) {
+
+            double MyCurrent_lat = gpsTracker.getLatitude();
+            double MyCurrent_long = gpsTracker.getLongitude();
+
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(MyCurrent_lat, MyCurrent_long, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+
+                    String Str_getCountryCode = addresses.get(0).getCountryCode();
+                    if (Str_getCountryCode.length() > 0 && !Str_getCountryCode.equals(null) && !Str_getCountryCode.equals("null")) {
+                        String Str_countyCode = CountryDialCode.getCountryCode(Str_getCountryCode);
+                        Tv_countryCode.setText(Str_countyCode);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void Referral_information() {
@@ -266,18 +293,18 @@ public class RegisterPage extends FragmentActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(RegisterPage.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(RegisterPage.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     //----------------------Code for TextWatcher-------------------------
@@ -339,8 +366,8 @@ public class RegisterPage extends FragmentActivityHockeyApp {
         } else if (!pass.matches("(.*[0-9].*)")) {
             return false;
         }
-			/*
-			 * else if(!pass.matches(
+            /*
+             * else if(!pass.matches(
 			 * "(.*[,~,!,@,#,$,%,^,&,*,(,),-,_,=,+,[,{,],},|,;,:,<,>,/,?].*$)")) {
 			 * return false; }
 			 */
@@ -371,7 +398,7 @@ public class RegisterPage extends FragmentActivityHockeyApp {
             dialog.show();
 
             TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
-            dialog_title.setText(getResources().getString(R.string.action_signingUp));
+            dialog_title.setText(getResources().getString(R.string.action_verifying));
         }
     };
 
@@ -381,9 +408,19 @@ public class RegisterPage extends FragmentActivityHockeyApp {
 
         System.out.println("--------------register url-------------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_name", Eusername.getText().toString());
+        jsonParams.put("email", Eemail.getText().toString());
+        jsonParams.put("password", Epassword.getText().toString());
+        jsonParams.put("phone_number", EphoneNo.getText().toString());
+        jsonParams.put("country_code", Tv_countryCode.getText().toString());
+        jsonParams.put("referal_code", Ereferalcode.getText().toString());
+        jsonParams.put("gcm_id", GCM_Id);
+
+        mRequest = new ServiceRequest(RegisterPage.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------register reponse-------------------" + response);
 
@@ -417,22 +454,11 @@ public class RegisterPage extends FragmentActivityHockeyApp {
                     intent.putExtra("ReferalCode", Ereferalcode.getText().toString());
                     intent.putExtra("GcmID", GCM_Id);
                     startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
                 } else {
-                    final MaterialDialog alertDialog = new MaterialDialog(RegisterPage.this);
-                    alertDialog.setTitle("Error");
-                    alertDialog
-                            .setMessage(Smessage)
-                            .setCanceledOnTouchOutside(false)
-                            .setPositiveButton(
-                                    "OK", new OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            alertDialog.dismiss();
-                                        }
-                                    }
-                            ).show();
+                    Alert(getResources().getString(R.string.login_label_alert_register_failed), Smessage);
                 }
 
                 // close keyboard
@@ -440,45 +466,13 @@ public class RegisterPage extends FragmentActivityHockeyApp {
                 mgr.hideSoftInputFromWindow(Eusername.getWindowToken(), 0);
 
                 dialog.dismiss();
-
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
-
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(RegisterPage.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                System.out.println("--------country_code-------------"+Tv_countryCode.getText().toString());
-
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_name", Eusername.getText().toString());
-                jsonParams.put("email", Eemail.getText().toString());
-                jsonParams.put("password", Epassword.getText().toString());
-                jsonParams.put("phone_number", EphoneNo.getText().toString());
-                jsonParams.put("country_code", Tv_countryCode.getText().toString());
-                jsonParams.put("referal_code", Ereferalcode.getText().toString());
-                jsonParams.put("gcm_id", GCM_Id);
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 

@@ -38,9 +38,9 @@ public class SessionManager {
     public static final String KEY_PHONENO = "phoneno";
     public static final String KEY_REFERAL_CODE = "referalcode";
     public static final String KEY_CATEGORY = "category";
+    public static final String KEY_CATEGORY_ID = "categoryId";
 
     public static final String KEY_COUPON_CODE = "coupon";
-
     public static final String KEY_WALLET_AMOUNT = "walletAmount";
 
     public static final String KEY_XMPP_USERID = "xmppUserId";
@@ -68,6 +68,12 @@ public class SessionManager {
         editor.putString(KEY_CATEGORY, category);
 
         // commit changes
+        editor.commit();
+    }
+
+    public void setCategoryID(String categoryID)
+    {
+        editor.putString(KEY_CATEGORY_ID, categoryID);
         editor.commit();
     }
 
@@ -120,7 +126,6 @@ public class SessionManager {
         user.put(KEY_REFERAL_CODE, pref.getString(KEY_REFERAL_CODE, ""));
         user.put(KEY_CATEGORY, pref.getString(KEY_CATEGORY, ""));
 
-
         return user;
     }
 
@@ -131,6 +136,14 @@ public class SessionManager {
         code.put(KEY_COUPON_CODE, pref.getString(KEY_COUPON_CODE, ""));
 
         return code;
+    }
+
+
+    //-----------Get CategoryId code-----
+    public HashMap<String, String> getCategoryID() {
+        HashMap<String, String> catID = new HashMap<String, String>();
+        catID.put(KEY_CATEGORY_ID, pref.getString(KEY_CATEGORY_ID, ""));
+        return catID;
     }
 
 

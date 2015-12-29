@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,33 +7,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONException;
@@ -44,9 +34,7 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 10/20/2015.
@@ -68,7 +56,8 @@ public class CabilyMoney extends ActivityHockeyApp
     private static EditText Et_cabilymoney_enteramount;
     private RelativeLayout layout_current_transaction;
 
-    private StringRequest postrequest;
+
+    private ServiceRequest mRequest;
     Dialog dialog;
     private boolean isRechargeAvailable=false;
     private String Sauto_charge_status="";
@@ -289,19 +278,18 @@ public class CabilyMoney extends ActivityHockeyApp
 
 
     //--------------Alert Method-----------
-    private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(CabilyMoney.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+    private void Alert(String title, String alert)
+    {
+        final PkDialog mDialog = new PkDialog(CabilyMoney.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //method to convert currency code to currency symbol
@@ -347,105 +335,76 @@ public class CabilyMoney extends ActivityHockeyApp
 
         System.out.println("-------------CabilyMoney Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        mRequest = new ServiceRequest(CabilyMoney.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        System.out.println("-------------CabilyMoney Response----------------"+response);
+                System.out.println("-------------CabilyMoney Response----------------" + response);
 
-                        String Sstatus = "",Scurrency_code="", Scurrentbalance="";
-                        Currency currencycode = null;
+                String Sstatus = "", Scurrency_code = "", Scurrentbalance = "";
+                Currency currencycode = null;
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Sauto_charge_status = object.getString("auto_charge_status");
-                            if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                JSONObject response_object =object.getJSONObject("response");
-                                if(response_object.length()>0)
-                                {
-                                    Scurrency_code = response_object.getString("currency");
-                                    currencycode = Currency.getInstance(getLocale(Scurrency_code));
-                                    Scurrentbalance = response_object.getString("current_balance");
-                                    Str_currentbalance = response_object.getString("current_balance");
-                                    ScurrencySymbol=currencycode.getSymbol();
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Sauto_charge_status = object.getString("auto_charge_status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            Scurrency_code = response_object.getString("currency");
+                            currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                            Scurrentbalance = response_object.getString("current_balance");
+                            Str_currentbalance = response_object.getString("current_balance");
+                            ScurrencySymbol = currencycode.getSymbol();
 
-                                    JSONObject recharge_object = response_object.getJSONObject("recharge_boundary");
-                                    if(recharge_object.length()>0)
-                                    {
-                                        Str_minimum_amt  = recharge_object.getString("min_amount");
-                                        Str_maximum_amt = recharge_object.getString("max_amount");
-                                        Str_midle_amt = recharge_object.getString("middle_amount");
-                                        isRechargeAvailable=true;
-                                    }
-                                    else
-                                    {
-                                        isRechargeAvailable=false;
-                                    }
+                            Object check_recharge_boundary_object = response_object.get("recharge_boundary");
+                            if (check_recharge_boundary_object instanceof JSONObject) {
+                                JSONObject recharge_object = response_object.getJSONObject("recharge_boundary");
+                                if (recharge_object.length() > 0) {
+                                    Str_minimum_amt = recharge_object.getString("min_amount");
+                                    Str_maximum_amt = recharge_object.getString("max_amount");
+                                    Str_midle_amt = recharge_object.getString("middle_amount");
+                                    isRechargeAvailable = true;
+                                } else {
+                                    isRechargeAvailable = false;
                                 }
                             }
-                            else
-                            {
-                                isRechargeAvailable=false;
-                            }
-
-
-
-                            if(Sstatus.equalsIgnoreCase("1")&&isRechargeAvailable)
-                            {
-                                session.createWalletAmount(currencycode.getSymbol()+Str_currentbalance);
-                                NavigationDrawer.navigationNotifyChange();
-
-                                Bt_cabilymoney_minimum_amount.setText(currencycode.getSymbol()+Str_minimum_amt);
-                                Bt_cabilymoney_maximum_amount.setText(currencycode.getSymbol()+Str_maximum_amt);
-                                Bt_cabilymoney_between_amount.setText(currencycode.getSymbol()+Str_midle_amt);
-                                Tv_cabilymoney_current_balnce.setText(currencycode.getSymbol()+Scurrentbalance);
-                                Et_cabilymoney_enteramount.setHint(getResources().getString(R.string.cabilymoney_lable_rechargemoney_edittext_hint)+" "+currencycode.getSymbol()+Str_minimum_amt+" "+"-"+" "+currencycode.getSymbol()+Str_maximum_amt);
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
-
-                        dialog.dismiss();
-
+                    } else {
+                        isRechargeAvailable = false;
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    if (Sstatus.equalsIgnoreCase("1") && isRechargeAvailable) {
+                        session.createWalletAmount(currencycode.getSymbol() + Str_currentbalance);
+                        NavigationDrawer.navigationNotifyChange();
+
+                        Bt_cabilymoney_minimum_amount.setText(currencycode.getSymbol() + Str_minimum_amt);
+                        Bt_cabilymoney_maximum_amount.setText(currencycode.getSymbol() + Str_maximum_amt);
+                        Bt_cabilymoney_between_amount.setText(currencycode.getSymbol() + Str_midle_amt);
+                        Tv_cabilymoney_current_balnce.setText(currencycode.getSymbol() + Scurrentbalance);
+                        Et_cabilymoney_enteramount.setHint(getResources().getString(R.string.cabilymoney_lable_rechargemoney_edittext_hint) + " " + currencycode.getSymbol() + Str_minimum_amt + " " + "-" + " " + currencycode.getSymbol() + Str_maximum_amt);
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(CabilyMoney.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -462,76 +421,55 @@ public class CabilyMoney extends ActivityHockeyApp
         TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
-
         System.out.println("-------------Cabily ADD Money Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("total_amount",Et_cabilymoney_enteramount.getText().toString());
 
-                        System.out.println("-------------Cabily ADD Money Response----------------"+response);
+        mRequest = new ServiceRequest(CabilyMoney.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
+                System.out.println("-------------Cabily ADD Money Response----------------"+response);
 
-                        String Sstatus = "", Smessage = "",Swallet_money="";
+                String Sstatus = "", Smessage = "",Swallet_money="";
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("msg");
-                            Swallet_money = object.getString("wallet_amount");
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("msg");
+                    Swallet_money = object.getString("wallet_amount");
 
-                            if (Sstatus.equalsIgnoreCase("1"))
-                            {
-                                session.createWalletAmount(ScurrencySymbol+Swallet_money);
-                                NavigationDrawer.navigationNotifyChange();
+                    if (Sstatus.equalsIgnoreCase("1"))
+                    {
+                        session.createWalletAmount(ScurrencySymbol+Swallet_money);
+                        NavigationDrawer.navigationNotifyChange();
 
-                                Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.action_loading_cabilymoney_transaction_wallet_success));
-                                Et_cabilymoney_enteramount.setText("");
-                                Tv_cabilymoney_current_balnce.setText(ScurrencySymbol+Swallet_money);
-                                Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                                Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                                Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                            }
-                            else
-                            {
-                                Alert(getResources().getString(R.string.action_error), Smessage);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
+                        Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.action_loading_cabilymoney_transaction_wallet_success));
+                        Et_cabilymoney_enteramount.setText("");
+                        Tv_cabilymoney_current_balnce.setText(ScurrencySymbol+Swallet_money);
+                        Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                        Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                        Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     }
-                }, new Response.ErrorListener() {
+                    else
+                    {
+                        Alert(getResources().getString(R.string.action_error), Smessage);
+                    }
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(CabilyMoney.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("total_amount",Et_cabilymoney_enteramount.getText().toString());
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 

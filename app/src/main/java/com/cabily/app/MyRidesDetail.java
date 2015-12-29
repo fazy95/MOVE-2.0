@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -22,6 +20,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,17 +28,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.CancelTripPojo;
 import com.cabily.pojo.MyRideDetailPojo;
-import com.cabily.pojo.PaymentListPojo;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
@@ -50,8 +43,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONArray;
@@ -63,9 +56,9 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import me.drakeet.materialdialog.MaterialDialog;
+
 
 /**
  * Created by Prem Kumar and Anitha on 10/29/2015.
@@ -77,7 +70,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
     private SessionManager session;
     private String UserID = "";
 
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     ArrayList<MyRideDetailPojo> itemlist;
     ArrayList<CancelTripPojo> itemlist_reason;
@@ -100,6 +93,7 @@ public class MyRidesDetail extends ActivityHockeyApp {
     public static MyRidesDetail myrideDetail_class;
 
     private String Str_LocationLatitude = "", Str_LocationLongitude = "";
+    private String currencySymbol = "";
 
     //------Invoice Dialog Declaration-----
     private EditText Et_dialog_InvoiceEmail;
@@ -112,7 +106,11 @@ public class MyRidesDetail extends ActivityHockeyApp {
     //------Tip Declaration-----
     private EditText Et_tip_Amount;
     private Button Bt_tip_Apply;
-    private RelativeLayout Rl_tip;
+    private RelativeLayout Rl_tip, Rl_main_tip;
+    private CheckBox Cb_tip;
+    private TextView Tv_tipAmount;
+    private LinearLayout Ll_deleteTip;
+
 
     public class RefreshReceiver extends BroadcastReceiver {
         @Override
@@ -151,40 +149,32 @@ public class MyRidesDetail extends ActivityHockeyApp {
             @Override
             public void onClick(View v) {
 
-                View view = View.inflate(MyRidesDetail.this, R.layout.material_alert_dialog, null);
-                final MaterialDialog mdialog = new MaterialDialog(MyRidesDetail.this);
-                mdialog.setContentView(view)
-                      .setPositiveButton(
-                                getResources().getString(R.string.my_rides_detail_cancel_ride_alert_yes), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        mdialog.dismiss();
 
-                                        cd = new ConnectionDetector(MyRidesDetail.this);
-                                        isInternetPresent = cd.isConnectingToInternet();
+                final PkDialog mDialog = new PkDialog(MyRidesDetail.this);
+                mDialog.setDialogTitle(getResources().getString(R.string.my_rides_detail_cancel_ride_alert_title));
+                mDialog.setDialogMessage(getResources().getString(R.string.my_rides_detail_cancel_ride_alert));
+                mDialog.setPositiveButton(getResources().getString(R.string.my_rides_detail_cancel_ride_alert_yes), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
+                        cd = new ConnectionDetector(MyRidesDetail.this);
+                        isInternetPresent = cd.isConnectingToInternet();
 
-                                        if (isInternetPresent) {
-                                            postRequest_CancelRides_Reason(Iconstant.cancel_myride_reason_url);
-                                        } else {
-                                            Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
-                                        }
-                                    }
-                                }
-                        )
-                      .setNegativeButton(
-                              getResources().getString(R.string.my_rides_detail_cancel_ride_alert_no), new View.OnClickListener() {
-                                  @Override
-                                  public void onClick(View v) {
-                                      mdialog.dismiss();
-                                  }
-                              }
-                      )
-                      .show();
+                        if (isInternetPresent) {
+                            postRequest_CancelRides_Reason(Iconstant.cancel_myride_reason_url);
+                        } else {
+                            Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                        }
+                    }
+                });
+                mDialog.setNegativeButton(getResources().getString(R.string.my_rides_detail_cancel_ride_alert_no), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.dismiss();
+                    }
+                });
+                mDialog.show();
 
-                TextView alert_title=(TextView)view.findViewById(R.id.material_alert_message_label);
-                TextView alert_message=(TextView)view.findViewById(R.id.material_alert_message_textview);
-                alert_title.setText(getResources().getString(R.string.my_rides_detail_cancel_ride_alert_title));
-                alert_message.setText(getResources().getString(R.string.my_rides_detail_cancel_ride_alert));
             }
         });
 
@@ -249,25 +239,42 @@ public class MyRidesDetail extends ActivityHockeyApp {
                 cd = new ConnectionDetector(MyRidesDetail.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if(Et_tip_Amount.getText().toString().length()>0)
-                {
+                if (Et_tip_Amount.getText().toString().length() > 0) {
                     if (isInternetPresent) {
-                        if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_apply_label)))
-                        {
-                            postRequest_Tip(Iconstant.tip_add_url,"Apply");
-                        }
-                        else if(Bt_tip_Apply.getText().toString().equalsIgnoreCase(getResources().getString(R.string.my_rides_detail_tip_remove_label)))
-                        {
-                            postRequest_Tip(Iconstant.tip_remove_url,"Remove");
-                        }
+                        postRequest_Tip(Iconstant.tip_add_url, "Apply");
                     } else {
                         Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                     }
-                }
-                else {
+                } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.my_rides_detail_tip_empty_label));
                 }
+            }
+        });
 
+        Cb_tip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (((CheckBox) v).isChecked()) {
+                    Rl_tip.setVisibility(View.VISIBLE);
+                } else {
+                    Rl_tip.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+        Ll_deleteTip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                cd = new ConnectionDetector(MyRidesDetail.this);
+                isInternetPresent = cd.isConnectingToInternet();
+
+                if (isInternetPresent) {
+                    postRequest_Tip(Iconstant.tip_remove_url, "Remove");
+                } else {
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                }
             }
         });
 
@@ -337,9 +344,14 @@ public class MyRidesDetail extends ActivityHockeyApp {
         Ll_reportIssue = (LinearLayout) findViewById(R.id.my_rides_detail_report_issue_layout);
         Ll_trackRide = (LinearLayout) findViewById(R.id.my_rides_detail_track_ride_layout);
 
-        Et_tip_Amount =(EditText)findViewById(R.id.my_rides_detail_tip_editText);
-        Bt_tip_Apply =(Button)findViewById(R.id.my_rides_detail_tip_apply_button);
-        Rl_tip =(RelativeLayout)findViewById(R.id.my_rides_detail_tip_layout);
+        Et_tip_Amount = (EditText) findViewById(R.id.my_rides_detail_tip_editText);
+        Bt_tip_Apply = (Button) findViewById(R.id.my_rides_detail_tip_apply_button);
+        Rl_main_tip = (RelativeLayout) findViewById(R.id.my_rides_detail_tip_top_layout);
+        Rl_tip = (RelativeLayout) findViewById(R.id.my_rides_detail_tip_layout);
+        Cb_tip = (CheckBox) findViewById(R.id.my_rides_detail_tip_checkBox);
+        Tv_tipAmount = (TextView) findViewById(R.id.my_rides_detail_tip_amount_textView);
+        Ll_deleteTip = (LinearLayout) findViewById(R.id.my_rides_detail_tip_amount_remove_layout);
+
 
         // -----code to refresh drawer using broadcast receiver-----
         refreshReceiver = new RefreshReceiver();
@@ -364,18 +376,18 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(MyRidesDetail.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(MyRidesDetail.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     //method to convert currency code to currency symbol
@@ -571,39 +583,55 @@ public class MyRidesDetail extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_loading));
 
         System.out.println("-------------MyRide Detail Url----------------" + Url);
+        System.out.println("-------------MyRide Detail user_id----------------" + UserID);
+        System.out.println("-------------MyRide Detail ride_id----------------" + SrideId_intent);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        System.out.println("-------------MyRide Detail Response----------------" + response);
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        Currency currencycode;
+                System.out.println("-------------MyRide Detail Response----------------" + response);
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONObject detail_object = response_object.getJSONObject("details");
-                                    if (detail_object.length() > 0) {
-                                        itemlist.clear();
-                                        MyRideDetailPojo pojo = new MyRideDetailPojo();
+                String Sstatus = "";
+                Currency currencycode;
 
-                                        currencycode = Currency.getInstance(getLocale(detail_object.getString("currency")));
-                                        pojo.setCurrrencySymbol(currencycode.getSymbol());
-                                        pojo.setCarType(detail_object.getString("cab_type"));
-                                        pojo.setRideId(detail_object.getString("ride_id"));
-                                        pojo.setRideStatus(detail_object.getString("ride_status"));
-                                        pojo.setDisplayStatus(detail_object.getString("disp_status"));
-                                        pojo.setDoCancelAction(detail_object.getString("do_cancel_action"));
-                                        pojo.setDoTrackAction(detail_object.getString("do_track_action"));
-                                        pojo.setIsFavLocation(detail_object.getString("is_fav_location"));
-                                        pojo.setPay_status(detail_object.getString("pay_status"));
-                                        pojo.setPickup(getResources().getString(R.string.my_rides_detail_pickup_textview) + " " + detail_object.getString("pickup_date"));
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+
+                            Object check_details_object = response_object.get("details");
+                            if (check_details_object instanceof JSONObject) {
+
+                                JSONObject detail_object = response_object.getJSONObject("details");
+                                if (detail_object.length() > 0) {
+                                    itemlist.clear();
+                                    MyRideDetailPojo pojo = new MyRideDetailPojo();
+
+                                    currencycode = Currency.getInstance(getLocale(detail_object.getString("currency")));
+                                    currencySymbol = currencycode.getSymbol();
+
+                                    pojo.setCurrrencySymbol(currencycode.getSymbol());
+                                    pojo.setCarType(detail_object.getString("cab_type"));
+                                    pojo.setRideId(detail_object.getString("ride_id"));
+                                    pojo.setRideStatus(detail_object.getString("ride_status"));
+                                    pojo.setDisplayStatus(detail_object.getString("disp_status"));
+                                    pojo.setDoCancelAction(detail_object.getString("do_cancel_action"));
+                                    pojo.setDoTrackAction(detail_object.getString("do_track_action"));
+                                    pojo.setIsFavLocation(detail_object.getString("is_fav_location"));
+                                    pojo.setPay_status(detail_object.getString("pay_status"));
+                                    pojo.setPickup(getResources().getString(R.string.my_rides_detail_pickup_textview) + " " + detail_object.getString("pickup_date"));
+
+
+                                    Object check_pickup_object = detail_object.get("pickup");
+                                    if (check_pickup_object instanceof JSONObject) {
 
                                         JSONObject pickup_object = detail_object.getJSONObject("pickup");
                                         if (pickup_object.length() > 0) {
@@ -618,9 +646,15 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                         } else {
                                             isPickUpAvailable = false;
                                         }
+                                    }
 
-                                        if (detail_object.getString("ride_status").equalsIgnoreCase("Completed") || detail_object.getString("ride_status").equalsIgnoreCase("Finished")) {
-                                            pojo.setDrop(getResources().getString(R.string.my_rides_detail_drop_textview) + " " + " " + detail_object.getString("drop_date"));
+
+                                    if (detail_object.getString("ride_status").equalsIgnoreCase("Completed") || detail_object.getString("ride_status").equalsIgnoreCase("Finished")) {
+                                        pojo.setDrop(getResources().getString(R.string.my_rides_detail_drop_textview) + " " + " " + detail_object.getString("drop_date"));
+
+
+                                        Object check_summary_object = detail_object.get("summary");
+                                        if (check_summary_object instanceof JSONObject) {
 
                                             JSONObject summary_object = detail_object.getJSONObject("summary");
                                             if (summary_object.length() > 0) {
@@ -632,6 +666,11 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                             } else {
                                                 isSummaryAvailable = false;
                                             }
+                                        }
+
+
+                                        Object check_fare_object = detail_object.get("fare");
+                                        if (check_fare_object instanceof JSONObject) {
 
                                             JSONObject fare_object = detail_object.getJSONObject("fare");
                                             if (fare_object.length() > 0) {
@@ -647,200 +686,182 @@ public class MyRidesDetail extends ActivityHockeyApp {
                                             }
                                         }
 
-                                        itemlist.add(pojo);
                                     }
+
+                                    itemlist.add(pojo);
                                 }
                             }
 
-
-
-
-                            //------------OnPost Execute------------
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                if (itemlist.size() > 0) {
-                                    Rl_address.setVisibility(View.VISIBLE);
-                                    Rl_pickup.setVisibility(View.VISIBLE);
-
-                                    Tv_carType.setText(getResources().getString(R.string.my_rides_detail_city_taxi_textview) + " " + itemlist.get(0).getCarType() + " " + getResources().getString(R.string.my_rides_detail_ride_textview));
-                                    Tv_carNo.setText(getResources().getString(R.string.my_rides_detail_crn_textview) + " " + itemlist.get(0).getRideId());
-                                    Tv_rideStatus.setText(itemlist.get(0).getRideStatus());
-
-                                    if (isPickUpAvailable) {
-                                        Tv_address.setText(itemlist.get(0).getAddress());
-                                        Tv_pickup.setText(itemlist.get(0).getPickup());
-
-
-                                        //set marker for User location.
-                                        if (itemlist.get(0).getLocationLat() != null && itemlist.get(0).getLocationLong() != null) {
-
-                                            Str_LocationLatitude = itemlist.get(0).getLocationLat();
-                                            Str_LocationLongitude = itemlist.get(0).getLocationLong();
-
-                                            googleMap.addMarker(new MarkerOptions()
-                                                    .position(new LatLng(Double.parseDouble(itemlist.get(0).getLocationLat()), Double.parseDouble(itemlist.get(0).getLocationLong())))
-                                                            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker_icon2)));
-                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-
-                                            // Move the camera to last position with a zoom level
-                                            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Double.parseDouble(itemlist.get(0).getLocationLat()), Double.parseDouble(itemlist.get(0).getLocationLong()))).zoom(15).build();
-                                            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                        }
-                                    }
-
-
-                                    if (itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Finished")) {
-                                        Tv_drop.setVisibility(View.VISIBLE);
-                                        Tv_drop.setText(itemlist.get(0).getDrop());
-                                        if (isSummaryAvailable) {
-                                            Tv_rideDistance.setText(itemlist.get(0).getRideDistance() + " " + getResources().getString(R.string.my_rides_detail_kms_textview));
-                                            Tv_timeTaken.setText(itemlist.get(0).getTimeTaken() + " " + getResources().getString(R.string.my_rides_detail_mins_textview));
-                                            Tv_waitTime.setText(itemlist.get(0).getWaitTime() + " " + getResources().getString(R.string.my_rides_detail_mins_textview));
-                                        }
-
-                                        if (isFareAvailable) {
-                                            Tv_totalBill.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getTotalBill());
-                                            Tv_totalPaid.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getTotalPaid());
-                                            Tv_walletUsuage.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getWalletUsuage());
-
-                                            if (itemlist.get(0).getCouponDiscount().equalsIgnoreCase("0")) {
-                                                Tv_couponDiscount.setVisibility(View.GONE);
-                                            } else {
-                                                Tv_couponDiscount.setVisibility(View.VISIBLE);
-                                                Tv_couponDiscount.setText(getResources().getString(R.string.my_rides_detail_coupon_discount_textview) + " " + itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getCouponDiscount());
-                                            }
-
-                                            if (itemlist.get(0).getWalletUsuage().equalsIgnoreCase("0")) {
-                                                Tv_walletUsuage.setVisibility(View.GONE);
-                                            } else {
-                                                Tv_walletUsuage.setVisibility(View.VISIBLE);
-                                                Tv_walletUsuage.setText(getResources().getString(R.string.my_rides_detail_wallet_usuage_textview) + " " + itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getWalletUsuage());
-                                            }
-                                        }
-
-                                        Rl_priceBottom.setVisibility(View.VISIBLE);
-                                    } else {
-                                        Rl_priceBottom.setVisibility(View.GONE);
-                                        Tv_drop.setVisibility(View.GONE);
-                                    }
-
-
-                                    //------------Button Change Function-------
-                                    if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing")) {
-                                        Ll_cancelTrip.setVisibility(View.GONE);
-                                        Ll_payment.setVisibility(View.VISIBLE);
-                                        Ll_mailInvoice.setVisibility(View.GONE);
-                                        Ll_reportIssue.setVisibility(View.GONE);
-                                        Rl_favorite.setVisibility(View.GONE);
-                                        Rl_tip.setVisibility(View.VISIBLE);
-                                    }
-
-                                    if (itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1")) {
-                                        Ll_cancelTrip.setVisibility(View.VISIBLE);
-                                        Ll_payment.setVisibility(View.GONE);
-                                        Ll_mailInvoice.setVisibility(View.GONE);
-                                        Ll_reportIssue.setVisibility(View.GONE);
-                                        Rl_favorite.setVisibility(View.GONE);
-                                        Rl_tip.setVisibility(View.GONE);
-                                    }
-
-                                    if (itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
-                                        Ll_cancelTrip.setVisibility(View.GONE);
-                                        Ll_payment.setVisibility(View.GONE);
-                                        Ll_mailInvoice.setVisibility(View.VISIBLE);
-                                        Ll_reportIssue.setVisibility(View.VISIBLE);
-                                        Rl_favorite.setVisibility(View.VISIBLE);
-                                        Rl_tip.setVisibility(View.GONE);
-
-                                        //Programmatically making textView to left of layout
-                                        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                                                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                                RelativeLayout.LayoutParams.WRAP_CONTENT);
-                                        params.addRule(RelativeLayout.LEFT_OF, R.id.my_rides_detail_favorite_layout);
-                                        params.addRule(RelativeLayout.CENTER_VERTICAL, R.id.my_rides_detail_favorite_layout);
-                                        Tv_rideStatus.setLayoutParams(params);
-                                    }
-
-                                    //------Show and Hide the Button Layout------
-                                    if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing") || itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
-                                        Rl_button.setVisibility(View.VISIBLE);
-                                    } else {
-                                        Rl_button.setVisibility(View.GONE);
-                                    }
-
-                                    //---------Changing Favourite Color-----
-                                    if (itemlist.get(0).getIsFavLocation().equalsIgnoreCase("1")) {
-                                        Iv_favorite.setImageResource(R.drawable.heart_red_icon);
-                                        Iv_favorite.setEnabled(false);
-                                    } else {
-                                        Iv_favorite.setImageResource(R.drawable.heart_grey_icon);
-                                        Iv_favorite.setEnabled(true);
-                                    }
-
-                                    //------Show and Hide Track Ride Button Layout------
-                                    if (itemlist.get(0).getDoTrackAction().equalsIgnoreCase("1")) {
-                                        Ll_trackRide.setVisibility(View.VISIBLE);
-                                    } else {
-                                        Ll_trackRide.setVisibility(View.GONE);
-                                    }
-
-                                    //------Show and Hide Tip Layout------
-                                    if(itemlist.get(0).getTip_amount().equalsIgnoreCase("0"))
-                                    {
-                                        Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_apply_label));
-                                        Bt_tip_Apply.setBackgroundColor(0xFF01A7CD);
-                                        Et_tip_Amount.setFocusable(true);
-                                        Et_tip_Amount.setText("");
-                                    }
-                                    else
-                                    {
-                                        Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_remove_label));
-                                        Bt_tip_Apply.setBackgroundColor(0xFFCC0000);
-                                        Et_tip_Amount.setFocusable(false);
-                                        Et_tip_Amount.setText(itemlist.get(0).getTip_amount());
-                                    }
-
-                                }
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
-
-                        dialog.dismiss();
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    //------------OnPost Execute------------
+                    if (Sstatus.equalsIgnoreCase("1")) {
+
+                        if (itemlist.size() > 0) {
+                            Rl_address.setVisibility(View.VISIBLE);
+                            Rl_pickup.setVisibility(View.VISIBLE);
+
+                            Tv_carType.setText(getResources().getString(R.string.my_rides_detail_city_taxi_textview) + " " + itemlist.get(0).getCarType() + " " + getResources().getString(R.string.my_rides_detail_ride_textview));
+                            Tv_carNo.setText(getResources().getString(R.string.my_rides_detail_crn_textview) + " " + itemlist.get(0).getRideId());
+                            Tv_rideStatus.setText(itemlist.get(0).getRideStatus());
+
+
+                            if (isPickUpAvailable) {
+                                Tv_address.setText(itemlist.get(0).getAddress());
+                                Tv_pickup.setText(itemlist.get(0).getPickup());
+
+
+                                //set marker for User location.
+                                if (itemlist.get(0).getLocationLat() != null && itemlist.get(0).getLocationLong() != null) {
+
+                                    Str_LocationLatitude = itemlist.get(0).getLocationLat();
+                                    Str_LocationLongitude = itemlist.get(0).getLocationLong();
+
+                                    googleMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(Double.parseDouble(itemlist.get(0).getLocationLat()), Double.parseDouble(itemlist.get(0).getLocationLong())))
+                                                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker_icon2)));
+                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+                                    // Move the camera to last position with a zoom level
+                                    CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Double.parseDouble(itemlist.get(0).getLocationLat()), Double.parseDouble(itemlist.get(0).getLocationLong()))).zoom(15).build();
+                                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                }
+                            }
+
+
+                            if (itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Finished")) {
+                                Tv_drop.setVisibility(View.VISIBLE);
+                                Tv_drop.setText(itemlist.get(0).getDrop());
+
+                                if (isSummaryAvailable) {
+                                    Tv_rideDistance.setText(itemlist.get(0).getRideDistance() + " " + getResources().getString(R.string.my_rides_detail_kms_textview));
+                                    Tv_timeTaken.setText(itemlist.get(0).getTimeTaken() + " " + getResources().getString(R.string.my_rides_detail_mins_textview));
+                                    Tv_waitTime.setText(itemlist.get(0).getWaitTime() + " " + getResources().getString(R.string.my_rides_detail_mins_textview));
+                                }
+
+                                if (isFareAvailable) {
+                                    Tv_totalBill.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getTotalBill());
+                                    Tv_totalPaid.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getTotalPaid());
+                                    Tv_walletUsuage.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getWalletUsuage());
+                                    Tv_tipAmount.setText(itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getTip_amount());
+
+                                    if (itemlist.get(0).getCouponDiscount().equalsIgnoreCase("0")) {
+                                        Tv_couponDiscount.setVisibility(View.GONE);
+                                    } else {
+                                        Tv_couponDiscount.setVisibility(View.VISIBLE);
+                                        Tv_couponDiscount.setText(getResources().getString(R.string.my_rides_detail_coupon_discount_textview) + " " + itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getCouponDiscount());
+                                    }
+
+                                    if (itemlist.get(0).getWalletUsuage().equalsIgnoreCase("0")) {
+                                        Tv_walletUsuage.setVisibility(View.GONE);
+                                    } else {
+                                        Tv_walletUsuage.setVisibility(View.VISIBLE);
+                                        Tv_walletUsuage.setText(getResources().getString(R.string.my_rides_detail_wallet_usuage_textview) + " " + itemlist.get(0).getCurrrencySymbol() + itemlist.get(0).getWalletUsuage());
+                                    }
+
+                                    if (itemlist.get(0).getTip_amount().equalsIgnoreCase("0")) {
+                                        Ll_deleteTip.setVisibility(View.GONE);
+                                        Rl_main_tip.setVisibility(View.VISIBLE);
+                                        Rl_tip.setVisibility(View.GONE);
+                                    } else {
+                                        Ll_deleteTip.setVisibility(View.VISIBLE);
+                                        Rl_main_tip.setVisibility(View.GONE);
+                                        Rl_tip.setVisibility(View.GONE);
+                                    }
+                                }
+
+                                Rl_priceBottom.setVisibility(View.VISIBLE);
+                            } else {
+                                Rl_priceBottom.setVisibility(View.GONE);
+                                Tv_drop.setVisibility(View.GONE);
+                            }
+
+
+                            //------------Button Change Function-------
+                            if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing")) {
+                                Ll_cancelTrip.setVisibility(View.GONE);
+                                Ll_payment.setVisibility(View.VISIBLE);
+                                Ll_mailInvoice.setVisibility(View.GONE);
+                                Ll_reportIssue.setVisibility(View.GONE);
+                                Rl_favorite.setVisibility(View.GONE);
+                            }
+
+                            if (itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1")) {
+                                Ll_cancelTrip.setVisibility(View.VISIBLE);
+                                Ll_payment.setVisibility(View.GONE);
+                                Ll_mailInvoice.setVisibility(View.GONE);
+                                Ll_reportIssue.setVisibility(View.GONE);
+                                Rl_favorite.setVisibility(View.GONE);
+                                Rl_main_tip.setVisibility(View.GONE);
+                                Rl_tip.setVisibility(View.GONE);
+                                Ll_deleteTip.setVisibility(View.GONE);
+                                Cb_tip.setChecked(false);
+                            }
+
+                            if (itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
+                                Ll_cancelTrip.setVisibility(View.GONE);
+                                Ll_payment.setVisibility(View.GONE);
+                                Ll_mailInvoice.setVisibility(View.VISIBLE);
+                                Ll_reportIssue.setVisibility(View.VISIBLE);
+                                Rl_favorite.setVisibility(View.VISIBLE);
+                                Rl_main_tip.setVisibility(View.GONE);
+                                Rl_tip.setVisibility(View.GONE);
+                                Ll_deleteTip.setVisibility(View.GONE);
+                                Cb_tip.setChecked(false);
+
+                                //Programmatically making textView to left of layout
+                                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                params.addRule(RelativeLayout.LEFT_OF, R.id.my_rides_detail_favorite_layout);
+                                params.addRule(RelativeLayout.CENTER_VERTICAL, R.id.my_rides_detail_favorite_layout);
+                                Tv_rideStatus.setLayoutParams(params);
+                            }
+
+
+                            //------Show and Hide the Button Layout------
+                            if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing") || itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
+                                Rl_button.setVisibility(View.VISIBLE);
+                            } else {
+                                Rl_button.setVisibility(View.GONE);
+                            }
+
+                            //---------Changing Favourite Color-----
+                            if (itemlist.get(0).getIsFavLocation().equalsIgnoreCase("1")) {
+                                Iv_favorite.setImageResource(R.drawable.heart_red_icon);
+                                Iv_favorite.setEnabled(false);
+                            } else {
+                                Iv_favorite.setImageResource(R.drawable.heart_grey_icon);
+                                Iv_favorite.setEnabled(true);
+                            }
+
+                            //------Show and Hide Track Ride Button Layout------
+                            if (itemlist.get(0).getDoTrackAction().equalsIgnoreCase("1")) {
+                                Ll_trackRide.setVisibility(View.VISIBLE);
+                            } else {
+                                Ll_trackRide.setVisibility(View.GONE);
+                            }
+                        }
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -858,89 +879,74 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
 
         System.out.println("-------------MyRide Cancel Reason Url----------------" + Url);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        System.out.println("-------------MyRide Cancel Reason Response----------------" + response);
+                System.out.println("-------------MyRide Cancel Reason Response----------------" + response);
 
-                        String Sstatus = "";
+                String Sstatus = "";
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONArray reason_array = response_object.getJSONArray("reason");
-                                    if (reason_array.length() > 0) {
-                                        itemlist_reason.clear();
-                                        for (int i = 0; i < reason_array.length(); i++) {
-                                            JSONObject reason_object = reason_array.getJSONObject(i);
-                                            CancelTripPojo pojo = new CancelTripPojo();
-                                            pojo.setReason(reason_object.getString("reason"));
-                                            pojo.setReasonId(reason_object.getString("id"));
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
 
-                                            itemlist_reason.add(pojo);
-                                        }
+                            Object check_reason_object = response_object.get("reason");
+                            if (check_reason_object instanceof JSONArray) {
 
-                                        isReasonAvailable = true;
-                                    } else {
-                                        isReasonAvailable = false;
+                                JSONArray reason_array = response_object.getJSONArray("reason");
+                                if (reason_array.length() > 0) {
+                                    itemlist_reason.clear();
+                                    for (int i = 0; i < reason_array.length(); i++) {
+                                        JSONObject reason_object = reason_array.getJSONObject(i);
+                                        CancelTripPojo pojo = new CancelTripPojo();
+                                        pojo.setReason(reason_object.getString("reason"));
+                                        pojo.setReasonId(reason_object.getString("id"));
+
+                                        itemlist_reason.add(pojo);
                                     }
+
+                                    isReasonAvailable = true;
+                                } else {
+                                    isReasonAvailable = false;
                                 }
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                             }
-
-
-                            if (Sstatus.equalsIgnoreCase("1") && isReasonAvailable) {
-                                Intent passIntent = new Intent(MyRidesDetail.this, MyRideCancelTrip.class);
-                                Bundle bundleObject = new Bundle();
-                                bundleObject.putSerializable("Reason", itemlist_reason);
-                                passIntent.putExtras(bundleObject);
-                                passIntent.putExtra("RideID", SrideId_intent);
-                                startActivity(passIntent);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    if (Sstatus.equalsIgnoreCase("1") && isReasonAvailable) {
+                        Intent passIntent = new Intent(MyRidesDetail.this, MyRideCancelTrip.class);
+                        Bundle bundleObject = new Bundle();
+                        bundleObject.putSerializable("Reason", itemlist_reason);
+                        passIntent.putExtras(bundleObject);
+                        passIntent.putExtra("RideID", SrideId_intent);
+                        startActivity(passIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -957,58 +963,39 @@ public class MyRidesDetail extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_sending_invoice));
 
         System.out.println("-------------MyRide Email Invoice Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("email", Semail);
+        jsonParams.put("ride_id", SrideId);
 
-                        String Sstatus = "", Sresponse = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Sresponse = object.getString("response");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                invoice_dialog.dismiss();
-                                Alert(getResources().getString(R.string.action_success), Sresponse);
-                            } else {
-                                Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
+
+                String Sstatus = "", Sresponse = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Sresponse = object.getString("response");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        invoice_dialog.dismiss();
+                        Alert(getResources().getString(R.string.action_success), Sresponse);
+                    } else {
+                        Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("email", Semail);
-                jsonParams.put("ride_id", SrideId);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -1027,82 +1014,62 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
         System.out.println("-------------Favourite Save Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("title", Et_dialog_FavouriteTitle.getText().toString());
+        jsonParams.put("latitude", Str_LocationLatitude);
+        jsonParams.put("longitude", Str_LocationLongitude);
+        jsonParams.put("address", Tv_address.getText().toString());
 
-                        System.out.println("-------------Favourite Save Response----------------" + response);
-                        String Sstatus = "", Smessage = "";
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            Smessage = object.getString("message");
+                System.out.println("-------------Favourite Save Response----------------" + response);
+                String Sstatus = "", Smessage = "";
 
-                            // close keyboard
-                            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            mgr.hideSoftInputFromWindow(Et_dialog_FavouriteTitle.getWindowToken(), 0);
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    Smessage = object.getString("message");
 
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                final MaterialDialog mdialog = new MaterialDialog(MyRidesDetail.this);
-                                mdialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(Smessage)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        mdialog.dismiss();
-                                                        favourite_dialog.dismiss();
-                                                        Iv_favorite.setImageResource(R.drawable.heart_red_icon);
-                                                        itemlist.get(0).setIsFavLocation("1");
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                            } else {
-                                Alert(getResources().getString(R.string.alert_label_title), Smessage);
+                    // close keyboard
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.hideSoftInputFromWindow(Et_dialog_FavouriteTitle.getWindowToken(), 0);
+
+                    if (Sstatus.equalsIgnoreCase("1")) {
+
+                        final PkDialog mDialog = new PkDialog(MyRidesDetail.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(Smessage);
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                favourite_dialog.dismiss();
+                                Iv_favorite.setImageResource(R.drawable.heart_red_icon);
+                                itemlist.get(0).setIsFavLocation("1");
                             }
+                        });
+                        mDialog.show();
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();
-
+                    } else {
+                        Alert(getResources().getString(R.string.alert_label_title), Smessage);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("title", Et_dialog_FavouriteTitle.getText().toString());
-                jsonParams.put("latitude", Str_LocationLatitude);
-                jsonParams.put("longitude", Str_LocationLongitude);
-                jsonParams.put("address", Tv_address.getText().toString());
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -1121,102 +1088,82 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
         System.out.println("-------------Track Ride Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("rideId", SrideId_intent);
 
-                        System.out.println("-------------Track Ride Response----------------" + response);
-                        String Sstatus = "";
-                        String driverID = "", driverName = "", driverImage = "", driverRating = "",
-                                driverLat = "", driverLong = "", driverTime = "", rideID = "", driverMobile = "",
-                                driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONObject driver_profile_object = response_object.getJSONObject("driver_profile");
-                                    if (driver_profile_object.length() > 0) {
-                                        driverID = driver_profile_object.getString("driver_id");
-                                        driverName = driver_profile_object.getString("driver_name");
-                                        driverImage = driver_profile_object.getString("driver_image");
-                                        driverRating = driver_profile_object.getString("driver_review");
-                                        driverLat = driver_profile_object.getString("driver_lat");
-                                        driverLong = driver_profile_object.getString("driver_lon");
-                                        driverTime = driver_profile_object.getString("min_pickup_duration");
-                                        rideID = driver_profile_object.getString("ride_id");
-                                        driverMobile = driver_profile_object.getString("phone_number");
-                                        driverCar_no = driver_profile_object.getString("vehicle_number");
-                                        driverCar_model = driver_profile_object.getString("vehicle_model");
-                                        userLat = driver_profile_object.getString("rider_lat");
-                                        userLong = driver_profile_object.getString("rider_lon");
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                                        isTrackRideAvailable = true;
-                                    }
-                                }
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                System.out.println("-------------Track Ride Response----------------" + response);
+                String Sstatus = "";
+                String driverID = "", driverName = "", driverImage = "", driverRating = "",
+                        driverLat = "", driverLong = "", driverTime = "", rideID = "", driverMobile = "",
+                        driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            JSONObject driver_profile_object = response_object.getJSONObject("driver_profile");
+                            if (driver_profile_object.length() > 0) {
+                                driverID = driver_profile_object.getString("driver_id");
+                                driverName = driver_profile_object.getString("driver_name");
+                                driverImage = driver_profile_object.getString("driver_image");
+                                driverRating = driver_profile_object.getString("driver_review");
+                                driverLat = driver_profile_object.getString("driver_lat");
+                                driverLong = driver_profile_object.getString("driver_lon");
+                                driverTime = driver_profile_object.getString("min_pickup_duration");
+                                rideID = driver_profile_object.getString("ride_id");
+                                driverMobile = driver_profile_object.getString("phone_number");
+                                driverCar_no = driver_profile_object.getString("vehicle_number");
+                                driverCar_model = driver_profile_object.getString("vehicle_model");
+                                userLat = driver_profile_object.getString("rider_lat");
+                                userLong = driver_profile_object.getString("rider_lon");
+
+                                isTrackRideAvailable = true;
                             }
-
-
-                            if (Sstatus.equalsIgnoreCase("1") && isTrackRideAvailable) {
-                                Intent i = new Intent(MyRidesDetail.this, MyRideDetailTrackRide.class);
-                                i.putExtra("driverID", driverID);
-                                i.putExtra("driverName", driverName);
-                                i.putExtra("driverImage", driverImage);
-                                i.putExtra("driverRating", driverRating);
-                                i.putExtra("driverLat", driverLat);
-                                i.putExtra("driverLong", driverLong);
-                                i.putExtra("driverTime", driverTime);
-                                i.putExtra("rideID", rideID);
-                                i.putExtra("driverMobile", driverMobile);
-                                i.putExtra("driverCar_no", driverCar_no);
-                                i.putExtra("driverCar_model", driverCar_model);
-                                i.putExtra("userLat", userLat);
-                                i.putExtra("userLong", userLong);
-                                startActivity(i);
-                                overridePendingTransition(R.anim.enter, R.anim.exit);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+
+                    if (Sstatus.equalsIgnoreCase("1") && isTrackRideAvailable) {
+                        Intent i = new Intent(MyRidesDetail.this, MyRideDetailTrackRide.class);
+                        i.putExtra("driverID", driverID);
+                        i.putExtra("driverName", driverName);
+                        i.putExtra("driverImage", driverImage);
+                        i.putExtra("driverRating", driverRating);
+                        i.putExtra("driverLat", driverLat);
+                        i.putExtra("driverLong", driverLong);
+                        i.putExtra("driverTime", driverTime);
+                        i.putExtra("rideID", rideID);
+                        i.putExtra("driverMobile", driverMobile);
+                        i.putExtra("driverCar_no", driverCar_no);
+                        i.putExtra("driverCar_model", driverCar_model);
+                        i.putExtra("userLat", userLat);
+                        i.putExtra("userLong", userLong);
+                        startActivity(i);
+                        overridePendingTransition(R.anim.enter, R.anim.exit);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("rideId", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
-
 
 
     //-----------------------Tip Post Request-----------------
@@ -1234,81 +1181,63 @@ public class MyRidesDetail extends ActivityHockeyApp {
 
         System.out.println("-------------tip Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("ride_id", SrideId_intent);
+        if (tipStatus.equalsIgnoreCase("Apply")) {
+            jsonParams.put("tips_amount", Et_tip_Amount.getText().toString());
+        }
 
-                        System.out.println("-------------tip Response----------------" + response);
-                        String Sstatus = "", Sresponse = "";
-                        try {
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
+                System.out.println("-------------tip Response----------------" + response);
+                String sStatus = "", sResponse = "", sTipAmount = "", sTotalBill = "";
+                try {
 
-                                JSONObject response_Object=object.getJSONObject("response");
-                                Sresponse = response_Object.getString("msg");
+                    JSONObject object = new JSONObject(response);
+                    sStatus = object.getString("status");
+                    if (sStatus.equalsIgnoreCase("1")) {
 
-                                if(tipStatus.equalsIgnoreCase("Apply"))
-                                {
-                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_remove_label));
-                                    Bt_tip_Apply.setBackgroundColor(0xFFCC0000);
-                                    Et_tip_Amount.setEnabled(false);
-                                }
-                                else
-                                {
-                                    Bt_tip_Apply.setText(getResources().getString(R.string.my_rides_detail_tip_apply_label));
-                                    Bt_tip_Apply.setBackgroundColor(0xFF01A7CD);
-                                    Et_tip_Amount.setEnabled(true);
-                                    Et_tip_Amount.setText("");
-                                }
-                                Alert(getResources().getString(R.string.action_success), Sresponse);
-                            } else {
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
+                        JSONObject response_Object = object.getJSONObject("response");
+                        sTipAmount = response_Object.getString("tips_amount");
+                        sTotalBill = response_Object.getString("total");
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (tipStatus.equalsIgnoreCase("Apply")) {
+                            Tv_tipAmount.setText(currencySymbol + sTipAmount);
+                            Tv_totalBill.setText(currencySymbol + sTotalBill);
+                            Rl_main_tip.setVisibility(View.GONE);
+                            Rl_tip.setVisibility(View.GONE);
+                            Ll_deleteTip.setVisibility(View.VISIBLE);
+                        } else {
+
+                            Tv_totalBill.setText(currencySymbol + sTotalBill);
+                            Tv_tipAmount.setText(currencySymbol + sTipAmount);
+                            Cb_tip.setChecked(false);
+                            Et_tip_Amount.setText("");
+                            Rl_main_tip.setVisibility(View.VISIBLE);
+                            Ll_deleteTip.setVisibility(View.GONE);
                         }
 
-                        dialog.dismiss();
+                    } else {
+                        sResponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), sResponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRidesDetail.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent", Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("ride_id", SrideId_intent);
-
-                if(tipStatus.equalsIgnoreCase("Apply"))
-                {
-                    jsonParams.put("tips_amount", Et_tip_Amount.getText().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
-    }
 
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onErrorListener() {
+                dialog.dismiss();
+            }
+        });
+    }
 
 
     //-----------------Move Back on pressed phone back button------------------

@@ -1,8 +1,6 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -14,12 +12,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.adapter.MyRidesAdapter;
 import com.cabily.iconstant.Iconstant;
@@ -27,21 +20,17 @@ import com.cabily.pojo.MyRidesPojo;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 10/28/2015.
@@ -53,7 +42,7 @@ public class MyRides extends ActivityHockeyApp {
     private SessionManager session;
     private String UserID = "";
 
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     private boolean isRideAvailable = false;
     ArrayList<MyRidesPojo> itemlist_all;
@@ -68,11 +57,12 @@ public class MyRides extends ActivityHockeyApp {
 
     private String StabSelectedCheck = "All";
     public static MyRides myride_class;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myrides);
-        myride_class=MyRides.this;
+        myride_class = MyRides.this;
         initialize();
 
         //Start XMPP Chat Service
@@ -173,22 +163,17 @@ public class MyRides extends ActivityHockeyApp {
 
                 if (isInternetPresent) {
 
-                    if (StabSelectedCheck.equalsIgnoreCase("All"))
-                    {
+                    if (StabSelectedCheck.equalsIgnoreCase("All")) {
                         Intent intent = new Intent(MyRides.this, MyRidesDetail.class);
                         intent.putExtra("RideID", itemlist_all.get(position).getRide_id());
                         startActivity(intent);
                         overridePendingTransition(R.anim.enter, R.anim.exit);
-                    }
-                    else if (StabSelectedCheck.equalsIgnoreCase("Upcoming"))
-                    {
+                    } else if (StabSelectedCheck.equalsIgnoreCase("Upcoming")) {
                         Intent intent = new Intent(MyRides.this, MyRidesDetail.class);
                         intent.putExtra("RideID", itemlist_upcoming.get(position).getRide_id());
                         startActivity(intent);
                         overridePendingTransition(R.anim.enter, R.anim.exit);
-                    }
-                    else
-                    {
+                    } else {
                         Intent intent = new Intent(MyRides.this, MyRidesDetail.class);
                         intent.putExtra("RideID", itemlist_completed.get(position).getRide_id());
                         startActivity(intent);
@@ -236,18 +221,17 @@ public class MyRides extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(MyRides.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(MyRides.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //-----------------------MyRides Post Request-----------------
@@ -265,105 +249,87 @@ public class MyRides extends ActivityHockeyApp {
 
         System.out.println("-------------MyRides Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("type", "all");
 
-                        System.out.println("-------------MyRides Response----------------" + response);
+        mRequest = new ServiceRequest(MyRides.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
+                System.out.println("-------------MyRides Response----------------" + response);
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
+                String Sstatus = "";
 
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONArray ride_array = response_object.getJSONArray("rides");
-                                    if (ride_array.length() > 0) {
-                                        itemlist_all.clear();
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
 
-                                        for (int i = 0; i < ride_array.length(); i++) {
-                                            JSONObject ride_object = ride_array.getJSONObject(i);
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            JSONArray ride_array = response_object.getJSONArray("rides");
+                            if (ride_array.length() > 0) {
+                                itemlist_all.clear();
 
-                                            MyRidesPojo pojo = new MyRidesPojo();
-                                            pojo.setRide_id(ride_object.getString("ride_id"));
-                                            pojo.setRide_time(ride_object.getString("ride_time"));
-                                            pojo.setRide_date(ride_object.getString("ride_date"));
-                                            pojo.setPickup(ride_object.getString("pickup"));
-                                            pojo.setRide_status(ride_object.getString("ride_status"));
-                                            pojo.setGroup(ride_object.getString("group"));
-                                            pojo.setDatetime(ride_object.getString("datetime"));
+                                for (int i = 0; i < ride_array.length(); i++) {
+                                    JSONObject ride_object = ride_array.getJSONObject(i);
 
-                                            itemlist_all.add(pojo);
+                                    MyRidesPojo pojo = new MyRidesPojo();
+                                    pojo.setRide_id(ride_object.getString("ride_id"));
+                                    pojo.setRide_time(ride_object.getString("ride_time"));
+                                    pojo.setRide_date(ride_object.getString("ride_date"));
+                                    pojo.setPickup(ride_object.getString("pickup"));
+                                    pojo.setRide_status(ride_object.getString("ride_status"));
+                                    pojo.setGroup(ride_object.getString("group"));
+                                    pojo.setDatetime(ride_object.getString("datetime"));
 
-                                            if (ride_object.getString("group").equalsIgnoreCase("upcoming")) {
-                                                itemlist_upcoming.add(pojo);
-                                            } else if (ride_object.getString("group").equalsIgnoreCase("completed")) {
-                                                itemlist_completed.add(pojo);
-                                            }
-                                        }
-                                        isRideAvailable = true;
-                                    } else {
-                                        isRideAvailable = false;
+                                    itemlist_all.add(pojo);
+
+                                    if (ride_object.getString("group").equalsIgnoreCase("upcoming")) {
+                                        itemlist_upcoming.add(pojo);
+                                    } else if (ride_object.getString("group").equalsIgnoreCase("completed")) {
+                                        itemlist_completed.add(pojo);
                                     }
                                 }
-
-                            }
-
-
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                if (isRideAvailable) {
-                                    empty_text.setVisibility(View.GONE);
-                                    adapter = new MyRidesAdapter(MyRides.this, itemlist_all);
-                                    listview.setAdapter(adapter);
-                                } else {
-                                    empty_text.setVisibility(View.VISIBLE);
-                                    listview.setEmptyView(empty_text);
-                                }
+                                isRideAvailable = true;
                             } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                                isRideAvailable = false;
                             }
-
-                            dialog.dismiss();
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                            dialog.dismiss();
                         }
+
                     }
-                }, new Response.ErrorListener() {
+
+
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        if (isRideAvailable) {
+                            empty_text.setVisibility(View.GONE);
+                            adapter = new MyRidesAdapter(MyRides.this, itemlist_all);
+                            listview.setAdapter(adapter);
+                        } else {
+                            empty_text.setVisibility(View.VISIBLE);
+                            listview.setEmptyView(empty_text);
+                        }
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                    }
+
+                    dialog.dismiss();
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    dialog.dismiss();
+                }
+
+            }
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(MyRides.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("type", "all");
-                return jsonParams;
-            }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 

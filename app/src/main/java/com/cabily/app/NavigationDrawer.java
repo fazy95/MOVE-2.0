@@ -6,14 +6,11 @@ package com.cabily.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +24,8 @@ import com.cabily.adapter.HomeMenuListAdapter;
 import com.cabily.fragment.Fragment_HomePage;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
 
-import java.util.List;
-
-import me.drakeet.materialdialog.MaterialDialog;
 
 public class NavigationDrawer extends ActionBarActivityHockeyApp {
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -38,7 +33,6 @@ public class NavigationDrawer extends ActionBarActivityHockeyApp {
     private static RelativeLayout mDrawer;
     private Context context;
     private ListView mDrawerList;
-
     private static HomeMenuListAdapter mMenuAdapter;
     private String[] title;
     private int[] icon;
@@ -219,18 +213,18 @@ public class NavigationDrawer extends ActionBarActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(NavigationDrawer.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(NavigationDrawer.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     //----------Method to Send Email--------

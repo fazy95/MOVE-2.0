@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,19 +17,15 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.adapter.PlaceSearchAdapter;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.EstimateDetailPojo;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +33,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/12/2015.
@@ -56,17 +50,16 @@ public class LocationSearch extends ActivityHockeyApp {
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
 
-    StringRequest postrequest;
-    StringRequest estimate_postrequest;
+    private ServiceRequest mRequest;
     Context context;
-    ArrayList<String> itemList_location=new ArrayList<String>();
-    ArrayList<String> itemList_placeId=new ArrayList<String>();
+    ArrayList<String> itemList_location = new ArrayList<String>();
+    ArrayList<String> itemList_placeId = new ArrayList<String>();
 
     PlaceSearchAdapter adapter;
-    private boolean isdataAvailable=false;
-    private boolean isEstimateAvailable=false;
+    private boolean isdataAvailable = false;
+    private boolean isEstimateAvailable = false;
 
-    private String Slatitude="",Slongitude="",Sselected_location="";
+    private String Slatitude = "", Slongitude = "", Sselected_location = "";
 
     Dialog dialog;
     ArrayList<EstimateDetailPojo> ratecard_list = new ArrayList<EstimateDetailPojo>();
@@ -82,15 +75,13 @@ public class LocationSearch extends ActivityHockeyApp {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Sselected_location=itemList_location.get(position);
+                Sselected_location = itemList_location.get(position);
 
                 cd = new ConnectionDetector(LocationSearch.this);
                 isInternetPresent = cd.isConnectingToInternet();
                 if (isInternetPresent) {
-                    LatLongRequest(Iconstant.GetAddressFrom_LatLong_url+itemList_placeId.get(position));
-                }
-                else
-                {
+                    LatLongRequest(Iconstant.GetAddressFrom_LatLong_url + itemList_placeId.get(position));
+                } else {
                     alert_layout.setVisibility(View.VISIBLE);
                     alert_textview.setText(getResources().getString(R.string.alert_nointernet));
                 }
@@ -114,8 +105,8 @@ public class LocationSearch extends ActivityHockeyApp {
                 isInternetPresent = cd.isConnectingToInternet();
 
                 if (isInternetPresent) {
-                    if (postrequest != null) {
-                        postrequest.cancel();
+                    if (mRequest != null) {
+                        mRequest.cancelRequest();
                     }
                     CitySearchRequest(Iconstant.place_search_url + et_search.getText().toString().toLowerCase());
                 } else {
@@ -137,8 +128,7 @@ public class LocationSearch extends ActivityHockeyApp {
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 // close keyboard
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
@@ -149,8 +139,7 @@ public class LocationSearch extends ActivityHockeyApp {
         });
     }
 
-    private void initialize()
-    {
+    private void initialize() {
         alert_layout = (RelativeLayout) findViewById(R.id.location_search_alert_layout);
         alert_textview = (TextView) findViewById(R.id.location_search_alert_textView);
         back = (RelativeLayout) findViewById(R.id.location_search_back_layout);
@@ -168,18 +157,18 @@ public class LocationSearch extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(LocationSearch.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(LocationSearch.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
     //-------------------Search Place Request----------------
@@ -187,45 +176,39 @@ public class LocationSearch extends ActivityHockeyApp {
 
         progresswheel.setVisibility(View.VISIBLE);
         System.out.println("--------------Search city url-------------------" + Url);
-        postrequest = new StringRequest(Request.Method.GET, Url, new Response.Listener<String>() {
 
+        mRequest = new ServiceRequest(LocationSearch.this);
+        mRequest.makeServiceRequest(Url, Request.Method.GET, null, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Search city  reponse-------------------" + response);
-                String status="";
+                String status = "";
                 try {
                     JSONObject object = new JSONObject(response);
                     if (object.length() > 0) {
 
-                        status=object.getString("status");
+                        status = object.getString("status");
                         JSONArray place_array = object.getJSONArray("predictions");
-                        if(status.equalsIgnoreCase("OK"))
-                        {
-                            if(place_array.length()>0)
-                            {
+                        if (status.equalsIgnoreCase("OK")) {
+                            if (place_array.length() > 0) {
                                 itemList_location.clear();
                                 itemList_placeId.clear();
-                                for (int i = 0; i < place_array.length(); i++)
-                                {
+                                for (int i = 0; i < place_array.length(); i++) {
                                     JSONObject place_object = place_array.getJSONObject(i);
                                     itemList_location.add(place_object.getString("description"));
                                     itemList_placeId.add(place_object.getString("place_id"));
                                 }
-                                isdataAvailable=true;
-                            }
-                            else
-                            {
+                                isdataAvailable = true;
+                            } else {
                                 itemList_location.clear();
                                 itemList_placeId.clear();
-                                isdataAvailable=false;
+                                isdataAvailable = false;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             itemList_location.clear();
                             itemList_placeId.clear();
-                            isdataAvailable=false;
+                            isdataAvailable = false;
                         }
                     }
                 } catch (JSONException e) {
@@ -235,36 +218,25 @@ public class LocationSearch extends ActivityHockeyApp {
 
                 progresswheel.setVisibility(View.INVISIBLE);
                 alert_layout.setVisibility(View.GONE);
-                if(isdataAvailable)
-                {
+                if (isdataAvailable) {
                     tv_emptyText.setVisibility(View.GONE);
-                }
-                else
-                {
+                } else {
                     tv_emptyText.setVisibility(View.VISIBLE);
                 }
-                adapter=new PlaceSearchAdapter(LocationSearch.this,itemList_location);
+                adapter = new PlaceSearchAdapter(LocationSearch.this, itemList_location);
                 listview.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
-
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 progresswheel.setVisibility(View.INVISIBLE);
                 alert_layout.setVisibility(View.GONE);
 
                 // close keyboard
                 CloseKeyboard(et_search);
-                VolleyErrorResponse.volleyError(LocationSearch.this, error);
             }
         });
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
     }
 
 
@@ -278,13 +250,15 @@ public class LocationSearch extends ActivityHockeyApp {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("--------------LatLong url-------------------" + Url);
-        postrequest = new StringRequest(Request.Method.GET, Url, new Response.Listener<String>() {
+
+        mRequest = new ServiceRequest(LocationSearch.this);
+        mRequest.makeServiceRequest(Url, Request.Method.GET, null, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------LatLong  reponse-------------------" + response);
                 String status = "";
@@ -337,20 +311,13 @@ public class LocationSearch extends ActivityHockeyApp {
                     Alert(getResources().getString(R.string.alert_label_title), status);
                 }
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(LocationSearch.this, error);
             }
         });
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
     }
-
 
 
     //-----------------Move Back on pressed phone back button------------------

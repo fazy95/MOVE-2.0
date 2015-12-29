@@ -13,7 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.pojo.CancelTripPojo;
 import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
@@ -27,6 +26,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.googlemapdrawpolyline.GMapV2GetRouteDirection;
 import com.mylibrary.gps.GPSTracker;
 import com.mylibrary.widgets.RoundedImageView;
@@ -38,7 +38,6 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/20/2015.
@@ -62,7 +61,6 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
             driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
 
     private boolean isReasonAvailable = false;
-    private StringRequest postrequest;
     Dialog dialog;
 
     private SessionManager session;
@@ -223,18 +221,18 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(MyRideDetailTrackRide.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(MyRideDetailTrackRide.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+       
     }
 
 

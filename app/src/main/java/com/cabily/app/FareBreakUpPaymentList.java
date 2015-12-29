@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,22 +10,17 @@ import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.adapter.MyRidePaymentListAdapter;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.PaymentListPojo;
+import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,21 +31,19 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/7/2015.
  */
-public class FareBreakUpPaymentList extends ActivityHockeyApp {
+public class FareBreakUpPaymentList extends ActivitySubClass {
     private RelativeLayout back;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private SessionManager session;
     private String UserID = "";
 
-    private StringRequest postrequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
     ArrayList<PaymentListPojo> itemlist;
     MyRidePaymentListAdapter adapter;
@@ -128,18 +120,17 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentList.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentList.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //method to convert currency code to currency symbol
@@ -171,89 +162,64 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
 
         System.out.println("-------------PaymentList Url----------------" + Url);
 
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        System.out.println("-------------PaymentList Response----------------"+response);
+        mRequest = new ServiceRequest(FareBreakUpPaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                JSONObject response_object = object.getJSONObject("response");
-                                if (response_object.length() > 0) {
-                                    JSONArray payment_array = response_object.getJSONArray("payment");
-                                    if (payment_array.length() > 0) {
-                                        itemlist.clear();
-                                        for(int i=0;i<payment_array.length();i++)
-                                        {
-                                            JSONObject reason_object = payment_array.getJSONObject(i);
-                                            PaymentListPojo pojo=new PaymentListPojo();
-                                            pojo.setPaymentName(reason_object.getString("name"));
-                                            pojo.setPaymentCode(reason_object.getString("code"));
+                System.out.println("-------------PaymentList Response----------------" + response);
 
-                                            itemlist.add(pojo);
-                                        }
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        JSONObject response_object = object.getJSONObject("response");
+                        if (response_object.length() > 0) {
+                            JSONArray payment_array = response_object.getJSONArray("payment");
+                            if (payment_array.length() > 0) {
+                                itemlist.clear();
+                                for (int i = 0; i < payment_array.length(); i++) {
+                                    JSONObject reason_object = payment_array.getJSONObject(i);
+                                    PaymentListPojo pojo = new PaymentListPojo();
+                                    pojo.setPaymentName(reason_object.getString("name"));
+                                    pojo.setPaymentCode(reason_object.getString("code"));
 
-                                        isPaymentAvailable=true;
-                                    }
-                                    else
-                                    {
-                                        isPaymentAvailable=false;
-                                    }
+                                    itemlist.add(pojo);
                                 }
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
 
-                            if(Sstatus.equalsIgnoreCase("1") && isPaymentAvailable)
-                            {
-                                adapter = new MyRidePaymentListAdapter(FareBreakUpPaymentList.this, itemlist);
-                                listview.setAdapter(adapter);
-                                listview.setExpanded(true);
+                                isPaymentAvailable = true;
+                            } else {
+                                isPaymentAvailable = false;
                             }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
                         }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                    if (Sstatus.equalsIgnoreCase("1") && isPaymentAvailable) {
+                        adapter = new MyRidePaymentListAdapter(FareBreakUpPaymentList.this, itemlist);
+                        listview.setAdapter(adapter);
+                        listview.setExpanded(true);
+                    }
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUpPaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -272,81 +238,55 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
 
 
         System.out.println("-------------MakePayment Cash Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        System.out.println("-------------MakePayment Cash Response----------------" + response);
+        mRequest = new ServiceRequest(FareBreakUpPaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
+                System.out.println("-------------MakePayment Cash Response----------------" + response);
 
-                                View view = View.inflate(FareBreakUpPaymentList.this, R.layout.material_alert_dialog, null);
-                                final MaterialDialog mdialog = new MaterialDialog(FareBreakUpPaymentList.this);
-                                mdialog.setContentView(view)
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        mdialog.dismiss();
-                                                        finish();
-                                                        FareBreakUp.farebreakup_class.finish();
-                                                        onBackPressed();
-                                                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
 
-                                TextView alert_title=(TextView)view.findViewById(R.id.material_alert_message_label);
-                                TextView alert_message=(TextView)view.findViewById(R.id.material_alert_message_textview);
-                                alert_title.setText(getResources().getString(R.string.my_rides_payment_cash_success));
-                                alert_message.setText(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
-
-                            } else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
+                        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                FareBreakUp.farebreakup_class.finish();
+                                onBackPressed();
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
+                        });
+                        mDialog.show();
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUpPaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -367,129 +307,93 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment Wallet Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        System.out.println("-------------MakePayment Wallet Response----------------" + response);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        String Sstatus = "",Scurrency_code="",Scurrent_wallet_balance="";
-                        Currency currencycode = null;
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("0")) {
-                                final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.my_rides_payment_empty_wallet_sorry))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_empty_wallet))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                    }
-                                                }
-                                        )
-                                        .show();
+        mRequest = new ServiceRequest(FareBreakUpPaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------MakePayment Wallet Response----------------" + response);
+
+                String Sstatus = "", Scurrency_code = "", Scurrent_wallet_balance = "";
+                Currency currencycode = null;
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("0")) {
+                        Alert(getResources().getString(R.string.my_rides_payment_empty_wallet_sorry), getResources().getString(R.string.my_rides_payment_empty_wallet));
+                    } else if (Sstatus.equalsIgnoreCase("1")) {
+                        //Updating wallet amount on Navigation Drawer Slide
+                        Scurrency_code = object.getString("currency");
+                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        Scurrent_wallet_balance = object.getString("wallet_amount");
+
+                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        NavigationDrawer.navigationNotifyChange();
+
+                        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_wallet_success));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                FareBreakUp.farebreakup_class.finish();
+                                Intent intent = new Intent(FareBreakUpPaymentList.this, MyRideRating.class);
+                                intent.putExtra("RideID", SrideId_intent);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else if(Sstatus.equalsIgnoreCase("1"))
-                            {
-                                //Updating wallet amount on Navigation Drawer Slide
-                                Scurrency_code = object.getString("currency");
-                                currencycode = Currency.getInstance(getLocale(Scurrency_code));
-                                Scurrent_wallet_balance = object.getString("wallet_amount");
+                        });
+                        mDialog.show();
 
-                                session.createWalletAmount(currencycode.getSymbol()+Scurrent_wallet_balance);
-                                NavigationDrawer.navigationNotifyChange();
+                    } else if (Sstatus.equalsIgnoreCase("2")) {
+                        //Updating wallet amount on Navigation Drawer Slide
+                        Scurrency_code = object.getString("currency");
+                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        Scurrent_wallet_balance = object.getString("wallet_amount");
 
-                                final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_wallet_success))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        finish();
-                                                        FareBreakUp.farebreakup_class.finish();
-                                                        Intent intent=new Intent(FareBreakUpPaymentList.this,MyRideRating.class);
-                                                        intent.putExtra("RideID",SrideId_intent);
-                                                        startActivity(intent);
-                                                        overridePendingTransition(R.anim.enter,R.anim.exit);
-                                                    }
-                                                }
-                                        )
-                                        .show();
+                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        NavigationDrawer.navigationNotifyChange();
+
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction("com.package.ACTION_CLASS_REFRESH");
+                        sendBroadcast(broadcastIntent);
+
+                        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                postRequest_PaymentList(Iconstant.paymentList_url);
                             }
-                            else if(Sstatus.equalsIgnoreCase("2"))
-                            {
-                                //Updating wallet amount on Navigation Drawer Slide
-                                Scurrency_code = object.getString("currency");
-                                currencycode = Currency.getInstance(getLocale(Scurrency_code));
-                                Scurrent_wallet_balance = object.getString("wallet_amount");
+                        });
+                        mDialog.show();
 
-                                session.createWalletAmount(currencycode.getSymbol()+Scurrent_wallet_balance);
-                                NavigationDrawer.navigationNotifyChange();
-
-                                Intent broadcastIntent = new Intent();
-                                broadcastIntent.setAction("com.package.ACTION_CLASS_REFRESH");
-                                sendBroadcast(broadcastIntent);
-
-                                final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.my_rides_payment_cash_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        postRequest_PaymentList(Iconstant.paymentList_url);
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                            }
-                            else {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
-
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUpPaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -508,78 +412,58 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment Auto-Detect Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
 
-                        System.out.println("-------------MakePayment Auto-Detect Response----------------" + response);
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                final MaterialDialog dialog = new MaterialDialog(FareBreakUpPaymentList.this);
-                                dialog.setTitle(getResources().getString(R.string.action_success))
-                                        .setMessage(getResources().getString(R.string.my_rides_payment_cash_success))
-                                        .setPositiveButton(
-                                                "OK", new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        dialog.dismiss();
-                                                        finish();
-                                                        FareBreakUp.farebreakup_class.finish();
-                                                        Intent intent=new Intent(FareBreakUpPaymentList.this,MyRideRating.class);
-                                                        intent.putExtra("RideID",SrideId_intent);
-                                                        startActivity(intent);
-                                                        overridePendingTransition(R.anim.enter, R.anim.exit);
-                                                    }
-                                                }
-                                        )
-                                        .show();
+        mRequest = new ServiceRequest(FareBreakUpPaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
+
+                System.out.println("-------------MakePayment Auto-Detect Response----------------" + response);
+
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+
+                        final PkDialog mDialog = new PkDialog(FareBreakUpPaymentList.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_success));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                finish();
+                                FareBreakUp.farebreakup_class.finish();
+                                Intent intent = new Intent(FareBreakUpPaymentList.this, MyRideRating.class);
+                                intent.putExtra("RideID", SrideId_intent);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
+                        });
+                        mDialog.show();
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUpPaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 
@@ -600,67 +484,46 @@ public class FareBreakUpPaymentList extends ActivityHockeyApp {
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------MakePayment WebView-MobileID Url----------------" + Url);
-        postrequest = new StringRequest(Request.Method.POST, Url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("user_id", UserID);
+        jsonParams.put("ride_id", SrideId_intent);
+        jsonParams.put("gateway", SpaymentCode);
 
-                        System.out.println("-------------MakePayment WebView-MobileID Response----------------" + response);
+        mRequest = new ServiceRequest(FareBreakUpPaymentList.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+            @Override
+            public void onCompleteListener(String response) {
 
-                        String Sstatus = "";
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Sstatus = object.getString("status");
-                            if (Sstatus.equalsIgnoreCase("1")) {
-                                String mobileId=object.getString("mobile_id");
-                                Intent intent=new Intent(FareBreakUpPaymentList.this,FareBreakUpPaymentWebView.class);
-                                intent.putExtra("MobileID",mobileId);
-                                intent.putExtra("RideID",SrideId_intent);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.enter, R.anim.exit);
-                            }
-                            else
-                            {
-                                String Sresponse = object.getString("response");
-                                Alert(getResources().getString(R.string.alert_label_title), Sresponse);
-                            }
+                System.out.println("-------------MakePayment WebView-MobileID Response----------------" + response);
 
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                String Sstatus = "";
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Sstatus = object.getString("status");
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        String mobileId = object.getString("mobile_id");
+                        Intent intent = new Intent(FareBreakUpPaymentList.this, FareBreakUpPaymentWebView.class);
+                        intent.putExtra("MobileID", mobileId);
+                        intent.putExtra("RideID", SrideId_intent);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.enter, R.anim.exit);
+                    } else {
+                        String Sresponse = object.getString("response");
+                        Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-                }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(FareBreakUpPaymentList.this, error);
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
             }
 
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("user_id", UserID);
-                jsonParams.put("ride_id", SrideId_intent);
-                jsonParams.put("gateway", SpaymentCode);
-                return jsonParams;
+            public void onErrorListener() {
+                dialog.dismiss();
             }
-        };
-        postrequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postrequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postrequest);
+        });
     }
 
 

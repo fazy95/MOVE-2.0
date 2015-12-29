@@ -39,12 +39,20 @@
             android:text="@string/aboutus_lable_header_textview"
             android:textColor="#ffffff"
             android:textSize="18sp"/>
+
     </RelativeLayout>
+
+    <View
+        android:id="@+id/aboutus_toolbar_shadow_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/aboutus_layout_header"
+        android:background="@xml/toolbar_shadow"/>
 
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/aboutus_layout_header"
+        android:layout_below="@+id/aboutus_toolbar_shadow_layout"
         android:fillViewport="true">
 
         <RelativeLayout

@@ -1,34 +1,32 @@
-<LinearLayout xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:card_view="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-              android:orientation="vertical"
-              android:paddingBottom="@dimen/activity_vertical_margin"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin"
-              tools:context=".MainActivity">
+<RelativeLayout xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context=".MainActivity">
 
     <com.mylibrary.widgets.CustomTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_above="@+id/book_cardview_navigation_layout"
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:gravity="center"
         android:text="@string/timer_label"
         android:textColor="#4e4e4e"
-        android:gravity="center"
         android:textSize="17sp"/>
 
     <android.support.v7.widget.CardView
         android:id="@+id/book_cardview_navigation_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
         android:background="#00000000"
@@ -52,8 +50,46 @@
             CircleProgressView:textColor="#00796B"
             CircleProgressView:unitColor="#009688"/>
 
-
     </android.support.v7.widget.CardView>
 
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/timer_cancel_ride_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="35dp"
+        android:src="@drawable/cancel_icon"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/timer_cancel_ride_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="35dp"
+        android:background="#00000000"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.mylibrary.widgets.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/timer_label_cancel_ride"
+            android:textColor="#4e4e4e"
+            android:textSize="15sp"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

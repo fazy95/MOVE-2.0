@@ -1,8 +1,6 @@
 package com.mylibrary.volley;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;

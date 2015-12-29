@@ -2,12 +2,12 @@ package com.cabily.app;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -16,28 +16,19 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
-import com.mylibrary.volley.AppController;
-import com.mylibrary.volley.VolleyErrorResponse;
-
-import android.view.View.OnClickListener;
+import com.mylibrary.dialog.PkDialog;
+import com.mylibrary.volley.ServiceRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/18/2015.
@@ -51,7 +42,7 @@ public class ResetPassword extends ActivityHockeyApp {
     private Button Bt_send;
     private CheckBox Cb_showPwd;
 
-    StringRequest postRequest;
+    private ServiceRequest mRequest;
     Dialog dialog;
 
     @Override
@@ -149,18 +140,18 @@ public class ResetPassword extends ActivityHockeyApp {
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(ResetPassword.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(ResetPassword.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+
     }
 
 
@@ -178,10 +169,14 @@ public class ResetPassword extends ActivityHockeyApp {
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_loading));
 
-        postRequest = new StringRequest(Request.Method.POST, Url, new Response.Listener<String>() {
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("email", Et_email.getText().toString());
+        jsonParams.put("password", Et_password.getText().toString());
 
+        mRequest = new ServiceRequest(ResetPassword.this);
+        mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
-            public void onResponse(String response) {
+            public void onCompleteListener(String response) {
 
                 System.out.println("--------------Reset Password reponse-------------------" + response);
 
@@ -192,21 +187,21 @@ public class ResetPassword extends ActivityHockeyApp {
                     Sstatus = object.getString("status");
                     Smessage = object.getString("response");
                     if (Sstatus.equalsIgnoreCase("1")) {
-                        final MaterialDialog dialog = new MaterialDialog(ResetPassword.this);
-                        dialog.setTitle(getResources().getString(R.string.action_success))
-                                .setMessage(Smessage)
-                                .setPositiveButton(
-                                        "OK", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                onBackPressed();
-                                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                                finish();
-                                            }
-                                        }
-                                )
-                                .show();
+
+                        final PkDialog mDialog = new PkDialog(ResetPassword.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.action_success));
+                        mDialog.setDialogMessage(Smessage);
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                onBackPressed();
+                                finish();
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                            }
+                        });
+                        mDialog.show();
                     } else {
                         Alert(getResources().getString(R.string.action_error), Smessage);
                     }
@@ -221,37 +216,13 @@ public class ResetPassword extends ActivityHockeyApp {
                 mgr.hideSoftInputFromWindow(Et_email.getWindowToken(), 0);
 
                 dialog.dismiss();
-
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorListener() {
                 dialog.dismiss();
-                VolleyErrorResponse.volleyError(ResetPassword.this, error);
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-agent",Iconstant.cabily_userAgent);
-                return headers;
-            }
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> jsonParams = new HashMap<String, String>();
-                jsonParams.put("email", Et_email.getText().toString());
-                jsonParams.put("password", Et_password.getText().toString());
-                return jsonParams;
-            }
-
-        };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        postRequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(postRequest);
+        });
     }
 
 

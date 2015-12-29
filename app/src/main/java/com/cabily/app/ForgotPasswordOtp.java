@@ -16,15 +16,14 @@ import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.utils.ConnectionDetector;
 import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
 
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/18/2015.
  */
-public class ForgotPasswordOtp extends ActivityHockeyApp
-{
-    private	Boolean isInternetPresent = false;
+public class ForgotPasswordOtp extends ActivityHockeyApp {
+    private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private RelativeLayout Rl_back;
     private EditText Et_otp;
@@ -33,7 +32,7 @@ public class ForgotPasswordOtp extends ActivityHockeyApp
     StringRequest postrequest;
     Dialog dialog;
 
-    private String Semail="",Sotp_Status="",Sotp="";
+    private String Semail = "", Sotp_Status = "", Sotp = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +74,8 @@ public class ForgotPasswordOtp extends ActivityHockeyApp
                 } else {
                     Intent i = new Intent(ForgotPasswordOtp.this, ResetPassword.class);
                     startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             }
         });
@@ -88,21 +87,18 @@ public class ForgotPasswordOtp extends ActivityHockeyApp
         cd = new ConnectionDetector(ForgotPasswordOtp.this);
         isInternetPresent = cd.isConnectingToInternet();
 
-        Rl_back=(RelativeLayout)findViewById(R.id.forgot_password_otp_header_back_layout);
-        Et_otp=(EditText)findViewById(R.id.forgot_password_otp_password_editText);
-        Bt_send=(Button)findViewById(R.id.forgot_password_otp_submit_button);
+        Rl_back = (RelativeLayout) findViewById(R.id.forgot_password_otp_header_back_layout);
+        Et_otp = (EditText) findViewById(R.id.forgot_password_otp_password_editText);
+        Bt_send = (Button) findViewById(R.id.forgot_password_otp_submit_button);
 
-        Intent intent=getIntent();
-        Semail=intent.getStringExtra("Intent_email");
-        Sotp_Status=intent.getStringExtra("Intent_Otp_Status");
-        Sotp=intent.getStringExtra("Intent_verificationCode");
+        Intent intent = getIntent();
+        Semail = intent.getStringExtra("Intent_email");
+        Sotp_Status = intent.getStringExtra("Intent_Otp_Status");
+        Sotp = intent.getStringExtra("Intent_verificationCode");
 
-        if(Sotp_Status.equalsIgnoreCase("development"))
-        {
+        if (Sotp_Status.equalsIgnoreCase("development")) {
             Et_otp.setText(Sotp);
-        }
-        else
-        {
+        } else {
             Et_otp.setText("");
         }
 
@@ -111,24 +107,22 @@ public class ForgotPasswordOtp extends ActivityHockeyApp
 
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
-        final MaterialDialog dialog = new MaterialDialog(ForgotPasswordOtp.this);
-        dialog.setTitle(title)
-                .setMessage(alert)
-                .setPositiveButton(
-                        "OK", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        }
-                )
-                .show();
+
+        final PkDialog mDialog = new PkDialog(ForgotPasswordOtp.this);
+        mDialog.setDialogTitle(title);
+        mDialog.setDialogMessage(alert);
+        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
     }
 
     //-----------------Move Back on pressed phone back button------------------
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)) {
 
             // close keyboard

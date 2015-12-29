@@ -40,12 +40,18 @@
             android:textSize="18sp"/>
     </RelativeLayout>
 
+    <View
+        android:id="@+id/my_rides_toolbar_shadow_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/my_rides_layout_header"
+        android:background="@xml/toolbar_shadow"/>
 
     <RelativeLayout
         android:id="@+id/my_rides_tab_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/my_rides_layout_header"
+        android:layout_below="@+id/my_rides_toolbar_shadow_layout"
         android:layout_marginTop="5dp"
         android:background="#00000000"
         android:visibility="visible">

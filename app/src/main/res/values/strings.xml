@@ -12,67 +12,76 @@
     <string name="action_pleasewait">Please Wait...</string>
     <string name="action_loading">Loading</string>
     <string name="action_saving">Saving</string>
-    <string name="action_error">Error</string>
+    <string name="action_error">Sorry</string>
     <string name="action_verifying">Verifying</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel_alert">CANCEL</string>
     <string name="alert_nointernet">No Internet Connection</string>
+    <string name="alert_nointernet_message">You are offline please check your internet connection</string>
     <string name="alert_servererror">Server Error</string>
     <string name="alert_gpsEnable">Enable GPS to locate your location</string>
     <string name="alert_nocar">Sorry! We do not provide services in your city yet.</string>
+    <string name="alert_update_location">Updating Your Location</string>
 
     <!-- signup and Signin Page -->
-    <string name="signin_main_label_Signin">SIGNIN</string>
+    <string name="signin_main_label_Signin">SIGN IN</string>
     <string name="signin_main_label_register">REGISTER</string>
 
     <!-- Login Page -->
-    <string name="login_label">Log In with Email</string>
+    <string name="login_label">SIGN IN</string>
     <string name="login_label_forgotpwd">Forgot Password?</string>
     <string name="login_label_email_hint">Email Address</string>
     <string name="login_label_pwd_hint">Password</string>
-    <string name="login_label_login">LOG IN</string>
-    <string name="login_label_alert_username">UserName can\'t be empty</string>
+    <string name="login_label_login">SIGN IN</string>
+    <string name="login_label_alert_username">Email address can\'t be empty</string>
+    <string name="login_label_alert_email_invalid">Email address is invalid</string>
     <string name="login_label_alert_password">Password can\'t be empty</string>
+    <string name="login_label_alert_signIn_failed">Sign In Failed</string>
 
     <!-- Register Page -->
-    <string name="register_label">Sign Up with Email</string>
+    <string name="register_label">REGISTER</string>
     <string name="register_label_email_hint">Email Address</string>
     <string name="register_label_pwd_hint">Password</string>
     <string name="register_label_username_hint">UserName</string>
     <string name="register_label_phone_hint">Phone Number</string>
     <string name="register_label_code_hint">Code</string>
-    <string name="register_label_referal_hint">Referal Code</string>
-    <string name="register_label_register">SIGN IN</string>
+    <string name="register_label_referal_hint">Referral Code</string>
+    <string name="register_label_register">REGISTER</string>
     <string name="register_label_alert_username">UserName can\'t be empty</string>
-    <string name="register_label_alert_password">Please Enter a valid Password.Password must be at least 6 characters, and must include at least one lower case letter, and one numeric digit.</string>
-    <string name="register_label_alert_email">Enter Valid Email</string>
-    <string name="register_label_alert_phoneNo">Enter Valid Phone Number</string>
-    <string name="register_label_alert_country_code">Enter Country Code</string>
+    <string name="register_label_alert_password">Password must be at least 6 characters, and must include at least one lower case letter, and one numeric digit.</string>
+    <string name="register_label_alert_email">Email address is invalid</string>
+    <string name="register_label_alert_phoneNo">Must be a valid phone number</string>
+    <string name="register_label_alert_country_code">Enter country code</string>
     <string name="register_label_referal_schema">Referral Schema!</string>
-    <string name="register_label_referal_ok">Ok</string>
+    <string name="register_label_referal_ok">OK</string>
     <string name="register_label_referal_schema_content1">Enter a referral code here to earn free ride coupons.</string>
     <string name="register_label_referal_schema_content2">Note:Referral schema is only applicable for users who have never booked an Cabily cab before.</string>
+    <string name="login_label_alert_register_failed">Register Failed</string>
 
     <!-- OTP Page -->
-    <string name="otp_label_verification">OTP Verification</string>
+    <string name="otp_label_verification">OTP VERIFICATION</string>
     <string name="otp_label_enter_otp">Enter OTP</string>
     <string name="otp_label_send">SEND</string>
     <string name="action_otp">Verifying</string>
     <string name="otp_label_alert_otp">OTP can\'t be empty</string>
-    <string name="otp_label_alert_invalid">Invalid OTP</string>
+    <string name="otp_label_alert_invalid">OTP is invalid</string>
 
 
     <!-- Forgot Password Page -->
     <string name="forgot_password_email_label_title">FORGOT PASSWORD</string>
     <string name="forgot_password_email_label_enter_email">Email Address</string>
     <string name="forgot_password_email_label_send_email">SEND E-MAIL</string>
-    <string name="forgot_password_email_label_enter_valid_email">Enter Valid Email</string>
-    <string name="forgot_password_email_label_success">Verification code has been sent to your registered Mobile number</string>
+    <string name="forgot_password_email_label_enter_valid_email">Email address is invalid</string>
+    <string name="forgot_password_email_label_success">Verification code has been sent to your registered mobile number</string>
 
     <!-- Reset Password Page -->
     <string name="reset_password_label_title">RESET PASSWORD</string>
     <string name="reset_password_label_email">Email Address</string>
     <string name="reset_password_label_enter_new_password">New Password</string>
     <string name="reset_password_label_show_password_text">Show Password</string>
-    <string name="reset_password_email_label_enter_valid_email">Enter Valid Email</string>
+    <string name="reset_password_email_label_enter_valid_email">Enter valid email</string>
     <string name="reset_password_email_label_enter_valid_password">Password can\'t be empty</string>
 
 
@@ -94,6 +103,7 @@
     <string name="home_label_cancel">CANCEL</string>
     <string name="home_label_confirm">CONFIRM</string>
     <string name="home_label_fromNow">from now</string>
+    <string name="home_label_confirmation">CONFIRMATION</string>
 
     <!-- GPS Alert Dialog -->
     <string name="gps_label_title">Use Location?</string>
@@ -105,20 +115,21 @@
     <string name="gps_label_yes">Yes</string>
 
     <!-- Alert Dialog -->
-    <string name="alert_label_title">Sorry!</string>
+    <string name="alert_label_title">Sorry</string>
     <string name="alert_label_ok">OK</string>
-    <string name="alert_label_content1">We could not accepte your request</string>
+    <string name="alert_label_content1">We could not accept your request</string>
     <string name="alert_label_content2">No cabs has been available at your place.Kindly try again after sometime</string>
 
     <!-- RIDE LATER Alert Dialog -->
     <string name="alert_label_ridelater_title">Invalid pickup time</string>
-    <string name="alert_label_ridelater_content">Please make sure that pickup time is after atleast an hour from now</string>
+    <string name="alert_label_ridelater_content">Please make sure that pickup time is after at least an hour from now</string>
 
     <!-- Book My Ride Layout -->
     <string name="ridenow_label_ratecard">Rate Card</string>
     <string name="ridenow_label_estimate">Estimate</string>
     <string name="ridenow_label_coupon">Apply Coupon</string>
     <string name="ridenow_label_cartype">Car Type</string>
+    <string name="ridenow_label_available_wallet_amount">Your Wallet :</string>
     <string name="ridenow_label_pickup_time">Pick Up Time</string>
     <string name="ridenow_label_confirm_success">Your booking has been successfully registered.Our driver will contact you soon.</string>
 
@@ -132,16 +143,20 @@
     <string name="couponcode_label_cancel">CANCEL</string>
     <string name="couponcode_label_verifying">Verifying...</string>
     <string name="couponcode_label_verifed">Verified</string>
-    <string name="couponcode_label_invalid_code">Invalid Coupon Code</string>
+    <string name="couponcode_label_invalid_code">Invalid coupon code</string>
 
     <!-- Timer Alert Dilaog -->
     <string name="timer_label_alert_retry">Retry</string>
     <string name="timer_label_alert_cancel">Cancel</string>
     <string name="timer_label_alert_sorry">Sorry!</string>
-    <string name="timer_label_alert_content">No Driver Available \n If you want to search once again press RETRY,for cancel booking press CANCEL</string>
+    <string name="timer_label_alert_content">No driver available \n if you want to search once again press RETRY,for cancel booking press CANCEL</string>
 
     <!-- Timer Activity -->
-    <string name="timer_label">We are searching driver for you,be relax!</string>
+    <string name="timer_label">We are searching driver for you,\n be relax!</string>
+    <string name="timer_label_cancel_ride">Cancelling your ride</string>
+    <string name="timer_label_alert_yes">YES</string>
+    <string name="timer_label_alert_no">NO</string>
+    <string name="timer_label_alert_cancel_ride_message">Are your sure you want to cancel this ride?</string>
 
     <!-- Track Your Ride Activity -->
     <string name="track_your_ride_label_cancelRide">Cancel Ride</string>
@@ -153,7 +168,7 @@
     <string name="track_your_ride_label_minutes">MINUTES</string>
     <string name="track_your_ride_label_hours">HOURS</string>
     <string name="track_your_ride_label_rating">Rating \t:</string>
-    <string name="track_your_ride_alert_content1">Unable to contact driver.please try again after sometime</string>
+    <string name="track_your_ride_alert_content1">Unable to contact driver.Please try again after sometime</string>
 
     <!--Home Car Type Select Dialog -->
     <string name="car_type_select_dialog_label_carType">Select Car Type</string>
@@ -187,11 +202,11 @@
     <string name="profile_lable_signinmydetails">MY DETAILS</string>
     <string name="profile_lable_signinlogout">Logout</string>
     <string name="profile_lable_save">Save</string>
-    <string name="profile_lable_username_success">Name Updated Successfully</string>
-    <string name="profile_lable_mobile_success">Mobile Number Updated Successfully</string>
-    <string name="profile_lable_error_name">Name Can\'t be Empty</string>
-    <string name="profile_lable_error_mobile">Enter Valid Phone Number</string>
-    <string name="profile_lable_error_mobilecode">Enter Country Code</string>
+    <string name="profile_lable_username_success">Name updated successfully</string>
+    <string name="profile_lable_mobile_success">Mobile number updated successfully</string>
+    <string name="profile_lable_error_name">Name can\'t be empty</string>
+    <string name="profile_lable_error_mobile">Enter valid phone number</string>
+    <string name="profile_lable_error_mobilecode">Enter country code</string>
     <string name="profile_lable_logout_title">LOGOUT</string>
     <string name="profile_lable_logout_message">Are you sure you want to logout?</string>
     <string name="profile_lable_logout_yes">YES</string>
@@ -202,11 +217,11 @@
     <string name="changepassword_lable_old_password_edittext">Enter old password</string>
     <string name="changepassword_lable_new_password_edittext">Enter new password</string>
     <string name="changepassword_lable_confirm_new_password_edittext">Enter confirm password</string>
-    <string name="changepassword_lable_confirm_notmatch_edittext">Password Does not match</string>
+    <string name="changepassword_lable_confirm_notmatch_edittext">Password does not match</string>
     <string name="changepassword_lable_submit">Submit</string>
-    <string name="changepassword_label_alert_oldpassword">Please Enter old Password</string>
-    <string name="changepassword_label_alert_newpassword">Please Enter new Password.Password must be at least 6 characters, and must include at least one lower case letter, and one numeric digit.</string>
-    <string name="changepassword_label_alert_confirmpassword">Please Enter confirm Password</string>
+    <string name="changepassword_label_alert_oldpassword">Please enter old password</string>
+    <string name="changepassword_label_alert_newpassword">Password must be at least 6 characters, and must include at least one lower case letter, and one numeric digit.</string>
+    <string name="changepassword_label_alert_confirmpassword">Please enter confirm password</string>
     <string name="changepassword_label_changed_success">Password has been changed successfully</string>
 
     <!--AboutUs-->
@@ -227,11 +242,11 @@
     <string name="emergencycontact_lable_sharealways_textview">Always share my ride with my contact</string>
     <string name="emergencycontact_lable_heremove_contact_textview">Remove contact</string>
     <string name="emergencycontact_lable_save_contact_textview">Save</string>
-    <string name="emergencycontact_lable_namevalidate_textview">Name can\'t be Empty</string>
-    <string name="emergencycontact_lable_mobilenovalidate_textview">Enter Valid Phone Number</string>
-    <string name="emergencycontact_lable_email_validate_textview">Enter Valid Email</string>
-    <string name="emergencycontact_lable_code_validate_textview">Enter Country Code</string>
-    <string name="emergencycontact_lable_saved_emergencycontacts">Emergency contact has been Updated successfully</string>
+    <string name="emergencycontact_lable_namevalidate_textview">Name can\'t be empty</string>
+    <string name="emergencycontact_lable_mobilenovalidate_textview">Enter valid phone number</string>
+    <string name="emergencycontact_lable_email_validate_textview">Enter valid email</string>
+    <string name="emergencycontact_lable_code_validate_textview">Enter country code</string>
+    <string name="emergencycontact_lable_saved_emergencycontacts">Emergency contact has been updated successfully</string>
     <string name="emergencycontact_lable_savingtextview">Saving...</string>
     <string name="emergencycontact_lable_deletesuccess_textview">Emergency contact has been deleted successfully</string>
 
@@ -273,7 +288,7 @@
     <string name="ratecard_lable_select_city">Select City</string>
     <string name="ratecard_lable_selected_city_hint">Selected City</string>
     <string name="ratecard_lable_selected_car_hint">Selected Car Type</string>
-    <string name="ratecard_lable_select_city_alert">First Select City</string>
+    <string name="ratecard_lable_select_city_alert">First select city</string>
     <string name="ratecard_lable_perMin">per min</string>
 
     <!--Cabily Money-->
@@ -287,7 +302,7 @@
     <string name="cabilymoney_lable_addcabilymoney">ADD CABILY MONEY</string>
     <string name="cabilymoney_enter_amount">please enter amount to add your wallet</string>
     <string name="action_loading_cabily_money_empty_field">Amount can\'t be empty</string>
-    <string name="action_loading_cabilymoney_transaction_wallet_success">Transaction Successful</string>
+    <string name="action_loading_cabilymoney_transaction_wallet_success">Transaction successful</string>
 
     <!--Cabily Money WebView-->
     <string name="cabily_webview_lable_header_textview">PAYMENT TRANSACTION</string>
@@ -295,7 +310,7 @@
     <string name="cabily_webview_lable_transaction_failed">Transaction has been failed</string>
     <string name="cabily_webview_lable_transaction_success">Payment was successful</string>
     <string name="cabily_webview_lable_cancel_transaction">Cancel Transaction</string>
-    <string name="cabily_webview_lable_cancel_transaction_proceed">Pressing back would cancel your current transcation.Proceed anyway ?</string>
+    <string name="cabily_webview_lable_cancel_transaction_proceed">Pressing back would cancel your current transaction.Proceed anyway ?</string>
 
     <!--Cabily Money Transaction-->
     <string name="cabily_transaction_lable_header_textview">RECENT TRANSACTION</string>
@@ -334,6 +349,7 @@
     <string name="my_rides_detail_drop_textview">Drop \t:</string>
     <string name="my_rides_detail_total_bill_textview">Total Bill :</string>
     <string name="my_rides_detail_total_paid_textview">Total Paid :</string>
+    <string name="my_rides_detail_tips_textview">Tips :</string>
     <string name="my_rides_detail_crn_textview">CRN</string>
     <string name="my_rides_detail_city_taxi_textview">City Taxi</string>
     <string name="my_rides_detail_ride_textview">ride</string>
@@ -355,11 +371,12 @@
     <string name="my_rides_detail_cancel_ride_alert_yes">YES</string>
     <string name="my_rides_detail_cancel_ride_alert_no">NO</string>
     <string name="my_rides_detail_cancel_ride_alert_title">CANCEL RIDE</string>
-    <string name="my_rides_detail_tip_label">Enter Tip Amount</string>
+    <string name="my_rides_detail_tip_label">Enter Tips Amount</string>
     <string name="my_rides_detail_tip_apply_label">APPLY</string>
     <string name="my_rides_detail_tip_remove_label">REMOVE</string>
-    <string name="my_rides_detail_tip_empty_label">Tip amount can\'t be empty</string>
-    <string name="my_rides_detail_tip_amount_label">Tip Amount :</string>
+    <string name="my_rides_detail_tip_empty_label">Invalid tip amount</string>
+    <string name="my_rides_detail_tip_amount_label">Tips</string>
+    <string name="my_rides_detail_tip_amount_message">Are you willing to provide tips to driver</string>
 
     <!--MyRides cancel Trip -->
     <string name="my_rides_cancel_trip_header_textview">CANCEL RIDE</string>
@@ -391,7 +408,7 @@
     <string name="pushnotification_alert_label_message">MESSAGE</string>
     <string name="pushnotification_alert_label_cab_arrived">Cab has arrived.</string>
     <string name="pushnotification_alert_label_ok">OK</string>
-    <string name="pushnotification_alert_label_ride_completed">Your Ride has been Completed</string>
+    <string name="pushnotification_alert_label_ride_completed">Your ride has been completed</string>
     <string name="pushnotification_alert_label_ride_cancelled_sorry">Sorry</string>
     <string name="pushnotification_alert_label_ride_arrived_success">Success</string>
     <string name="pushnotification_alert_label">Alert</string>
@@ -399,28 +416,36 @@
 
     <!--Fare BreakUp Page-->
     <string name="fare_breakup_label_message">FARE BREAKUP</string>
-    <string name="fare_breakup_label_total_amount">Total Amount \t :</string>
-    <string name="fare_breakup_label_duration">Duration \t\t\t\t :</string>
-    <string name="fare_breakup_label_waiting">Waiting \t\t\t\t\t :</string>
-    <string name="fare_breakup_label_timeTravel">Time Travel \t\t :</string>
+    <string name="fare_breakup_label_total_amount">Base Fare</string>
+    <string name="fare_breakup_label_duration">Duration</string>
+    <string name="fare_breakup_label_waiting">Waiting</string>
+    <string name="fare_breakup_label_timeTravel">Distance</string>
+    <string name="fare_breakup_label_subtotal">Subtotal</string>
+    <string name="fare_breakup_label_tips">Tips</string>
+    <string name="fare_breakup_label_serviceTax">Service Tax</string>
+    <string name="fare_breakup_label_driverRating">DRIVER RATING</string>
+    <string name="fare_breakup_label_tripTotal">TRIP TOTAL</string>
+    <string name="fare_breakup_label_total">Total</string>
+    <string name="fare_breakup_label_remove">Remove</string>
     <string name="fare_breakup_label_payment">MAKE PAYMENT</string>
     <string name="fare_breakup_label_complete_payment">Please complete your payment</string>
+    <string name="fare_breakup_label_tip_remove_failed">Failed to add tip to driver</string>
 
 
     <!--Favorite List Page-->
     <string name="favorite_list_label_title">FAVORITE</string>
-    <string name="favorite_list_label_no_favorite_yet">No Favorite added yet !</string>
-    <string name="favorite_list_label_frequent_access">Select frequent pickup location and save them as Favorite for instance access</string>
+    <string name="favorite_list_label_no_favorite_yet">No favorite added yet !</string>
+    <string name="favorite_list_label_frequent_access">Select frequent pickup location and save them as favorite for instance access</string>
     <string name="favorite_list_label_add_favorite">ADD FAVOURITES</string>
-    <string name="favorite_list_label_select_location">Invalid Favorite Address</string>
+    <string name="favorite_list_label_select_location">Invalid favorite address</string>
 
     <!--Add Favorite Page-->
     <string name="favorite_add_label_title">ADD FAVORITE</string>
     <string name="favorite_add_label_name">Name of your favourites</string>
     <string name="favorite_add_label_save">Save</string>
     <string name="favorite_add_label_gettingAddress">Getting Address....</string>
-    <string name="favorite_add_label_no_address">Cannot get Address!</string>
-    <string name="favorite_add_label_invalid_address">Invalid Address</string>
+    <string name="favorite_add_label_no_address">Cannot get address!</string>
+    <string name="favorite_add_label_invalid_address">Invalid address</string>
     <string name="favorite_add_label_name_empty">Name of your favourites can\'t be empty</string>
 
 </resources>
