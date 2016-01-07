@@ -96,7 +96,7 @@
             android:value="AIzaSyDX3ihFwLTKgZcrIL-NhZVP7ejdemZaIFk"/>
 
 
-        <activity android:name="net.hockeyapp.android.UpdateActivity" />
+        <!--<activity android:name="net.hockeyapp.android.UpdateActivity" />-->
 
 
 

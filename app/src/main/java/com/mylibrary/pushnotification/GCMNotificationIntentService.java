@@ -104,9 +104,9 @@ public class GCMNotificationIntentService extends IntentService {
                             message = extras.get(Iconstant.Push_Message).toString();
                         }
 
-                        sendNotification(message.toString());
+                        //sendNotification(message.toString());
 
-                        Intent local = new Intent();
+                        /*Intent local = new Intent();
                         local.setAction("com.app.pushnotification");
                         local.putExtra("driverID", driverID);
                         local.putExtra("driverName",driverName);
@@ -121,7 +121,7 @@ public class GCMNotificationIntentService extends IntentService {
                         local.putExtra("driverCar_no",driverCar_no);
                         local.putExtra("driverCar_model",driverCar_model);
                         local.putExtra("message",message);
-                        this.sendBroadcast(local);
+                        this.sendBroadcast(local);*/
 
                     } catch (Exception e) {
                         e.printStackTrace();

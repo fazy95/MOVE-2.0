@@ -282,7 +282,7 @@ public class LoginPage extends ActivityHockeyApp {
 
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
-                Currency currencycode  = null;
+                Currency currencycode = null;
                 try {
 
                     JSONObject object = new JSONObject(response);
@@ -300,6 +300,7 @@ public class LoginPage extends ActivityHockeyApp {
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
                         ScurrencyCode = object.getString("currency");
+                        currencycode = Currency.getInstance(getLocale(ScurrencyCode));
                     }
 
                 } catch (JSONException e) {
@@ -308,7 +309,7 @@ public class LoginPage extends ActivityHockeyApp {
                 }
                 if (Sstatus.equalsIgnoreCase("1")) {
                     session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
-                    session.createWalletAmount(ScurrencyCode + SwalletAmount);
+                    session.createWalletAmount(currencycode.getSymbol() + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 
                     //starting XMPP service

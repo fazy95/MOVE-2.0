@@ -116,6 +116,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     Context context;
     private ProgressWheel progressWheel;
     private TextView Tv_walletAmount;
+    private TextView Tv_marker_time, Tv_marker_min;
+    private LinearLayout Ll_marker_time;
 
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -167,6 +169,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private EditText coupon_edittext;
     private String coupon_selectedDate = "";
     private String coupon_selectedTime = "";
+    private String Str_couponCode="";
 
     //------Declaration for Confirm Ride-----
     private String response_time = "", riderId = "";
@@ -219,6 +222,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     googleMap.getUiSettings().setAllGesturesEnabled(true);
                     ridenow_option_layout.setVisibility(View.GONE);
                     center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                    center_marker.setEnabled(true);
                     listview.setVisibility(View.VISIBLE);
                     rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
                     rideNow_textview.setText(getResources().getString(R.string.home_label_ride_now));
@@ -332,10 +336,32 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             @Override
             public void onClick(View v) {
 
+
+                //Enable and Disable RideNow Button
+                if (CarAvailable.equalsIgnoreCase("no cabs")) {
+
+                    Ll_marker_time.setVisibility(View.GONE);
+                    Tv_marker_time.setVisibility(View.GONE);
+                    Tv_marker_min.setVisibility(View.GONE);
+                    center_marker.setImageResource(R.drawable.pickup_map_pointer_no_car_available);
+                    rideNow_textview.setTextColor(Color.parseColor("#848484"));
+                    rideNow_layout.setClickable(false);
+                } else {
+
+                    Ll_marker_time.setVisibility(View.VISIBLE);
+                    Tv_marker_time.setVisibility(View.VISIBLE);
+                    Tv_marker_min.setVisibility(View.VISIBLE);
+                    center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                    rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                    rideNow_layout.setClickable(true);
+
+                    Tv_marker_time.setText(CarAvailable.replace("min", "").replace("mins", ""));
+                }
+
                 Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
                 ridenow_option_layout.startAnimation(animFadeOut);
                 ridenow_option_layout.setVisibility(View.GONE);
-                center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                center_marker.setEnabled(true);
 
                 googleMap.getUiSettings().setAllGesturesEnabled(true);
                 listview.setVisibility(View.VISIBLE);
@@ -364,27 +390,47 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 if (rideLater_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_ride_later))) {
 
                     selectedType = "1";
+                    Str_couponCode="";
 
-                    if (CarAvailable.equalsIgnoreCase("no cabs")) {
-                        Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_label_content1));
-                    } else {
-                        new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
-                                .setListener(listener)
-                                .setInitialDate(new Date())
-                                .setMinDate(new Date())
-                                        //.setMaxDate(maxDate)
-                                        //.setIs24HourTime(true)
-                                .setTheme(SlideDateTimePicker.HOLO_LIGHT)
-                                .setIndicatorColor(Color.parseColor("#F83C6F"))
-                                .build()
-                                .show();
-                    }
+                    new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
+                            .setListener(listener)
+                            .setInitialDate(new Date())
+                            .setMinDate(new Date())
+                                    //.setMaxDate(maxDate)
+                                    //.setIs24HourTime(true)
+                            .setTheme(SlideDateTimePicker.HOLO_LIGHT)
+                            .setIndicatorColor(Color.parseColor("#F83C6F"))
+                            .build()
+                            .show();
+
                 } else if (rideLater_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_cancel))) {
+
+
+                    //Enable and Disable RideNow Button
+                    if (CarAvailable.equalsIgnoreCase("no cabs")) {
+
+                        Ll_marker_time.setVisibility(View.GONE);
+                        Tv_marker_time.setVisibility(View.GONE);
+                        Tv_marker_min.setVisibility(View.GONE);
+                        center_marker.setImageResource(R.drawable.pickup_map_pointer_no_car_available);
+                        rideNow_textview.setTextColor(Color.parseColor("#848484"));
+                        rideNow_layout.setClickable(false);
+                    } else {
+
+                        Ll_marker_time.setVisibility(View.VISIBLE);
+                        Tv_marker_time.setVisibility(View.VISIBLE);
+                        Tv_marker_min.setVisibility(View.VISIBLE);
+                        center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                        rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                        rideNow_layout.setClickable(true);
+
+                        Tv_marker_time.setText(CarAvailable.replace("min", "").replace("mins", ""));
+                    }
 
                     Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
                     ridenow_option_layout.startAnimation(animFadeOut);
                     ridenow_option_layout.setVisibility(View.GONE);
-                    center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                    center_marker.setEnabled(true);
 
                     googleMap.getUiSettings().setAllGesturesEnabled(true);
                     listview.setVisibility(View.VISIBLE);
@@ -408,10 +454,16 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 if (rideNow_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_ride_now))) {
                     selectedType = "0";
+                    Str_couponCode="";
 
                     if (CarAvailable.equalsIgnoreCase("no cabs")) {
                         Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_label_content1));
                     } else {
+
+                        tv_coupon_label.setText(getResources().getString(R.string.ridenow_label_coupon));
+                        tv_coupon_label.setTextColor(Color.parseColor("#4e4e4e"));
+
+
                         //-------getting current date and time---------
                         coupon_selectedDate = coupon_mFormatter.format(new Date());
                         coupon_selectedTime = coupon_time_mFormatter.format(new Date());
@@ -425,6 +477,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         ridenow_option_layout.startAnimation(animFadeIn);
                         ridenow_option_layout.setVisibility(View.VISIBLE);
                         center_marker.setImageResource(R.drawable.pickup_map_pointer_pin);
+                        center_marker.setEnabled(false);
 
                         listview.setVisibility(View.GONE);
                         rideLater_textview.setText(getResources().getString(R.string.home_label_cancel));
@@ -445,13 +498,53 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     isInternetPresent = cd.isConnectingToInternet();
 
                     if (isInternetPresent) {
-                        HashMap<String, String> code = session.getCouponCode();
-                        String coupon = code.get(SessionManager.KEY_COUPON_CODE);
+                       /* HashMap<String, String> code = session.getCouponCode();
+                        String coupon = code.get(SessionManager.KEY_COUPON_CODE);*/
 
-                        ConfirmRideRequest(Iconstant.confirm_ride_url, coupon, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "");
+                        ConfirmRideRequest(Iconstant.confirm_ride_url, Str_couponCode, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "");
                     } else {
                         Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
                     }
+                }
+            }
+        });
+
+
+        center_marker.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!CarAvailable.equalsIgnoreCase("no cabs")) {
+                    selectedType = "0";
+
+                    //-------getting current date and time---------
+                    coupon_selectedDate = coupon_mFormatter.format(new Date());
+                    coupon_selectedTime = coupon_time_mFormatter.format(new Date());
+                    String displaytime = CarAvailable + " " + getResources().getString(R.string.home_label_fromNow);
+
+                    //--------Disabling the map functionality---------
+                    googleMap.getUiSettings().setAllGesturesEnabled(false);
+                    currentLocation_image.setClickable(false);
+
+                    Animation animFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in);
+                    ridenow_option_layout.startAnimation(animFadeIn);
+                    ridenow_option_layout.setVisibility(View.VISIBLE);
+                    center_marker.setImageResource(R.drawable.pickup_map_pointer_pin);
+                    center_marker.setEnabled(false);
+
+                    listview.setVisibility(View.GONE);
+                    rideLater_textview.setText(getResources().getString(R.string.home_label_cancel));
+                    rideNow_textview.setText(getResources().getString(R.string.home_label_confirm));
+
+                    tv_carType.setText(ScarType);
+                    tv_pickuptime.setText(displaytime);
+
+                    //----Disabling onClick Listener-----
+                    pickTime_layout.setEnabled(false);
+                    drawer_layout.setEnabled(false);
+                    address_layout.setEnabled(false);
+                    favorite_layout.setEnabled(false);
+                    NavigationDrawer.disableSwipeDrawer();
                 }
             }
         });
@@ -644,6 +737,10 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         progressWheel = (ProgressWheel) rooView.findViewById(R.id.book_my_ride_progress_wheel);
         Tv_walletAmount = (TextView) rootview.findViewById(R.id.book_my_ride_wallet_amount_textView);
         Rl_Confirm_Back = (RelativeLayout) rootview.findViewById(R.id.book_my_ride_confirm_header_back_layout);
+
+        Tv_marker_time = (TextView) rootview.findViewById(R.id.book_my_ride_confirm_header_car_time_textView);
+        Tv_marker_min = (TextView) rootview.findViewById(R.id.book_my_ride_confirm_header_car_time_min_textView);
+        Ll_marker_time = (LinearLayout) rooView.findViewById(R.id.book_my_ride_marker_time_layout);
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
@@ -915,8 +1012,17 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
             if (Integer.parseInt(currenttime) <= Integer.parseInt(selecedtime)) {
 
+                //Enable and Disable RideNow Button
+                if (selectedType.equalsIgnoreCase("1")) {
+                    rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                    rideNow_layout.setClickable(true);
+                }
+
                 coupon_selectedDate = coupon_mFormatter.format(date);
                 coupon_selectedTime = coupon_time_mFormatter.format(date);
+
+
+
 
                 //--------Disabling the map functionality---------
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
@@ -931,6 +1037,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 ridenow_option_layout.startAnimation(animFadeIn);
                 ridenow_option_layout.setVisibility(View.VISIBLE);
                 center_marker.setImageResource(R.drawable.pickup_map_pointer_pin);
+                center_marker.setEnabled(false);
 
                 listview.setVisibility(View.GONE);
                 rideLater_textview.setText(getResources().getString(R.string.home_label_cancel));
@@ -992,7 +1099,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         progressWheel.setVisibility(View.VISIBLE);
         //center_marker.setVisibility(View.GONE);
         rideNow_layout.setEnabled(false);
-        rideLater_layout.setEnabled(false);
 
         System.out.println("--------------Book My ride url-------------------" + Url);
 
@@ -1165,15 +1271,23 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                         //Enable and Disable RideNow Button
                         if (CarAvailable.equalsIgnoreCase("no cabs")) {
+
+                            Ll_marker_time.setVisibility(View.GONE);
+                            Tv_marker_time.setVisibility(View.GONE);
+                            Tv_marker_min.setVisibility(View.GONE);
+                            center_marker.setImageResource(R.drawable.pickup_map_pointer_no_car_available);
                             rideNow_textview.setTextColor(Color.parseColor("#848484"));
-                            rideLater_textview.setTextColor(Color.parseColor("#848484"));
                             rideNow_layout.setClickable(false);
-                            rideLater_layout.setClickable(false);
                         } else {
+
+                            Ll_marker_time.setVisibility(View.VISIBLE);
+                            Tv_marker_time.setVisibility(View.VISIBLE);
+                            Tv_marker_min.setVisibility(View.VISIBLE);
+                            center_marker.setImageResource(R.drawable.pickup_map_pointer);
                             rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
-                            rideLater_textview.setTextColor(Color.parseColor("#FFFFFF"));
                             rideNow_layout.setClickable(true);
-                            rideLater_layout.setClickable(true);
+
+                            Tv_marker_time.setText(CarAvailable.replace("min", "").replace("mins", ""));
                         }
 
                         listview.setVisibility(View.VISIBLE);
@@ -1198,7 +1312,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 //loading_layout.setVisibility(View.GONE);
                 //center_marker.setVisibility(View.VISIBLE);
                 rideNow_layout.setEnabled(true);
-                rideLater_layout.setEnabled(true);
             }
 
             @Override
@@ -1207,7 +1320,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 //loading_layout.setVisibility(View.GONE);
                 //center_marker.setVisibility(View.VISIBLE);
                 rideNow_layout.setEnabled(true);
-                rideLater_layout.setEnabled(true);
 
                 alert_layout.setVisibility(View.VISIBLE);
                 bottom_layout.setVisibility(View.GONE);
@@ -1250,10 +1362,14 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                             coupon_dialog.dismiss();
 
                             String code = result_object.getString("code");
+                            Str_couponCode=code;
                             session.setCouponCode(code);
                             tv_coupon_label.setText(getResources().getString(R.string.couponcode_label_verifed));
                             tv_coupon_label.setTextColor(getResources().getColor(R.color.darkgreen_color));
                         } else {
+
+                            Str_couponCode="";
+
                             coupon_apply_layout.setVisibility(View.VISIBLE);
                             coupon_loading_layout.setVisibility(View.GONE);
 
@@ -1282,7 +1398,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
     //-------------------Confirm Ride Post Request----------------
 
-    private void ConfirmRideRequest(String Url, final String code, final String pickpudate, final String pickup_time, final String type, final String category, final String pickup_location, final String pickup_lat, final String pickup_lon, final String try_value) {
+    private void ConfirmRideRequest(String Url, final String code, final String pickUpDate, final String pickup_time, final String type, final String category, final String pickup_location, final String pickup_lat, final String pickup_lon, final String try_value) {
 
         dialog = new Dialog(getActivity());
         dialog.getWindow();
@@ -1300,7 +1416,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("code", code);
-        jsonParams.put("pickup_date", pickpudate);
+        jsonParams.put("pickup_date", pickUpDate);
         jsonParams.put("pickup_time", pickup_time);
         jsonParams.put("type", type);
         jsonParams.put("category", category);
@@ -1312,7 +1428,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
         System.out.println("---------------user_id----------" + UserID);
         System.out.println("---------------code----------" + code);
-        System.out.println("---------------pickpudate----------" + pickpudate);
+        System.out.println("---------------pickpudate----------" + pickUpDate);
         System.out.println("---------------pickup_time----------" + pickup_time);
         System.out.println("---------------type----------" + type);
         System.out.println("---------------category----------" + category);
@@ -1368,7 +1484,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                             if (selected_type.equalsIgnoreCase("1")) {
 
-
                                 final PkDialog mDialog = new PkDialog(getActivity());
                                 mDialog.setDialogTitle(getActivity().getResources().getString(R.string.action_success));
                                 mDialog.setDialogMessage(getActivity().getResources().getString(R.string.ridenow_label_confirm_success));
@@ -1377,13 +1492,36 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                     public void onClick(View v) {
                                         mDialog.dismiss();
 
+
+                                        //Enable and Disable RideNow Button
+                                        if (CarAvailable.equalsIgnoreCase("no cabs")) {
+
+                                            Ll_marker_time.setVisibility(View.GONE);
+                                            Tv_marker_time.setVisibility(View.GONE);
+                                            Tv_marker_min.setVisibility(View.GONE);
+                                            center_marker.setImageResource(R.drawable.pickup_map_pointer_no_car_available);
+                                            rideNow_textview.setTextColor(Color.parseColor("#848484"));
+                                            rideNow_layout.setClickable(false);
+                                        } else {
+
+                                            Ll_marker_time.setVisibility(View.VISIBLE);
+                                            Tv_marker_time.setVisibility(View.VISIBLE);
+                                            Tv_marker_min.setVisibility(View.VISIBLE);
+                                            center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                                            rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
+                                            rideNow_layout.setClickable(true);
+
+                                            Tv_marker_time.setText(CarAvailable.replace("min", "").replace("mins", ""));
+                                        }
+
+
                                         //---------Hiding the bottom layout after success request--------
                                         googleMap.getUiSettings().setAllGesturesEnabled(true);
 
                                         Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out);
                                         ridenow_option_layout.startAnimation(animFadeOut);
                                         ridenow_option_layout.setVisibility(View.GONE);
-                                        center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                                        center_marker.setEnabled(true);
 
                                         listview.setVisibility(View.VISIBLE);
                                         rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
@@ -1495,6 +1633,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         ridenow_option_layout.startAnimation(animFadeOut);
                         ridenow_option_layout.setVisibility(View.GONE);
                         center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                        center_marker.setEnabled(true);
 
                         listview.setVisibility(View.VISIBLE);
                         rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));
@@ -1701,14 +1840,10 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         //Enable and Disable RideNow Button
                         if (CarAvailable.equalsIgnoreCase("no cabs")) {
                             rideNow_textview.setTextColor(Color.parseColor("#848484"));
-                            rideLater_textview.setTextColor(Color.parseColor("#848484"));
                             rideNow_layout.setClickable(false);
-                            rideLater_layout.setClickable(false);
                         } else {
                             rideNow_textview.setTextColor(Color.parseColor("#FFFFFF"));
-                            rideLater_textview.setTextColor(Color.parseColor("#FFFFFF"));
                             rideNow_layout.setClickable(true);
-                            rideLater_layout.setClickable(true);
                         }
 
                         listview.setVisibility(View.GONE);
@@ -1800,6 +1935,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 ridenow_option_layout.startAnimation(animFadeOut);
                 ridenow_option_layout.setVisibility(View.GONE);
                 center_marker.setImageResource(R.drawable.pickup_map_pointer);
+                center_marker.setEnabled(true);
 
                 listview.setVisibility(View.VISIBLE);
                 rideLater_textview.setText(getResources().getString(R.string.home_label_ride_later));

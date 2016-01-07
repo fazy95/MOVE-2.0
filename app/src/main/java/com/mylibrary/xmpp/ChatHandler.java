@@ -1,12 +1,19 @@
 package com.mylibrary.xmpp;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.support.v4.app.NotificationCompat;
 
 import com.cabily.app.AboutUs;
 import com.cabily.app.FareBreakUp;
 import com.cabily.app.PushNotificationAlert;
+import com.cabily.app.SingUpAndSignIn;
 import com.cabily.iconstant.Iconstant;
 import com.casperon.app.cabily.R;
 
@@ -92,15 +99,22 @@ public class ChatHandler {
 
     private void showCabArrivedAlert(JSONObject messageObject) throws Exception
     {
-        refreshMethod();
+        //refreshMethod();
 
-        Intent i1=new Intent(context, PushNotificationAlert.class);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
+        context.sendBroadcast(broadcastIntent);
+
+        sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
+
+
+        /*Intent i1=new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
         i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
         i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(i1);
+        context.startActivity(i1);*/
     }
 
     private void rideCancelledAlert(JSONObject messageObject) throws Exception
@@ -194,6 +208,10 @@ public class ChatHandler {
         finish_pushAlert.setAction("com.pushnotification.finish.PushNotificationAlert");
         context.sendBroadcast(finish_pushAlert);
 
+        Intent finish_MyRideDetails = new Intent();
+        finish_MyRideDetails.setAction("com.pushnotification.finish.MyRideDetails");
+        context.sendBroadcast(finish_MyRideDetails);
+
         Intent local = new Intent();
         local.setAction("com.pushnotification.finish.trackyourRide");
         context.sendBroadcast(local);
@@ -201,5 +219,62 @@ public class ChatHandler {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.pushnotification.updateBottom_view");
         context.sendBroadcast(broadcastIntent);
+
+    }
+
+    private void trackRideRefreshMethod()
+    {
+        Intent finish_fareBreakUp = new Intent();
+        finish_fareBreakUp.setAction("com.pushnotification.finish.FareBreakUp");
+        context.sendBroadcast(finish_fareBreakUp);
+
+        Intent finish_timerPage = new Intent();
+        finish_timerPage.setAction("com.pushnotification.finish.TimerPage");
+        context.sendBroadcast(finish_timerPage);
+
+        Intent finish_pushAlert = new Intent();
+        finish_pushAlert.setAction("com.pushnotification.finish.PushNotificationAlert");
+        context.sendBroadcast(finish_pushAlert);
+
+        Intent finish_MyRideDetails = new Intent();
+        finish_MyRideDetails.setAction("com.pushnotification.finish.MyRideDetails");
+        context.sendBroadcast(finish_MyRideDetails);
+
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.pushnotification.updateBottom_view");
+        context.sendBroadcast(broadcastIntent);
+
+    }
+
+
+
+    private void sendNotification(String msg) {
+        Intent notificationIntent = null;
+        notificationIntent = new Intent(context, SingUpAndSignIn.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Resources res = context.getResources();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setContentIntent(contentIntent)
+                .setSmallIcon(R.drawable.app_logo)
+                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.app_logo))
+                .setTicker(msg)
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                .setContentTitle("Cabily")
+                .setLights(0xffff0000, 100, 2000)
+                .setPriority(Notification.DEFAULT_SOUND)
+                .setContentText(msg);
+
+        Notification n = builder.getNotification();
+
+        n.defaults |= Notification.DEFAULT_ALL;
+        nm.notify(0, n);
+
     }
 }

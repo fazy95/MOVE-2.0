@@ -10,16 +10,16 @@ public interface Iconstant
 
      /*Testing Url*/
 
-        String BaseUrl = "http://project.dectar.com/cabilydemo/api/v1/";
+        /*String BaseUrl = "http://project.dectar.com/cabilydemo/api/v1/";
         String XMPP_HOST_URL = "67.219.149.186";
-        String XMPP_SERVICE_NAME = "messaging.dectar.com";
+        String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
 
 
     /*Live Url*/
 
-        /*String BaseUrl="http://project.dectar.com/fortaxi/api/v1/";
+        String BaseUrl="http://project.dectar.com/fortaxi/api/v1/";
         String XMPP_HOST_URL = "67.219.149.186";
-        String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
+        String XMPP_SERVICE_NAME = "messaging.dectar.com";
 
 
 

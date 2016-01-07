@@ -33,6 +33,7 @@ public class NavigationDrawer extends ActionBarActivityHockeyApp {
     private static RelativeLayout mDrawer;
     private Context context;
     private ListView mDrawerList;
+
     private static HomeMenuListAdapter mMenuAdapter;
     private String[] title;
     private int[] icon;

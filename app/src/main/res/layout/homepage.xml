@@ -21,13 +21,12 @@
             android:name="com.google.android.gms.maps.MapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/map_header"
             android:clickable="false"/>
 
 
         <RelativeLayout
-            android:layout_width="210dp"
-            android:layout_height="93dp"
+            android:layout_width="240dp"
+            android:layout_height="115dp"
             android:layout_above="@+id/book_my_ride_center_view1"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
@@ -41,15 +40,49 @@
                 android:src="@drawable/pickup_map_pointer"
                 android:visibility="visible"/>
 
+
+            <LinearLayout
+                android:id="@+id/book_my_ride_marker_time_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/book_my_ride_center_marker"
+                android:layout_marginLeft="26dp"
+                android:layout_marginTop="21dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/book_my_ride_confirm_header_car_time_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="#ffffff"
+                    android:textSize="10sp"/>
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/book_my_ride_confirm_header_car_time_min_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:text="min"
+                    android:textColor="#ffffff"
+                    android:textSize="9sp"/>
+
+            </LinearLayout>
+
+
             <com.mylibrary.materialprogresswheel.ProgressWheel
                 android:id="@+id/book_my_ride_progress_wheel"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:layout_alignTop="@+id/book_my_ride_center_marker"
                 android:layout_marginLeft="15dp"
-                android:layout_marginTop="15dp"
-                android:visibility="gone"
-                app:matProg_barWidth="2dp"
+                android:layout_marginTop="17dp"
+                android:visibility="invisible"
+                app:matProg_barWidth="1dp"
                 wheel:matProg_barColor="#FCC900"
                 wheel:matProg_fillRadius="true"
                 wheel:matProg_progressIndeterminate="true"/>
@@ -221,6 +254,7 @@
             android:layout_width="fill_parent"
             android:layout_height="65dp"
             android:layout_alignParentBottom="true"
+            android:layout_weight="1"
             android:background="#ccffffff"
             android:divider="#00000000"
             android:requiresFadingEdge="horizontal"

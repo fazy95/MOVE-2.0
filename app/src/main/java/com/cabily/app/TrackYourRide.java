@@ -1,7 +1,10 @@
 package com.cabily.app;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -57,8 +60,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     MarkerOptions marker;
     GPSTracker gps;
     private double MyCurrent_lat = 0.0, MyCurrent_long = 0.0;
-    private RelativeLayout alert_layout;
-    private TextView alert_textview;
 
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -74,11 +75,26 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private String UserID = "";
     ArrayList<CancelTripPojo> itemlist_reason;
     public static TrackYourRide trackyour_ride_class;
+    private TextView Tv_headerTitle;
+    private View track_your_ride_view1;
 
 
     LatLng fromPosition;
     LatLng toPosition;
     MarkerOptions markerOptions;
+
+    public class RefreshReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver")) {
+
+                Tv_headerTitle.setText("Driver Has Arrived");
+                rl_endTrip.setVisibility(View.GONE);
+                track_your_ride_view1.setVisibility(View.GONE);
+            }
+        }
+    }
+    private RefreshReceiver refreshReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +117,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         itemlist_reason = new ArrayList<CancelTripPojo>();
         markerOptions = new MarkerOptions();
 
-        alert_layout = (RelativeLayout) findViewById(R.id.track_your_ride_alert_layout);
-        alert_textview = (TextView) findViewById(R.id.track_your_ride_alert_textView);
-
         tv_done = (TextView) findViewById(R.id.track_your_ride_done_textview);
         tv_drivername = (TextView) findViewById(R.id.track_your_ride_driver_name);
         tv_carModel = (TextView) findViewById(R.id.track_your_ride_driver_carmodel);
@@ -114,6 +127,11 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         driver_image = (RoundedImageView) findViewById(R.id.track_your_ride_driverimage);
         rl_callDriver = (RelativeLayout) findViewById(R.id.track_your_ride_calldriver_layout);
         rl_endTrip = (RelativeLayout) findViewById(R.id.track_your_ride_endtrip_layout);
+
+        Tv_headerTitle= (TextView) findViewById(R.id.track_your_ride_track_label);
+        track_your_ride_view1= (View) findViewById(R.id.track_your_ride_view1);
+
+
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -132,6 +150,13 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             userLong = intent.getStringExtra("userLong");
         }
 
+
+        // -----code to refresh drawer using broadcast receiver-----
+        refreshReceiver = new RefreshReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
+        registerReceiver(refreshReceiver, intentFilter);
+
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
@@ -141,7 +166,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         tv_carModel.setText(driverCar_model);
         tv_time.setText(driverTime);
         tv_timeMinute.setVisibility(View.INVISIBLE);
-        tv_rating.setText(getResources().getString(R.string.track_your_ride_label_rating) + " " + driverRating);
+        tv_rating.setText(driverRating);
         Picasso.with(this)
                 .load(driverImage)
                 .into(driver_image);
@@ -187,12 +212,11 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             MyCurrent_long = Dlongitude;
 
             // Move the camera to last position with a zoom level
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(17).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(15).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         } else {
-            alert_layout.setVisibility(View.VISIBLE);
-            alert_textview.setText(getResources().getString(R.string.alert_gpsEnable));
+            Alert(getResources().getString(R.string.action_error),getResources().getString(R.string.alert_gpsEnable));
         }
 
         //set marker for driver location.
@@ -431,5 +455,12 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        // Unregister the logout receiver
+        unregisterReceiver(refreshReceiver);
+        super.onDestroy();
     }
 }

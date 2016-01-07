@@ -66,7 +66,7 @@
             <RelativeLayout
                 android:id="@+id/ratecard_city_relativeLayout"
                 android:layout_width="fill_parent"
-                android:layout_height="70dp"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp">
 
@@ -126,7 +126,7 @@
             <RelativeLayout
                 android:id="@+id/ratecard_cartype_relativeLayout"
                 android:layout_width="fill_parent"
-                android:layout_height="70dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/ratecard__view1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="1px">

@@ -109,7 +109,7 @@ public class TimerPage extends ActivitySubClass {
             public void onClick(View v) {
 
                 mdialog = new PkDialog(TimerPage.this);
-                mdialog.setDialogTitle("");
+                mdialog.setDialogTitle(getResources().getString(R.string.timer_label_alert_cancel_ride));
                 mdialog.setDialogMessage(getResources().getString(R.string.timer_label_alert_cancel_ride_message));
                 mdialog.setPositiveButton(getResources().getString(R.string.timer_label_alert_yes), new View.OnClickListener() {
                     @Override

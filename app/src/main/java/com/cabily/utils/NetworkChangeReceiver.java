@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.mylibrary.xmpp.ChatService;
 
@@ -26,6 +27,5 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         return (netInfo != null && netInfo.isConnected());
 
     }
-
 
 }

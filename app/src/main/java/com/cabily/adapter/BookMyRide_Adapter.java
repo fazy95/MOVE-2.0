@@ -75,7 +75,7 @@ public class BookMyRide_Adapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
         holder.name.setText(data.get(position).getCat_name());
-        holder.time.setText(data.get(position).getCat_time());
+       // holder.time.setText(data.get(position).getCat_time());
 
         if (data.get(position).getSelected_Cat().equalsIgnoreCase(data.get(position).getCat_id())) {
             imageLoader.DisplayImage(String.valueOf(data.get(position).getIcon_active()), holder.image);

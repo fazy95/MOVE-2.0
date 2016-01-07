@@ -29,10 +29,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.CancelTripPojo;
 import com.cabily.pojo.MyRideDetailPojo;
+import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
@@ -63,7 +63,7 @@ import me.drakeet.materialdialog.MaterialDialog;
 /**
  * Created by Prem Kumar and Anitha on 10/29/2015.
  */
-public class MyRidesDetail extends ActivityHockeyApp {
+public class MyRidesDetail extends ActivitySubClass {
     private RelativeLayout back;
     private static Boolean isInternetPresent = false;
     private ConnectionDetector cd;

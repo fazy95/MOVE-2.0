@@ -31,7 +31,7 @@
 
     <!-- Login Page -->
     <string name="login_label">SIGN IN</string>
-    <string name="login_label_forgotpwd">Forgot Password?</string>
+    <string name="login_label_forgotpwd">Forgot password?</string>
     <string name="login_label_email_hint">Email Address</string>
     <string name="login_label_pwd_hint">Password</string>
     <string name="login_label_login">SIGN IN</string>
@@ -72,7 +72,7 @@
     <!-- Forgot Password Page -->
     <string name="forgot_password_email_label_title">FORGOT PASSWORD</string>
     <string name="forgot_password_email_label_enter_email">Email Address</string>
-    <string name="forgot_password_email_label_send_email">SEND E-MAIL</string>
+    <string name="forgot_password_email_label_send_email">RESET PASSWORD</string>
     <string name="forgot_password_email_label_enter_valid_email">Email address is invalid</string>
     <string name="forgot_password_email_label_success">Verification code has been sent to your registered mobile number</string>
 
@@ -156,6 +156,7 @@
     <string name="timer_label_cancel_ride">Cancelling your ride</string>
     <string name="timer_label_alert_yes">YES</string>
     <string name="timer_label_alert_no">NO</string>
+    <string name="timer_label_alert_cancel_ride">Cancel Ride</string>
     <string name="timer_label_alert_cancel_ride_message">Are your sure you want to cancel this ride?</string>
 
     <!-- Track Your Ride Activity -->
@@ -228,7 +229,7 @@
     <string name="aboutus_lable_header_textview">ABOUT US</string>
     <string name="aboutus_lable_poweredby_textview">POWERED BY :</string>
     <string name="aboutus_lable_company_textview">CABILY</string>
-    <string name="aboutus_lable_version_code_textview">VERSION 1.0</string>
+    <string name="aboutus_lable_version_code_textview">VERSION 2.0</string>
     <string name="aboutus_lable_aboutus_description_textview">Cabily – a taxi booking app that will take the hassle out of getting to your destination quickly and without having to spend too much. Using highly advanced taxi booking software, it will provide you with a quick quote to help you avoid any surprises when you get to your destination, and assign you to a professional and responsible driver.</string>
 
     <!--Emergency Contact-->

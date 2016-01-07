@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,13 +45,11 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
     private TextView tv_done;
     private TextView tv_drivername, tv_carModel, tv_carNo, tv_rating, tv_time, tv_timeMinute;
     private RoundedImageView driver_image;
-    private LinearLayout rl_callDriver, rl_endTrip;
+    private RelativeLayout rl_callDriver, rl_endTrip;
     private GoogleMap googleMap;
     MarkerOptions marker;
     GPSTracker gps;
     private double MyCurrent_lat = 0.0, MyCurrent_long = 0.0;
-    private RelativeLayout alert_layout;
-    private TextView alert_textview;
 
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -77,7 +74,7 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myride_detail_track_ride);
-        initilize();
+        initialize();
         initializeMap();
 
         //Start XMPP Chat Service
@@ -85,7 +82,7 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
 
     }
 
-    private void initilize() {
+    private void initialize() {
         cd = new ConnectionDetector(MyRideDetailTrackRide.this);
         isInternetPresent = cd.isConnectingToInternet();
         gps = new GPSTracker(MyRideDetailTrackRide.this);
@@ -93,9 +90,6 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
         itemlist_reason = new ArrayList<CancelTripPojo>();
         v2GetRouteDirection = new GMapV2GetRouteDirection();
         markerOptions = new MarkerOptions();
-
-        alert_layout = (RelativeLayout) findViewById(R.id.myride_detail_track_your_ride_alert_layout);
-        alert_textview = (TextView) findViewById(R.id.myride_detail_track_your_ride_alert_textView);
 
         tv_done = (TextView) findViewById(R.id.myride_detail_track_your_ride_done_textview);
         tv_drivername = (TextView) findViewById(R.id.myride_detail_track_your_ride_driver_name);
@@ -105,8 +99,8 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
         tv_time = (TextView) findViewById(R.id.myride_detail_track_your_ride_arrive_time_textview);
         tv_timeMinute = (TextView) findViewById(R.id.myride_detail_track_your_ride_arrive_minute_textview);
         driver_image = (RoundedImageView) findViewById(R.id.myride_detail_track_your_ride_driverimage);
-        rl_callDriver = (LinearLayout) findViewById(R.id.myride_detail_track_your_ride_calldriver_layout);
-        rl_endTrip = (LinearLayout) findViewById(R.id.myride_detail_track_your_ride_endtrip_layout);
+        rl_callDriver = (RelativeLayout) findViewById(R.id.myride_detail_track_your_ride_calldriver_layout);
+        rl_endTrip = (RelativeLayout) findViewById(R.id.myride_detail_track_your_ride_endtrip_layout);
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -134,7 +128,7 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
         tv_carModel.setText(driverCar_model);
         tv_time.setText(driverTime);
         tv_timeMinute.setVisibility(View.INVISIBLE);
-        tv_rating.setText(getResources().getString(R.string.track_your_ride_label_rating) + " " + driverRating);
+        tv_rating.setText(driverRating);
         Picasso.with(this)
                 .load(driverImage)
                 .into(driver_image);
@@ -180,12 +174,11 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
             MyCurrent_long = Dlongitude;
 
             // Move the camera to last position with a zoom level
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(17).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(15).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         } else {
-            alert_layout.setVisibility(View.VISIBLE);
-            alert_textview.setText(getResources().getString(R.string.alert_gpsEnable));
+            Alert(getResources().getString(R.string.action_error), getResources().getString(R.string.alert_gpsEnable));
         }
 
         //set marker for driver location.

@@ -159,6 +159,8 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     }
 
 
+
+
   /* public void onTaskRemoved(Intent rootIntent) {
         stopSelf();
         System.out.println("---------------service destroied--------------------");

@@ -26,6 +26,7 @@ public class ActivitySubClass extends ActivityHockeyApp
         filter.addAction("com.pushnotification.finish.FareBreakUp");
         filter.addAction("com.pushnotification.finish.FareBreakUpPaymentList");
         filter.addAction("com.pushnotification.finish.MyRidePaymentList");
+        filter.addAction("com.pushnotification.finish.MyRideDetails");
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -45,6 +46,9 @@ public class ActivitySubClass extends ActivityHockeyApp
                     finish();
                 }
                 else if (intent.getAction().equals("com.pushnotification.finish.MyRidePaymentList")) {
+                    finish();
+                }
+                else if (intent.getAction().equals("com.pushnotification.finish.MyRideDetails")) {
                     finish();
                 }
                           }
