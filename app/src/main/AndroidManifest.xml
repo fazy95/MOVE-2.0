@@ -329,6 +329,13 @@
             android:theme="@style/NoActionBar_Theme"
             android:windowSoftInputMode="stateHidden|adjustPan"/>
 
+        <activity
+            android:name="com.cabily.app.ChatActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+
     </application>
 
 </manifest>

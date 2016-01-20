@@ -164,6 +164,7 @@
     <string name="track_your_ride_label_track">Track Your Ride</string>
     <string name="track_your_ride_label_done">Done</string>
     <string name="track_your_ride_label_callDriver">CONTACT DRIVER</string>
+    <string name="track_your_ride_label_chatDriver">Chat</string>
     <string name="track_your_ride_label_endTrip">CANCEL RIDE</string>
     <string name="track_your_ride_label_arrive_in">ARRIVING IN</string>
     <string name="track_your_ride_label_minutes">MINUTES</string>
