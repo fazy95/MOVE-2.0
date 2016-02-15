@@ -55,8 +55,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     }
     public ChatService() {
         super("ChatService");
-        chatHandler = new ChatHandler(getApplicationContext(), this);
-
     }
     @Override
     protected void onHandleIntent(Intent intent) {
