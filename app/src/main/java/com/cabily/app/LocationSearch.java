@@ -108,7 +108,8 @@ public class LocationSearch extends ActivityHockeyApp {
                     if (mRequest != null) {
                         mRequest.cancelRequest();
                     }
-                    CitySearchRequest(Iconstant.place_search_url + et_search.getText().toString().toLowerCase());
+                    String data =  et_search.getText().toString().toLowerCase().replace(" ","%20");
+                    CitySearchRequest(Iconstant.place_search_url +data);
                 } else {
                     alert_layout.setVisibility(View.VISIBLE);
                     alert_textview.setText(getResources().getString(R.string.alert_nointernet));
