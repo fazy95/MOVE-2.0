@@ -47,6 +47,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.googlemapdrawpolyline.GMapV2GetRouteDirection;
 import com.mylibrary.gps.GPSTracker;
+import com.mylibrary.latlnginterpolation.LatLngInterpolator;
+import com.mylibrary.latlnginterpolation.MarkerAnimation;
 import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.widgets.RoundedImageView;
 import com.mylibrary.xmpp.ChatService;
@@ -74,17 +76,14 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     MarkerOptions marker;
     GPSTracker gps;
     private double MyCurrent_lat = 0.0, MyCurrent_long = 0.0;
-
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private String driverID = "", driverName = "", driverImage = "", driverRating = "",
             driverLat = "", driverLong = "", driverTime = "", rideID = "", driverMobile = "",
             driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
-
     private boolean isReasonAvailable = false;
     private ServiceRequest mRequest;
     Dialog dialog;
-
     private SessionManager session;
     private String UserID = "";
     ArrayList<CancelTripPojo> itemlist_reason;
@@ -93,17 +92,15 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private View track_your_ride_view1;
     private View arriveView;
     private RelativeLayout Rl_arriveLayout;
-
-
     LatLng fromPosition;
     LatLng toPosition;
     MarkerOptions markerOptions;
+    private static Marker curentDriverMarker;
 
     public class RefreshReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver")) {
-
                 Tv_headerTitle.setText("Driver Has Arrived");
                 rl_endTrip.setVisibility(View.GONE);
                 track_your_ride_view1.setVisibility(View.GONE);
@@ -115,6 +112,45 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
 
     private RefreshReceiver refreshReceiver;
 
+
+    static LatLngInterpolator latLngInterpolator = new LatLngInterpolator.Spherical();
+    public static void updateMap(LatLng latLng) {
+        MarkerAnimation.animateMarkerToICS(curentDriverMarker, latLng, latLngInterpolator);
+    }
+
+
+    public static class FragmentMessage extends Handler {
+
+        @Override
+        public void handleMessage(Message message) {
+            String data = message.obj.toString();
+            Log.d("Hello","Message +++++++++++++++++++++++"+ data);
+            try{
+                String[] array = data.split(",");
+                float lat =  Float.valueOf(array[1]);
+                float lng = Float.valueOf(array[2]);
+                float bearing = Float.valueOf(array[3]);
+                if(curentDriverMarker != null){
+                    LatLng mLatLng = new LatLng(lat,lng);
+                    curentDriverMarker.setPosition(mLatLng);
+                    updateMap(mLatLng);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void createChat(){
+        ChatService.startUserAction(getApplicationContext());
+        String sSenderID=""+driverID;
+        String  sToID = sSenderID + "@" + Iconstant.XMPP_SERVICE_NAME;
+        Chat chat = ChatService.createChat(sToID);
+        ChatService.setChatMessenger(new Messenger(new FragmentMessage()));
+        ChatService.enableChat();
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,11 +158,11 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         trackyour_ride_class = TrackYourRide.this;
         initialize();
         initializeMap();
-
         //Start XMPP Chat Service
-        ChatService.startUserAction(TrackYourRide.this);
-
+        createChat();
     }
+
+
 
     private void initialize() {
         cd = new ConnectionDetector(TrackYourRide.this);
@@ -354,7 +390,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     rectLine.add(directionPoint.get(i));
                 }
                 // Adding route on the map
-                googleMap.addPolyline(rectLine);
+                //googleMap.addPolyline(rectLine);
                 markerOptions.position(toPosition);
                 markerOptions.position(fromPosition);
                 markerOptions.draggable(true);
@@ -364,10 +400,9 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 googleMap.addMarker(new MarkerOptions()
                         .position(toPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
-                googleMap.addMarker(new MarkerOptions()
+                curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
                         .position(fromPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_map_icon)));
-
                 //Show path in
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(toPosition);
@@ -463,7 +498,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         });
     }
 
-
     //-----------------Move Back on pressed phone back button------------------
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -488,6 +522,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     public void onDestroy() {
         // Unregister the logout receiver
         unregisterReceiver(refreshReceiver);
+        ChatService.disableChat();
         super.onDestroy();
     }
 }

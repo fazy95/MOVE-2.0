@@ -3,6 +3,8 @@ package com.mylibrary.xmpp;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Messenger;
+import android.os.RemoteException;
 
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.SessionManager;
@@ -36,6 +38,13 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     private static SessionManager session;
     private static AbstractXMPPConnection connection;
     private static  boolean isConnected;
+    //Declaration for Chat
+    private static Chat chat;
+    private static ChatManager chatManager;
+    static boolean isChatEnabled;
+    private static Messenger chatMessenger;
+    ChatHandler chatHandler;
+
     /**
      */
     public static void startUserAction(Context context) {
@@ -46,6 +55,8 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     }
     public ChatService() {
         super("ChatService");
+        chatHandler = new ChatHandler(getApplicationContext(), this);
+
     }
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -53,7 +64,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
             handleActionFoo();
         }
     }
-
     /**
      * Handle action Foo in the provided background thread with the provided
      * parameters.
@@ -132,8 +142,8 @@ public class ChatService extends IntentService implements ChatManagerListener, C
             if(userName.length()>0&&password.length()>0)
             {
                 connection.login(userName, password);
-                ChatManager chatmanager = ChatManager.getInstanceFor(connection);
-                chatmanager.addChatListener(this);
+                chatManager = ChatManager.getInstanceFor(connection);
+                chatManager.addChatListener(this);
             }
 
         } catch (XMPPException e) {
@@ -148,10 +158,46 @@ public class ChatService extends IntentService implements ChatManagerListener, C
 
     @Override
     public void processMessage(Chat chat, final Message message) {
-        ChatHandler chatHandler = new ChatHandler(getApplicationContext(),this);
-        chatHandler.onHandleChatMessage(message);
+        if(chatHandler == null){
+            chatHandler = new ChatHandler(getApplicationContext(), this);
+        }
+        if (isChatEnabled && chatMessenger != null) {
+            android.os.Message chatMessage = android.os.Message.obtain();
+            chatMessage.obj = message.getBody();
+            try {
+                if(message.getBody().contains("MI_MESSAGE")){
+                    chatMessenger.send(chatMessage);
+                }else{
+                    chatHandler.onHandleChatMessage(message);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            chatHandler.onHandleChatMessage(message);
+        }
     }
 
+    public static void setChatMessenger(Messenger messenger) {
+        chatMessenger = messenger;
+    }
+    /*
+    Need add chat validation object
+    */
+    public static Chat createChat(String chatID) {
+        if (chatID != null && chatManager != null) {
+            chat = chatManager.createChat(chatID);
+        }
+        return chat;
+    }
+
+    public static void enableChat() {
+        isChatEnabled = true;
+    }
+
+    public static void disableChat() {
+        isChatEnabled = false;
+    }
 
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
