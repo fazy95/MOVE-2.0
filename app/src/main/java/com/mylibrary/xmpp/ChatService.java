@@ -3,8 +3,6 @@ package com.mylibrary.xmpp;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Messenger;
-import android.os.RemoteException;
 
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.SessionManager;
@@ -38,9 +36,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     private static SessionManager session;
     private static AbstractXMPPConnection connection;
     private static  boolean isConnected;
-    private static Chat chat;
-    private static ChatManager chatmanager;
-
     /**
      */
     public static void startUserAction(Context context) {
@@ -133,12 +128,14 @@ public class ChatService extends IntentService implements ChatManagerListener, C
                 userName = session.getXmppKey().get(SessionManager.KEY_XMPP_USERID);
                 password = session.getXmppKey().get(SessionManager.KEY_XMPP_SEC_KEY);
             }
+
             if(userName.length()>0&&password.length()>0)
             {
                 connection.login(userName, password);
-                chatmanager = ChatManager.getInstanceFor(connection);
+                ChatManager chatmanager = ChatManager.getInstanceFor(connection);
                 chatmanager.addChatListener(this);
             }
+
         } catch (XMPPException e) {
             e.printStackTrace();
         } catch (SmackException e) {
@@ -153,43 +150,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     public void processMessage(Chat chat, final Message message) {
         ChatHandler chatHandler = new ChatHandler(getApplicationContext(),this);
         chatHandler.onHandleChatMessage(message);
-        if (isChatEnabled && chatMessenger != null) {
-            android.os.Message message1 = android.os.Message.obtain();
-            message1.obj = message.getBody();
-            try {
-                chatMessenger.send(message1);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    private static Messenger chatMessenger;
-
-    public static void setChatMessenger(Messenger messenger) {
-        chatMessenger = messenger;
-    }
-
-
-    /*
-    Need add chat validation object
-    */
-    public static Chat createChat(String userJID) {
-        if (userJID != null && chatmanager != null) {
-            chat = chatmanager.createChat(userJID);
-        }
-        return chat;
-    }
-
-    static boolean isChatEnabled;
-
-    public static void enableChat() {
-        isChatEnabled = true;
-    }
-
-    public static void disableChat() {
-        isChatEnabled = false;
     }
 
 
@@ -197,6 +157,9 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     public void chatCreated(Chat chat, boolean createdLocally) {
         chat.addMessageListener(this);
     }
+
+
+
 
   /* public void onTaskRemoved(Intent rootIntent) {
         stopSelf();

@@ -97,6 +97,21 @@
 
 
         <!--<activity android:name="net.hockeyapp.android.UpdateActivity" />-->
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="http"
+            android:host="www.example.com"
+            android:pathPrefix="/plumbal" />
+
+        <data android:scheme="example"
+            android:host="plumbal" />
+
+        <data android:scheme="http"
+            android:host="play.google.com"
+            android:pathPrefix="/store/apps/details?id=com.casperon.plumbal" />
+
+
 
 
 
@@ -119,7 +134,19 @@
             android:windowSoftInputMode="stateHidden|adjustPan"/>
 
         <activity
-            android:name="com.cabily.app.ForgotPassword"
+            android:name="com.cabily.app.RegisterFacebook"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.ForgotPasswordOtp"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar_Theme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.cabily.app.FacebookOtpPage"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar_Theme"
             android:windowSoftInputMode="stateHidden|adjustPan"/>
@@ -328,13 +355,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar_Theme"
             android:windowSoftInputMode="stateHidden|adjustPan"/>
-
-        <activity
-            android:name="com.cabily.app.ChatActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar_Theme"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
-
 
     </application>
 

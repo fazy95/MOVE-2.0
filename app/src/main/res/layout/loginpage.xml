@@ -128,12 +128,26 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
+            <Button
+                android:id="@+id/login_fb_btn_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="42dp"
+                android:layout_below="@+id/login_submit_button"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/app_color_button"
+                android:text="@string/login_label_facecook_login"
+                android:textColor="#ffffff"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
 
             <RelativeLayout
                 android:id="@+id/login_forgotpwd_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/login_submit_button"
+                android:layout_below="@+id/login_fb_btn_layout"
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="25dp"
@@ -148,7 +162,29 @@
                     android:textSize="14sp" />
             </RelativeLayout>
 
+           <!-- <RelativeLayout
+                android:id="@+id/login_fb_btn_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/login_forgotpwd_layout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/fb_login_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/login_label_facecook_login"
+                    android:textColor="#ffffff"
+                    android:textSize="17dp"
+                    android:textStyle="bold" />
             </RelativeLayout>
+-->
+
+        </RelativeLayout>
     </ScrollView>
 
 </RelativeLayout>

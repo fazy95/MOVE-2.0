@@ -17,12 +17,15 @@ import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mylibrary.dialog.PkDialog;
@@ -253,7 +256,7 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
             if (result.equalsIgnoreCase("Success")) {
                 googleMap.clear();
                 ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(document);
-                PolylineOptions rectLine = new PolylineOptions().width(5).color(
+                PolylineOptions rectLine = new PolylineOptions().width(10).color(
                         Color.RED);
 
                 for (int i = 0; i < directionPoint.size(); i++) {
@@ -273,6 +276,13 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
                 googleMap.addMarker(new MarkerOptions()
                         .position(fromPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_map_icon)));
+
+                //Show path in
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(toPosition);
+                builder.include(fromPosition);
+                LatLngBounds bounds = builder.build();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 21));
             }
         }
     }

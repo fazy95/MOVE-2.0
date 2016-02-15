@@ -4,6 +4,7 @@ package com.cabily.app;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.cabily.HockeyApp.FragmentActivityHockeyApp;
+import com.cabily.facebook.Util;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
@@ -380,6 +382,13 @@ public class ProfilePage extends FragmentActivityHockeyApp {
             }
         });
     }
+    public void logoutFromFacebook() {
+        Util.clearCookies(ProfilePage.this);
+        // your sharedPrefrence
+        SharedPreferences.Editor editor = context.getSharedPreferences("CASPreferences",Context.MODE_PRIVATE).edit();
+        editor.clear();
+        editor.commit();
+    }
 
 
     //-----------------------Logout Request-----------------
@@ -409,6 +418,7 @@ public class ProfilePage extends FragmentActivityHockeyApp {
 
                 dialog.dismiss();
                 if (Sstatus.equalsIgnoreCase("1")) {
+                    logoutFromFacebook();
                     session.logoutUser();
                     Intent local = new Intent();
                     local.setAction("com.app.logout");

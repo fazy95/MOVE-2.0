@@ -64,7 +64,6 @@
                 android:id="@+id/my_rides_rating_listView"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/my_rides_rating_why_label"
                 android:background="#ffffff"
                 android:divider="@null">
             </com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView>

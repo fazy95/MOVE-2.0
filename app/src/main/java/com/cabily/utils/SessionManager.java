@@ -46,6 +46,8 @@ public class SessionManager {
     public static final String KEY_XMPP_USERID = "xmppUserId";
     public static final String KEY_XMPP_SEC_KEY = "xmppSecKey";
 
+
+
     public SessionManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);

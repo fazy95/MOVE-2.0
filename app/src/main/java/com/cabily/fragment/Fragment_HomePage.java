@@ -103,6 +103,8 @@ import me.drakeet.materialdialog.MaterialDialog;
 
 public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    private TextView tv_apply;
     private RelativeLayout drawer_layout;
     private RelativeLayout address_layout, favorite_layout, bottom_layout;
     private RelativeLayout loading_layout;
@@ -164,12 +166,13 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private static View rootview;
 
     //------Declaration for Coupon code-----
-    private RelativeLayout coupon_apply_layout, coupon_loading_layout;
+    private RelativeLayout coupon_apply_layout, coupon_loading_layout,coupon_allowance_layout;
     private MaterialDialog coupon_dialog;
     private EditText coupon_edittext;
     private String coupon_selectedDate = "";
     private String coupon_selectedTime = "";
-    private String Str_couponCode="";
+    private String Str_couponCode = "";
+    private TextView coupon_allowance;
 
     //------Declaration for Confirm Ride-----
     private String response_time = "", riderId = "";
@@ -390,7 +393,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 if (rideLater_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_ride_later))) {
 
                     selectedType = "1";
-                    Str_couponCode="";
+                    Str_couponCode = "";
 
                     new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
                             .setListener(listener)
@@ -454,7 +457,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                 if (rideNow_textview.getText().toString().equalsIgnoreCase(getResources().getString(R.string.home_label_ride_now))) {
                     selectedType = "0";
-                    Str_couponCode="";
+                    Str_couponCode = "";
 
                     if (CarAvailable.equalsIgnoreCase("no cabs")) {
                         Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_label_content1));
@@ -501,6 +504,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                        /* HashMap<String, String> code = session.getCouponCode();
                         String coupon = code.get(SessionManager.KEY_COUPON_CODE);*/
 
+                        riderId="";
                         ConfirmRideRequest(Iconstant.confirm_ride_url, Str_couponCode, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "");
                     } else {
                         Alert(getActivity().getResources().getString(R.string.alert_label_title), getActivity().getResources().getString(R.string.alert_nointernet));
@@ -617,8 +621,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 cd = new ConnectionDetector(getActivity());
                 isInternetPresent = cd.isConnectingToInternet();
 
-                Log.e("latitude--on_camera_change---->", "" + latitude);
-                Log.e("longitude--on_camera_change---->", "" + longitude);
+                Log.e("camerachange lat-->", "" + latitude);
+                Log.e("on_camera_change lon-->", "" + longitude);
 
                 if (latitude != 0.0) {
                     googleMap.clear();
@@ -768,16 +772,30 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         coupon_dialog = new MaterialDialog(getActivity());
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.coupon_code_dialog, null);
 
-        TextView tv_apply = (TextView) view.findViewById(R.id.couponcode_apply_textView);
+        tv_apply = (TextView) view.findViewById(R.id.couponcode_apply_textView);
         TextView tv_cancel = (TextView) view.findViewById(R.id.couponcode_cancel_textView);
         final TextView tv_nointernet = (TextView) view.findViewById(R.id.couponcode_nointernet_textView);
         coupon_edittext = (EditText) view.findViewById(R.id.couponcode_editText);
         coupon_apply_layout = (RelativeLayout) view.findViewById(R.id.couponcode_apply_layout);
         coupon_loading_layout = (RelativeLayout) view.findViewById(R.id.couponcode_loading_layout);
+        coupon_allowance_layout = (RelativeLayout) view.findViewById(R.id.couponcode_allowance_amount_layout);
+        coupon_allowance = (TextView) view.findViewById(R.id.couponcode_allowance_textview);
+
+        HashMap<String, String> code = session.getCouponCode();
+        String coupon = code.get(SessionManager.KEY_COUPON_CODE);
+        if (!coupon.isEmpty()) {
+            coupon_edittext.setText(coupon);
+            tv_apply.setText(getResources().getString(R.string.couponcode_label_remove));
+
+        }
 
         coupon_apply_layout.setVisibility(View.VISIBLE);
         coupon_loading_layout.setVisibility(View.GONE);
         coupon_edittext.addTextChangedListener(EditorWatcher);
+
+
+
+
         coupon_edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -810,8 +828,15 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     if (isInternetPresent) {
                         tv_nointernet.setVisibility(View.INVISIBLE);
                         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-                        CouponCodeRequest(Iconstant.couponCode_apply_url, coupon_edittext.getText().toString(), coupon_selectedDate);
+                            if (getResources().getString(R.string.couponcode_label_apply).equalsIgnoreCase(tv_apply.getText().toString())) {
+                                CouponCodeRequest(Iconstant.couponCode_apply_url, coupon_edittext.getText().toString(), coupon_selectedDate);
+                            }else{
+                                session.setCouponCode(" ");
+                                coupon_edittext.setText("");
+                                tv_apply.setText(getResources().getString(R.string.couponcode_label_apply));
+                                coupon_allowance_layout.setVisibility(View.GONE);
+                                tv_coupon_label.setText(getResources().getString(R.string.ridenow_label_coupon));
+                            }
                     } else {
                         tv_nointernet.setVisibility(View.VISIBLE);
                     }
@@ -964,11 +989,11 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 }
                 strAdd = strReturnedAddress.toString();
             } else {
-                Log.e("My Current loction address", "No Address returned!");
+                Log.e("Current loction address", "No Address returned!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("My Current loction address", "Canont get Address!");
+            Log.e("Current loction address", "Canont get Address!");
         }
         return strAdd;
     }
@@ -1022,8 +1047,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 coupon_selectedTime = coupon_time_mFormatter.format(date);
 
 
-
-
                 //--------Disabling the map functionality---------
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
                 currentLocation_image.setClickable(false);
@@ -1071,6 +1094,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
             String currenttime = mTime_Formatter.format(d);
             String selecedtime = mTime_Formatter.format(date);
             String displaytime = mFormatter.format(date);
+
 
             if (selecedtime.equalsIgnoreCase("00")) {
                 selecedtime = "24";
@@ -1155,6 +1179,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             driver_list.clear();
                                             driver_status = false;
                                         }
+                                    } else {
+                                        driver_status = false;
                                     }
 
 
@@ -1197,6 +1223,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             ratecard_list.clear();
                                             ratecard_status = false;
                                         }
+                                    } else {
+                                        ratecard_status = false;
                                     }
 
 
@@ -1232,6 +1260,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             category_list.clear();
                                             category_status = false;
                                         }
+                                    } else {
+                                        category_status = false;
                                     }
                                 }
                             }
@@ -1265,6 +1295,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                             // adding marker
                             googleMap.addMarker(marker);
                         }
+                    } else {
+                        googleMap.clear();
                     }
 
                     if (category_status) {
@@ -1359,19 +1391,34 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
                             coupon_apply_layout.setVisibility(View.VISIBLE);
                             coupon_loading_layout.setVisibility(View.GONE);
-                            coupon_dialog.dismiss();
+
 
                             String code = result_object.getString("code");
-                            Str_couponCode=code;
+                            String type = result_object.getString("discount_type");
+                            String discount = result_object.getString("discount_amount");
+
+                            Str_couponCode = code;
                             session.setCouponCode(code);
-                            tv_coupon_label.setText(getResources().getString(R.string.couponcode_label_verifed));
+                            coupon_allowance_layout.setVisibility(View.VISIBLE);
+                            if(getResources().getString(R.string.couponcode_allowance_type).equalsIgnoreCase(type)) {
+                                coupon_allowance.setText(getResources().getString(R.string.couponcode_label_allowance_text1) +discount + getResources().getString(R.string.couponcode_label_allowance_text2));
+                            }
+                            else
+                            {
+                                coupon_allowance.setText(getResources().getString(R.string.couponcode_label_allowance_text1) +discount + getResources().getString(R.string.couponcode_label_allowance_text3));
+                            }
+                            tv_apply.setText(getResources().getString(R.string.couponcode_label_remove));
+                            tv_coupon_label.setText(Str_couponCode);//getResources().getString(R.string.couponcode_label_verifed)
                             tv_coupon_label.setTextColor(getResources().getColor(R.color.darkgreen_color));
+
                         } else {
 
-                            Str_couponCode="";
+                            Str_couponCode = "";
+                            session.setCouponCode(Str_couponCode);
 
                             coupon_apply_layout.setVisibility(View.VISIBLE);
                             coupon_loading_layout.setVisibility(View.GONE);
+                            coupon_allowance_layout.setVisibility(View.GONE);
 
                             coupon_edittext.setText("");
                             coupon_edittext.setHint(getResources().getString(R.string.couponcode_label_invalid_code));
@@ -1720,6 +1767,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             driver_list.clear();
                                             driver_status = false;
                                         }
+                                    } else {
+                                        driver_status = false;
                                     }
 
 
@@ -1762,6 +1811,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             ratecard_list.clear();
                                             ratecard_status = false;
                                         }
+                                    } else {
+                                        ratecard_status = false;
                                     }
 
 
@@ -1797,6 +1848,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                                             category_list.clear();
                                             category_status = false;
                                         }
+                                    } else {
+                                        category_status = false;
                                     }
 
                                 }

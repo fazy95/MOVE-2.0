@@ -6,9 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -23,12 +29,19 @@ import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mylibrary.dialog.PkDialog;
@@ -39,6 +52,7 @@ import com.mylibrary.widgets.RoundedImageView;
 import com.mylibrary.xmpp.ChatService;
 import com.squareup.picasso.Picasso;
 
+import org.jivesoftware.smack.chat.Chat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,6 +91,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     public static TrackYourRide trackyour_ride_class;
     private TextView Tv_headerTitle;
     private View track_your_ride_view1;
+    private View arriveView;
+    private RelativeLayout Rl_arriveLayout;
 
 
     LatLng fromPosition;
@@ -91,9 +107,12 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 Tv_headerTitle.setText("Driver Has Arrived");
                 rl_endTrip.setVisibility(View.GONE);
                 track_your_ride_view1.setVisibility(View.GONE);
+                Rl_arriveLayout.setVisibility(View.INVISIBLE);
+                arriveView.setVisibility(View.INVISIBLE);
             }
         }
     }
+
     private RefreshReceiver refreshReceiver;
 
     @Override
@@ -101,7 +120,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.track_your_ride);
         trackyour_ride_class = TrackYourRide.this;
-        initilize();
+        initialize();
         initializeMap();
 
         //Start XMPP Chat Service
@@ -109,7 +128,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
 
     }
 
-    private void initilize() {
+    private void initialize() {
         cd = new ConnectionDetector(TrackYourRide.this);
         isInternetPresent = cd.isConnectingToInternet();
         gps = new GPSTracker(TrackYourRide.this);
@@ -127,10 +146,11 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         driver_image = (RoundedImageView) findViewById(R.id.track_your_ride_driverimage);
         rl_callDriver = (RelativeLayout) findViewById(R.id.track_your_ride_calldriver_layout);
         rl_endTrip = (RelativeLayout) findViewById(R.id.track_your_ride_endtrip_layout);
+        Rl_arriveLayout = (RelativeLayout) findViewById(R.id.track_your_ride_label_arrival_layout);
+        arriveView = (View) findViewById(R.id.track_your_ride_drive_info_view);
 
-        Tv_headerTitle= (TextView) findViewById(R.id.track_your_ride_track_label);
-        track_your_ride_view1= (View) findViewById(R.id.track_your_ride_view1);
-
+        Tv_headerTitle = (TextView) findViewById(R.id.track_your_ride_track_label);
+        track_your_ride_view1 = (View) findViewById(R.id.track_your_ride_view1);
 
 
         Intent intent = getIntent();
@@ -216,7 +236,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         } else {
-            Alert(getResources().getString(R.string.action_error),getResources().getString(R.string.alert_gpsEnable));
+            Alert(getResources().getString(R.string.action_error), getResources().getString(R.string.alert_gpsEnable));
         }
 
         //set marker for driver location.
@@ -297,7 +317,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             }
         });
         mDialog.show();
-      
+
     }
 
 
@@ -347,6 +367,13 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 googleMap.addMarker(new MarkerOptions()
                         .position(fromPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_map_icon)));
+
+                //Show path in
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(toPosition);
+                builder.include(fromPosition);
+                LatLngBounds bounds = builder.build();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 21));
             }
         }
     }

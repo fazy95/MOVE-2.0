@@ -1,6 +1,5 @@
 package com.cabily.app;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -8,15 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cabily.iconstant.Iconstant;
 import com.cabily.subclass.ActivitySubClass;
 import com.casperon.app.cabily.R;
-
-import me.drakeet.materialdialog.MaterialDialog;
 
 /**
  * Created by Prem Kumar and Anitha on 11/6/2015.
@@ -89,13 +85,13 @@ public class PushNotificationAlert extends ActivitySubClass {
             Tv_title.setText(getResources().getString(R.string.pushnotification_alert_label_ride_arrived_success));
         }
 
-        try {
+       /* try {
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 

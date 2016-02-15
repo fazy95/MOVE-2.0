@@ -47,7 +47,7 @@ import java.util.Locale;
 
 
 
-public class OtpPage extends ActivityHockeyApp {
+public class FacebookOtpPage extends ActivityHockeyApp {
     private Context context;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -61,7 +61,7 @@ public class OtpPage extends ActivityHockeyApp {
     Dialog dialog;
 
     private String Susername = "", Semail = "", Spassword = "", Sphone = "", ScountryCode = "", SreferalCode = "", SgcmId = "";
-    private String Sotp_Status = "", Sotp = "";
+    private String Sotp_Status = "", Sotp = "",media_id="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,7 @@ public class OtpPage extends ActivityHockeyApp {
                 } else if (!Sotp.equals(Eotp.getText().toString())) {
                     erroredit(Eotp, getResources().getString(R.string.otp_label_alert_invalid));
                 } else {
-                    cd = new ConnectionDetector(OtpPage.this);
+                    cd = new ConnectionDetector(FacebookOtpPage.this);
                     isInternetPresent = cd.isConnectingToInternet();
 
                     if (isInternetPresent) {
@@ -117,13 +117,13 @@ public class OtpPage extends ActivityHockeyApp {
     }
 
     private void initialize() {
-        session = new SessionManager(OtpPage.this);
-        cd = new ConnectionDetector(OtpPage.this);
+        session = new SessionManager(FacebookOtpPage.this);
+        cd = new ConnectionDetector(FacebookOtpPage.this);
         isInternetPresent = cd.isConnectingToInternet();
 
-        back = (RelativeLayout) findViewById(R.id.otp_header_back_layout);
-        Eotp = (EditText) findViewById(R.id.otp_password_editText);
-        send = (Button) findViewById(R.id.otp_submit_button);
+        back = (RelativeLayout) findViewById(R.id.facebook_otp_header_back_layout);
+        Eotp = (EditText) findViewById(R.id.facebook_otp_password_editText);
+        send = (Button) findViewById(R.id.facebook_otp_submit_button);
 
         Eotp.addTextChangedListener(EditorWatcher);
 
@@ -137,6 +137,7 @@ public class OtpPage extends ActivityHockeyApp {
         SgcmId = intent.getStringExtra("GcmID");
         Sotp_Status = intent.getStringExtra("Otp_Status");
         Sotp = intent.getStringExtra("Otp");
+        media_id = intent.getStringExtra("MediaId");
 
         if (Sotp_Status.equalsIgnoreCase("development")) {
             Eotp.setText(Sotp);
@@ -148,7 +149,7 @@ public class OtpPage extends ActivityHockeyApp {
     //--------------Alert Method-----------
     private void Alert(String title, String alert) {
 
-        final PkDialog mDialog = new PkDialog(OtpPage.this);
+        final PkDialog mDialog = new PkDialog(FacebookOtpPage.this);
         mDialog.setDialogTitle(title);
         mDialog.setDialogMessage(alert);
         mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
@@ -182,7 +183,7 @@ public class OtpPage extends ActivityHockeyApp {
 
     //--------------------Code to set error for EditText-----------------------
     private void erroredit(EditText editname, String msg) {
-        Animation shake = AnimationUtils.loadAnimation(OtpPage.this, R.anim.shake);
+        Animation shake = AnimationUtils.loadAnimation(FacebookOtpPage.this, R.anim.shake);
         editname.startAnimation(shake);
 
         ForegroundColorSpan fgcspan = new ForegroundColorSpan(Color.parseColor("#CC0000"));
@@ -211,8 +212,8 @@ public class OtpPage extends ActivityHockeyApp {
             InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
 
-            OtpPage.this.finish();
-            OtpPage.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            FacebookOtpPage.this.finish();
+            FacebookOtpPage.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             return true;
         }
         return false;
@@ -223,7 +224,7 @@ public class OtpPage extends ActivityHockeyApp {
 
     private void PostRequest(String Url) {
 
-        dialog = new Dialog(OtpPage.this);
+        dialog = new Dialog(FacebookOtpPage.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.custom_loading);
@@ -233,7 +234,7 @@ public class OtpPage extends ActivityHockeyApp {
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_otp));
 
-        System.out.println("--------------Otp url-------------------" + Url);
+        System.out.println("--------------facebook Otp url-------------------" + Url);
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_name", Susername);
@@ -243,19 +244,21 @@ public class OtpPage extends ActivityHockeyApp {
         jsonParams.put("country_code", ScountryCode);
         jsonParams.put("referal_code", SreferalCode);
         jsonParams.put("gcm_id", SgcmId);
+        jsonParams.put("media_id", media_id);
 
-        mRequest = new ServiceRequest(OtpPage.this);
+
+        mRequest = new ServiceRequest(FacebookOtpPage.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
 
-                System.out.println("--------------Otp reponse-------------------" + response);
+                System.out.println("--------------facebook Otp reponse-------------------" + response);
 
 
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "",
                         SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
-                 String sCurrencySymbol="";
+                String sCurrencySymbol="";
 
                 try {
 
@@ -287,13 +290,13 @@ public class OtpPage extends ActivityHockeyApp {
 
                 if (Sstatus.equalsIgnoreCase("1")) {
                     SingUpAndSignIn.activty.finish();
-                    System.out.println("--------SsecretKey-----------"+SsecretKey);
+
                     session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 
                     //starting XMPP service
-                    ChatService.startUserAction(OtpPage.this);
+                    ChatService.startUserAction(FacebookOtpPage.this);
 
                     Intent intent = new Intent(context, UpdateUserLocation.class);
                     startActivity(intent);
@@ -301,7 +304,7 @@ public class OtpPage extends ActivityHockeyApp {
                     overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                 } else {
 
-                    final PkDialog mDialog = new PkDialog(OtpPage.this);
+                    final PkDialog mDialog = new PkDialog(FacebookOtpPage.this);
                     mDialog.setDialogTitle(getResources().getString(R.string.action_error));
                     mDialog.setDialogMessage(Smessage);
                     mDialog.setCancelOnTouchOutside(false);

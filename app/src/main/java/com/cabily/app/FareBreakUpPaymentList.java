@@ -84,8 +84,8 @@ public class FareBreakUpPaymentList extends ActivitySubClass {
                     } else if (itemlist.get(position).getPaymentCode().equalsIgnoreCase("auto_detect")) {
                         MakePayment_Stripe(Iconstant.makepayment_autoDetect_url);
                     } else {
-                        MakePayment_WebView_MobileID(Iconstant.makepayment_Get_webview_mobileId_url);
                         SpaymentCode=itemlist.get(position).getPaymentCode();
+                        MakePayment_WebView_MobileID(Iconstant.makepayment_Get_webview_mobileId_url);
                     }
                 } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));

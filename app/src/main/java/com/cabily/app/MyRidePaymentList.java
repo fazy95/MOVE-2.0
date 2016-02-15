@@ -16,6 +16,7 @@ import com.cabily.iconstant.Iconstant;
 import com.cabily.pojo.PaymentListPojo;
 import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
+import com.cabily.utils.CurrencySymbolConverter;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView;
@@ -84,8 +85,8 @@ public class MyRidePaymentList extends ActivitySubClass {
                     } else if (itemlist.get(position).getPaymentCode().equalsIgnoreCase("auto_detect")) {
                         MakePayment_Stripe(Iconstant.makepayment_autoDetect_url);
                     } else {
-                        MakePayment_WebView_MobileID(Iconstant.makepayment_Get_webview_mobileId_url);
                         SpaymentCode = itemlist.get(position).getPaymentCode();
+                        MakePayment_WebView_MobileID(Iconstant.makepayment_Get_webview_mobileId_url);
                     }
                 } else {
                     Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
@@ -315,7 +316,7 @@ public class MyRidePaymentList extends ActivitySubClass {
                 System.out.println("-------------MakePayment Wallet Response----------------" + response);
 
                 String Sstatus = "", Scurrency_code = "", Scurrent_wallet_balance = "";
-                Currency currencycode = null;
+                String sCurrencySymbol="";
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
@@ -325,10 +326,10 @@ public class MyRidePaymentList extends ActivitySubClass {
 
                         //Updating wallet amount on Navigation Drawer Slide
                         Scurrency_code = object.getString("currency");
-                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(Scurrency_code);
                         Scurrent_wallet_balance = object.getString("wallet_amount");
 
-                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        session.createWalletAmount(sCurrencySymbol + Scurrent_wallet_balance);
                         NavigationDrawer.navigationNotifyChange();
 
                         final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
@@ -352,10 +353,10 @@ public class MyRidePaymentList extends ActivitySubClass {
                     } else if (Sstatus.equalsIgnoreCase("2")) {
                         //Updating wallet amount on Navigation Drawer Slide
                         Scurrency_code = object.getString("currency");
-                        currencycode = Currency.getInstance(getLocale(Scurrency_code));
+                        sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(Scurrency_code);
                         Scurrent_wallet_balance = object.getString("wallet_amount");
 
-                        session.createWalletAmount(currencycode.getSymbol() + Scurrent_wallet_balance);
+                        session.createWalletAmount(sCurrencySymbol+ Scurrent_wallet_balance);
                         NavigationDrawer.navigationNotifyChange();
 
                         Intent broadcastIntent = new Intent();

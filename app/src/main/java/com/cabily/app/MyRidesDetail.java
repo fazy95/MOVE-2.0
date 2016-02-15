@@ -14,8 +14,10 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -64,6 +66,9 @@ import me.drakeet.materialdialog.MaterialDialog;
  * Created by Prem Kumar and Anitha on 10/29/2015.
  */
 public class MyRidesDetail extends ActivitySubClass {
+    private ImageView Iv_panic;
+    private MaterialDialog panic_dialog;
+
     private RelativeLayout back;
     private static Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -277,6 +282,12 @@ public class MyRidesDetail extends ActivitySubClass {
                 }
             }
         });
+        Iv_panic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
     }
 
@@ -351,6 +362,8 @@ public class MyRidesDetail extends ActivitySubClass {
         Cb_tip = (CheckBox) findViewById(R.id.my_rides_detail_tip_checkBox);
         Tv_tipAmount = (TextView) findViewById(R.id.my_rides_detail_tip_amount_textView);
         Ll_deleteTip = (LinearLayout) findViewById(R.id.my_rides_detail_tip_amount_remove_layout);
+
+        Iv_panic = (ImageView) findViewById(R.id.panic_image);
 
 
         // -----code to refresh drawer using broadcast receiver-----
@@ -454,7 +467,6 @@ public class MyRidesDetail extends ActivitySubClass {
             }
         }
     };
-
 
     //----------Method to Send Email--------
     protected void sendEmail() {
@@ -1087,9 +1099,10 @@ public class MyRidesDetail extends ActivitySubClass {
 
 
         System.out.println("-------------Track Ride Url----------------" + Url);
+        System.out.println("-------------Track Ride ride_id----------------" + SrideId_intent);
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
-        jsonParams.put("rideId", SrideId_intent);
+        jsonParams.put("ride_id", SrideId_intent);
 
         mRequest = new ServiceRequest(MyRidesDetail.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {

@@ -1,6 +1,8 @@
 package com.mylibrary.volley;
 
 import android.content.Context;
+import android.content.Intent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -13,7 +15,13 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.cabily.app.SingUpAndSignIn;
 import com.cabily.iconstant.Iconstant;
+import com.cabily.utils.SessionManager;
+import com.casperon.app.cabily.R;
+import com.mylibrary.dialog.PkDialog;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +33,8 @@ public class ServiceRequest {
     private Context context;
     private ServiceListener mServiceListener;
     private StringRequest stringRequest;
+    private SessionManager sessionManager;
+    private String userID = "", gcmID = "";
 
     public interface ServiceListener {
         void onCompleteListener(String response);
@@ -33,6 +43,11 @@ public class ServiceRequest {
 
     public ServiceRequest(Context context) {
         this.context = context;
+        sessionManager=new SessionManager(context);
+
+        /*HashMap<String, String> user = sessionManager.getUserDetails();
+        userID = user.get(SessionManager.KEY_USERID);
+        gcmID = user.get(SessionManager.KEY_);*/
     }
 
     public void cancelRequest()
@@ -51,6 +66,27 @@ public class ServiceRequest {
             public void onResponse(String response) {
                 try {
                     mServiceListener.onCompleteListener(response);
+
+                    JSONObject object = new JSONObject(response);
+                    if (object.has("is_dead")) {
+                        System.out.println("-----------is dead----------------");
+                        final PkDialog mDialog = new PkDialog(context);
+                        mDialog.setDialogTitle(context.getResources().getString(R.string.action_session_expired_title));
+                        mDialog.setDialogMessage(context.getResources().getString(R.string.action_session_expired_message));
+                        mDialog.setPositiveButton(context.getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+                                sessionManager.logoutUser();
+                                Intent intent = new Intent(context, SingUpAndSignIn.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                context.startActivity(intent);
+                            }
+                        });
+                        mDialog.show();
+
+                    }
+
                 } catch (Exception e) {
                 }
             }
@@ -99,6 +135,5 @@ public class ServiceRequest {
         stringRequest.setShouldCache(false);
         AppController.getInstance().addToRequestQueue(stringRequest);
     }
-
 
 }

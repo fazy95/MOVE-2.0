@@ -269,32 +269,37 @@ public class MyRides extends ActivityHockeyApp {
                     if (Sstatus.equalsIgnoreCase("1")) {
                         JSONObject response_object = object.getJSONObject("response");
                         if (response_object.length() > 0) {
-                            JSONArray ride_array = response_object.getJSONArray("rides");
-                            if (ride_array.length() > 0) {
-                                itemlist_all.clear();
+                            Object check_rides_object = response_object.get("rides");
+                            if (check_rides_object instanceof JSONArray) {
+                                JSONArray ride_array = response_object.getJSONArray("rides");
+                                if (ride_array.length() > 0) {
+                                    itemlist_all.clear();
 
-                                for (int i = 0; i < ride_array.length(); i++) {
-                                    JSONObject ride_object = ride_array.getJSONObject(i);
+                                    for (int i = 0; i < ride_array.length(); i++) {
+                                        JSONObject ride_object = ride_array.getJSONObject(i);
 
-                                    MyRidesPojo pojo = new MyRidesPojo();
-                                    pojo.setRide_id(ride_object.getString("ride_id"));
-                                    pojo.setRide_time(ride_object.getString("ride_time"));
-                                    pojo.setRide_date(ride_object.getString("ride_date"));
-                                    pojo.setPickup(ride_object.getString("pickup"));
-                                    pojo.setRide_status(ride_object.getString("ride_status"));
-                                    pojo.setGroup(ride_object.getString("group"));
-                                    pojo.setDatetime(ride_object.getString("datetime"));
+                                        MyRidesPojo pojo = new MyRidesPojo();
+                                        pojo.setRide_id(ride_object.getString("ride_id"));
+                                        pojo.setRide_time(ride_object.getString("ride_time"));
+                                        pojo.setRide_date(ride_object.getString("ride_date"));
+                                        pojo.setPickup(ride_object.getString("pickup"));
+                                        pojo.setRide_status(ride_object.getString("ride_status"));
+                                        pojo.setGroup(ride_object.getString("group"));
+                                        pojo.setDatetime(ride_object.getString("datetime"));
 
-                                    itemlist_all.add(pojo);
+                                        itemlist_all.add(pojo);
 
-                                    if (ride_object.getString("group").equalsIgnoreCase("upcoming")) {
-                                        itemlist_upcoming.add(pojo);
-                                    } else if (ride_object.getString("group").equalsIgnoreCase("completed")) {
-                                        itemlist_completed.add(pojo);
+                                        if (ride_object.getString("group").equalsIgnoreCase("upcoming")) {
+                                            itemlist_upcoming.add(pojo);
+                                        } else if (ride_object.getString("group").equalsIgnoreCase("completed")) {
+                                            itemlist_completed.add(pojo);
+                                        }
                                     }
+                                    isRideAvailable = true;
+                                } else {
+                                    isRideAvailable = false;
                                 }
-                                isRideAvailable = true;
-                            } else {
+                            }else {
                                 isRideAvailable = false;
                             }
                         }

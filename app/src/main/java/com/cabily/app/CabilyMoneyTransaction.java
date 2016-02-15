@@ -239,33 +239,39 @@ public class CabilyMoneyTransaction extends ActivityHockeyApp {
                         if (response_object.length() > 0) {
                             Currency currencycode = Currency.getInstance(getLocale(response_object.getString("currency")));
 
-                            JSONArray trans_array = response_object.getJSONArray("trans");
-                            if (trans_array.length() > 0) {
-                                itemlist_all.clear();
+                            Object check_trans_object = response_object.get("trans");
+                            if (check_trans_object instanceof JSONArray) {
+                                JSONArray trans_array = response_object.getJSONArray("trans");
+                                if (trans_array.length() > 0) {
+                                    itemlist_all.clear();
 
-                                for (int i = 0; i < trans_array.length(); i++) {
-                                    JSONObject trans_object = trans_array.getJSONObject(i);
+                                    for (int i = 0; i < trans_array.length(); i++) {
+                                        JSONObject trans_object = trans_array.getJSONObject(i);
 
-                                    CabilyMoneyTransactionPojo pojo = new CabilyMoneyTransactionPojo();
-                                    pojo.setTrans_type(trans_object.getString("type"));
-                                    pojo.setTrans_amount(trans_object.getString("trans_amount"));
-                                    pojo.setTitle(trans_object.getString("title"));
-                                    pojo.setTrans_date(trans_object.getString("trans_date"));
-                                    pojo.setBalance_amount(trans_object.getString("balance_amount"));
-                                    pojo.setCurrencySymbol(currencycode.getSymbol());
+                                        CabilyMoneyTransactionPojo pojo = new CabilyMoneyTransactionPojo();
+                                        pojo.setTrans_type(trans_object.getString("type"));
+                                        pojo.setTrans_amount(trans_object.getString("trans_amount"));
+                                        pojo.setTitle(trans_object.getString("title"));
+                                        pojo.setTrans_date(trans_object.getString("trans_date"));
+                                        pojo.setBalance_amount(trans_object.getString("balance_amount"));
+                                        pojo.setCurrencySymbol(currencycode.getSymbol());
 
-                                    itemlist_all.add(pojo);
+                                        itemlist_all.add(pojo);
 
-                                    if (trans_object.getString("type").equalsIgnoreCase("CREDIT")) {
-                                        itemlist_credit.add(pojo);
-                                    } else {
-                                        itemlist_debit.add(pojo);
+                                        if (trans_object.getString("type").equalsIgnoreCase("CREDIT")) {
+                                            itemlist_credit.add(pojo);
+                                        } else {
+                                            itemlist_debit.add(pojo);
+                                        }
                                     }
+                                    isTransactionAvailable = true;
+                                } else {
+                                    isTransactionAvailable = false;
                                 }
-                                isTransactionAvailable = true;
-                            } else {
+                            }else {
                                 isTransactionAvailable = false;
                             }
+
                         }
 
                     }

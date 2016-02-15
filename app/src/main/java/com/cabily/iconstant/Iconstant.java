@@ -4,82 +4,83 @@ public interface Iconstant
 {
     /*Local Url*/
 
-        /*String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/api/v1/";
+        /*String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/";
         String XMPP_HOST_URL = "192.168.1.150";
         String XMPP_SERVICE_NAME = "casp83";*/
-
      /*Testing Url*/
 
-        /*String BaseUrl = "http://project.dectar.com/cabilydemo/api/v1/";
+        /*String BaseUrl = "http://project.dectar.com/cabilydemo/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
 
 
     /*Live Url*/
 
-        String BaseUrl="http://project.dectar.com/fortaxi/api/v1/";
+        String BaseUrl="http://project.dectar.com/fortaxi/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";
 
 
 
-        String setUserLocation=BaseUrl+"app/set-user-geo";
-        String loginurl = BaseUrl + "app/login";
-        String register_url = BaseUrl + "app/check-user";
-        String register_otp_url = BaseUrl + "app/register";
-        String forgot_password_url = BaseUrl + "app/user/reset-password";
-        String reset_password_url = BaseUrl + "app/user/update-reset-password";
-        String BookMyRide_url = BaseUrl + "app/get-map-view";
-        String couponCode_apply_url = BaseUrl + "app/apply-coupon";
-        String confirm_ride_url = BaseUrl + "app/book-ride";
-        String delete_ride_url = BaseUrl + "app/delete-ride";
-        String estimate_price_url = BaseUrl + "app/get-eta";
+        String setUserLocation=BaseUrl+"api/v1/app/set-user-geo";
+        String loginurl = BaseUrl + "api/v1/app/login";
+        String register_url = BaseUrl + "api/v1/app/check-user";
+        String faceboo_register_url = BaseUrl + "api/v1/app/social-login";
+
+        String register_otp_url = BaseUrl + "api/v1/app/register";
+        String forgot_password_url = BaseUrl + "api/v1/app/user/reset-password";
+        String reset_password_url = BaseUrl + "api/v1/app/user/update-reset-password";
+        String BookMyRide_url = BaseUrl + "api/v1/app/get-map-view";
+        String couponCode_apply_url = BaseUrl + "api/v1/app/apply-coupon";
+        String confirm_ride_url = BaseUrl + "api/v1/app/book-ride";
+        String delete_ride_url = BaseUrl + "api/v1/app/delete-ride";
+        String estimate_price_url = BaseUrl + "api/v1/app/get-eta";
         String place_search_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?types=geocode&key=AIzaSyAKDx43QL5xXBitDdviXavpqLPsGZ3uY6o&input=";
         String GetAddressFrom_LatLong_url = "https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyAKDx43QL5xXBitDdviXavpqLPsGZ3uY6o&placeid=";
-        String changePassword_url= BaseUrl+"app/user/change-password";
-        String profile_edit_userName_url= BaseUrl+"app/user/change-name";
-        String profile_edit_mobileNo_url= BaseUrl+"app/user/change-mobile";
-        String logout_url= BaseUrl+"app/logout";
+        String changePassword_url= BaseUrl+"api/v1/app/user/change-password";
+        String profile_edit_userName_url= BaseUrl+"api/v1/app/user/change-name";
+        String profile_edit_mobileNo_url= BaseUrl+"api/v1/app/user/change-mobile";
+        String logout_url= BaseUrl+"api/v1/app/logout";
 
-        String emergencycontact_add_url= BaseUrl+"app/user/set-emergency-contact";
-        String emergencycontact_view_url= BaseUrl+"app/user/view-emergency-contact";
-        String emergencycontact_delete_url= BaseUrl+"app/user/delete-emergency-contact";
+        String emergencycontact_add_url= BaseUrl+"api/v1/app/user/set-emergency-contact";
+        String emergencycontact_view_url= BaseUrl+"api/v1/app/user/view-emergency-contact";
+        String emergencycontact_delete_url= BaseUrl+"api/v1/app/user/delete-emergency-contact";
 
-        String invite_earn_friends_url= BaseUrl+"app/get-invites";
+        String invite_earn_friends_url= BaseUrl+"api/v1/app/get-invites";
 
-        String ratecard_select_city_url= BaseUrl+"app/get-location";
-        String ratecard_select_cartype_url= BaseUrl+"app/get-category";
-        String ratecard_display_url= BaseUrl+"app/get-ratecard";
+        String ratecard_select_city_url= BaseUrl+"api/v1/app/get-location";
+        String ratecard_select_cartype_url= BaseUrl+"api/v1/app/get-category";
+        String ratecard_display_url= BaseUrl+"api/v1/app/get-ratecard";
 
-        String cabily_money_url= BaseUrl+"app/get-money-page";
-        String cabily_add_money_url= BaseUrl+"mobile/wallet-recharge/stripe-process?";
-        String cabily_money_webview_url= BaseUrl+"mobile/wallet-recharge/payform?user_id=";
-        String cabily_money_transaction_url= BaseUrl+"app/get-trans-list";
+        String cabily_money_url= BaseUrl+"api/v1/app/get-money-page";
+        String cabily_add_money_url= BaseUrl+"api/v1/mobile/wallet-recharge/stripe-process?";
+        String cabily_money_webview_url= BaseUrl+"api/v1/mobile/wallet-recharge/payform?user_id=";
+        String cabily_money_transaction_url= BaseUrl+"api/v1/app/get-trans-list";
 
-        String myrides_url= BaseUrl+"app/my-rides";
-        String myride_details_inVoiceEmail_url= BaseUrl+"app/mail-invoice";
-        String myride_details_url= BaseUrl+"app/view-ride";
-        String myride_details_track_your_ride_url= BaseUrl+"app/track-driver";
-        String cancel_myride_reason_url= BaseUrl+"app/cancellation-reason";
-        String cancel_myride_url= BaseUrl+"app/cancel-ride";
-        String paymentList_url= BaseUrl+"app/payment-list";
+        String myrides_url= BaseUrl+"api/v1/app/my-rides";
+        String myride_details_inVoiceEmail_url= BaseUrl+"api/v1/app/mail-invoice";
+        String myride_details_url= BaseUrl+"api/v1/app/view-ride";
+        String myride_details_track_your_ride_url= BaseUrl+"api/v3/track-driver";
+        String cancel_myride_reason_url= BaseUrl+"api/v1/app/cancellation-reason";
+        String cancel_myride_url= BaseUrl+"api/v1/app/cancel-ride";
+        String paymentList_url= BaseUrl+"api/v1/app/payment-list";
 
-        String makepayment_cash_url= BaseUrl+"app/payment/by-cash";
-        String makepayment_wallet_url= BaseUrl+"app/payment/by-wallet";
-        String makepayment_autoDetect_url= BaseUrl+"app/payment/by-auto-detect";
-        String makepayment_Get_webview_mobileId_url= BaseUrl+"app/payment/by-gateway";
-        String makepayment_webview_url= BaseUrl+"mobile/proceed-payment?mobileId=";
+        String makepayment_cash_url= BaseUrl+"api/v1/app/payment/by-cash";
+        String makepayment_wallet_url= BaseUrl+"api/v1/app/payment/by-wallet";
+        String makepayment_autoDetect_url= BaseUrl+"api/v1/app/payment/by-auto-detect";
+        String makepayment_Get_webview_mobileId_url= BaseUrl+"api/v1/app/payment/by-gateway";
+        String makepayment_webview_url= BaseUrl+"api/v1/mobile/proceed-payment?mobileId=";
 
-        String myride_rating_url= BaseUrl+"app/review/options-list";
-        String myride_rating_submit_url= BaseUrl+"app/review/submit";
+        String myride_rating_url= BaseUrl+"api/v1/app/review/options-list";
+        String myride_rating_submit_url= BaseUrl+"api/v1/app/review/submit";
 
-        String favoritelist_display_url= BaseUrl+"app/favourite/display";
-        String favoritelist_add_url= BaseUrl+"app/favourite/add";
-        String favoritelist_edit_url= BaseUrl+"app/favourite/edit";
-        String favoritelist_delete_url= BaseUrl+"app/favourite/remove";
+        String favoritelist_display_url= BaseUrl+"api/v1/app/favourite/display";
+        String favoritelist_add_url= BaseUrl+"api/v1/app/favourite/add";
+        String favoritelist_edit_url= BaseUrl+"api/v1/app/favourite/edit";
+        String favoritelist_delete_url= BaseUrl+"api/v1/app/favourite/remove";
 
-        String tip_add_url= BaseUrl+"app/apply-tips";
-        String tip_remove_url= BaseUrl+"app/remove-tips";
+        String tip_add_url= BaseUrl+"api/v1/app/apply-tips";
+        String tip_remove_url= BaseUrl+"api/v1/app/remove-tips";
 
 
 

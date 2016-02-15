@@ -38,6 +38,7 @@ public class ChatHandler {
         try {
             String data = URLDecoder.decode(message.getBody(), "UTF-8");
             JSONObject messageObject = new JSONObject(data);
+
             if (messageObject.length() > 0) {
                 System.out.println("--------------xmpp service data----------------------" + data);
                 String action = (String) messageObject.get(Iconstant.Push_Action);
@@ -64,39 +65,14 @@ public class ChatHandler {
                 else if (action.equalsIgnoreCase(Iconstant.PushNotification_PaymentPaid_Key))
                 {
                     paymentPaid(messageObject);
-                }else if (action.equalsIgnoreCase(Iconstant.PushNotification_Ad_Key)){
-                    postAdMessage(messageObject);
                 }
+
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
-    private void postAdMessage(JSONObject messageObject) throws Exception{
-        String title =  messageObject.getString(Iconstant.UserID_Arrived);
-        String description =  messageObject.getString(Iconstant.RideID_Arrived);
-        String msg =  messageObject.getString(Iconstant.Push_Message_Arrived);
-        Intent notificationIntent = null;
-        notificationIntent = new Intent(context, SingUpAndSignIn.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Resources res = context.getResources();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.app_logo)
-                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.app_logo))
-                .setTicker(msg)
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true)
-                .setContentTitle("Cabily")
-                .setLights(0xffff0000, 100, 2000)
-                .setPriority(Notification.DEFAULT_SOUND)
-                .setContentText(msg);
-        Notification n = builder.getNotification();
-        n.defaults |= Notification.DEFAULT_ALL;
-        nm.notify(0, n);
     }
 
     private void sendBroadCastToRideConfirm(JSONObject messageObject) throws Exception {
@@ -123,10 +99,22 @@ public class ChatHandler {
 
     private void showCabArrivedAlert(JSONObject messageObject) throws Exception
     {
+        //refreshMethod();
+
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
         context.sendBroadcast(broadcastIntent);
-        sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
+
+       // sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
+
+
+        /*Intent i1=new Intent(context, PushNotificationAlert.class);
+        i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
+        i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
+        i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
+        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);*/
     }
 
     private void rideCancelledAlert(JSONObject messageObject) throws Exception
@@ -262,10 +250,11 @@ public class ChatHandler {
 
     private void sendNotification(String msg) {
         Intent notificationIntent = null;
-        notificationIntent = new Intent(context, SingUpAndSignIn.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+      
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
         Resources res = context.getResources();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentIntent(contentIntent)

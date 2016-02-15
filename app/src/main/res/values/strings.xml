@@ -24,6 +24,8 @@
     <string name="alert_gpsEnable">Enable GPS to locate your location</string>
     <string name="alert_nocar">Sorry! We do not provide services in your city yet.</string>
     <string name="alert_update_location">Updating Your Location</string>
+    <string name="action_session_expired_title">Session Expired</string>
+    <string name="action_session_expired_message">Please re-login to renew your session</string>
 
     <!-- signup and Signin Page -->
     <string name="signin_main_label_Signin">SIGN IN</string>
@@ -39,6 +41,7 @@
     <string name="login_label_alert_email_invalid">Email address is invalid</string>
     <string name="login_label_alert_password">Password can\'t be empty</string>
     <string name="login_label_alert_signIn_failed">Sign In Failed</string>
+    <string name="login_label_facecook_login">Facebook Login</string>
 
     <!-- Register Page -->
     <string name="register_label">REGISTER</string>
@@ -140,10 +143,17 @@
     <!-- Coupon Code Dilaog -->
     <string name="couponcode_label_title">Enter Coupon Code</string>
     <string name="couponcode_label_apply">APPLY</string>
+    <string name="couponcode_label_remove">REMOVE</string>
     <string name="couponcode_label_cancel">CANCEL</string>
     <string name="couponcode_label_verifying">Verifying...</string>
     <string name="couponcode_label_verifed">Verified</string>
     <string name="couponcode_label_invalid_code">Invalid coupon code</string>
+    <string name="couponcode_label_allowance_text1">You have successfully applied coupon code and </string>
+    <string name="couponcode_label_allowance_text2">% will be reduced from your total amount.</string>
+    <string name="couponcode_label_allowance_text3"> rupees will be reduced from your total amount.</string>
+    <string name="couponcode_label_allowance">Your Allowance</string>
+    <string name="couponcode_allowance_type">Percent</string>
+
 
     <!-- Timer Alert Dilaog -->
     <string name="timer_label_alert_retry">Retry</string>
@@ -164,7 +174,6 @@
     <string name="track_your_ride_label_track">Track Your Ride</string>
     <string name="track_your_ride_label_done">Done</string>
     <string name="track_your_ride_label_callDriver">CONTACT DRIVER</string>
-    <string name="track_your_ride_label_chatDriver">Chat</string>
     <string name="track_your_ride_label_endTrip">CANCEL RIDE</string>
     <string name="track_your_ride_label_arrive_in">ARRIVING IN</string>
     <string name="track_your_ride_label_minutes">MINUTES</string>

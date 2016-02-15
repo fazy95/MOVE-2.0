@@ -98,7 +98,7 @@ public class FareBreakUp extends ActivitySubClass {
                 cd = new ConnectionDetector(FareBreakUp.this);
                 isInternetPresent = cd.isConnectingToInternet();
 
-                if (Et_tip_Amount.getText().toString().length() > 0) {
+                if (Et_tip_Amount.getText().toString().length() > 0 && Double.parseDouble(Et_tip_Amount.getText().toString())>0.0) {
                     if (isInternetPresent) {
                         postRequest_Tip(Iconstant.tip_add_url, "Apply");
                     } else {

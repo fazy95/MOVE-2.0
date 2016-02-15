@@ -21,6 +21,7 @@ import com.android.volley.Request;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
+import com.cabily.utils.CurrencySymbolConverter;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.mylibrary.dialog.PkDialog;
@@ -39,8 +40,7 @@ import java.util.Locale;
 /**
  * Created by Prem Kumar and Anitha on 10/20/2015.
  */
-public class CabilyMoney extends ActivityHockeyApp
-{
+public class CabilyMoney extends ActivityHockeyApp {
     private RelativeLayout back;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -59,9 +59,9 @@ public class CabilyMoney extends ActivityHockeyApp
 
     private ServiceRequest mRequest;
     Dialog dialog;
-    private boolean isRechargeAvailable=false;
-    private String Sauto_charge_status="";
-    private String Str_currentbalance="",Str_minimum_amt="",Str_maximum_amt="",Str_midle_amt="",ScurrencySymbol="";
+    private boolean isRechargeAvailable = false;
+    private String Sauto_charge_status = "";
+    private String Str_currentbalance = "", Str_minimum_amt = "", Str_maximum_amt = "", Str_midle_amt = "", ScurrencySymbol = "";
 
     public class RefreshReceiver extends BroadcastReceiver {
         @Override
@@ -73,13 +73,14 @@ public class CabilyMoney extends ActivityHockeyApp
             }
         }
     }
+
     private RefreshReceiver refreshReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cabily_money);
-        context=CabilyMoney.this;
+        context = CabilyMoney.this;
         initialize();
 
         //Start XMPP Chat Service
@@ -102,7 +103,7 @@ public class CabilyMoney extends ActivityHockeyApp
         layout_current_transaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(CabilyMoney.this,CabilyMoneyTransaction.class);
+                Intent intent = new Intent(CabilyMoney.this, CabilyMoneyTransaction.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.enter, R.anim.exit);
             }
@@ -153,41 +154,29 @@ public class CabilyMoney extends ActivityHockeyApp
         Bt_add_cabilymoney.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String enteredValue=Et_cabilymoney_enteramount.getText().toString();
+                String enteredValue = Et_cabilymoney_enteramount.getText().toString();
 
-                if(Str_minimum_amt!=null && Str_minimum_amt.length()>0)
-                {
-                    if(enteredValue.length()==0)
-                    {
+                if (Str_minimum_amt != null && Str_minimum_amt.length() > 0) {
+                    if (enteredValue.length() == 0) {
                         Alert(getResources().getString(R.string.action_error), getResources().getString(R.string.action_loading_cabily_money_empty_field));
-                    }
-                    else if(Integer.parseInt(enteredValue)<Integer.parseInt(Str_minimum_amt) || Integer.parseInt(enteredValue)>Integer.parseInt(Str_maximum_amt))
-                    {
-                        Alert(getResources().getString(R.string.action_error), getResources().getString(R.string.cabilymoney_lable_rechargemoney_alert)+" "+ScurrencySymbol+Str_minimum_amt+" "+"-"+" "+ScurrencySymbol+Str_maximum_amt);
-                    }
-                    else
-                    {
+                    } else if (Integer.parseInt(enteredValue) < Integer.parseInt(Str_minimum_amt) || Integer.parseInt(enteredValue) > Integer.parseInt(Str_maximum_amt)) {
+                        Alert(getResources().getString(R.string.action_error), getResources().getString(R.string.cabilymoney_lable_rechargemoney_alert) + " " + ScurrencySymbol + Str_minimum_amt + " " + "-" + " " + ScurrencySymbol + Str_maximum_amt);
+                    } else {
                         cd = new ConnectionDetector(CabilyMoney.this);
                         isInternetPresent = cd.isConnectingToInternet();
 
-                        if(isInternetPresent)
-                        {
-                            if(Sauto_charge_status.equalsIgnoreCase("1"))
-                            {
+                        if (isInternetPresent) {
+                            if (Sauto_charge_status.equalsIgnoreCase("1")) {
                                 postRequest_AddMoney(Iconstant.cabily_add_money_url);
-                            }
-                            else
-                            {
-                                Intent intent=new Intent(CabilyMoney.this,CabilyMoneyWebview.class);
-                                intent.putExtra("cabilyMoney_recharge_amount",Et_cabilymoney_enteramount.getText().toString());
-                                intent.putExtra("cabilyMoney_currency_symbol",ScurrencySymbol);
-                                intent.putExtra("cabilyMoney_currentBalance",Str_currentbalance);
+                            } else {
+                                Intent intent = new Intent(CabilyMoney.this, CabilyMoneyWebview.class);
+                                intent.putExtra("cabilyMoney_recharge_amount", Et_cabilymoney_enteramount.getText().toString());
+                                intent.putExtra("cabilyMoney_currency_symbol", ScurrencySymbol);
+                                intent.putExtra("cabilyMoney_currentBalance", Str_currentbalance);
                                 startActivity(intent);
                                 overridePendingTransition(R.anim.enter, R.anim.exit);
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
                         }
                     }
@@ -202,33 +191,26 @@ public class CabilyMoney extends ActivityHockeyApp
         cd = new ConnectionDetector(CabilyMoney.this);
         isInternetPresent = cd.isConnectingToInternet();
 
-        Bt_add_cabilymoney = (Button)findViewById(R.id.cabily_money_add_money_button);
-        Et_cabilymoney_enteramount = (EditText)findViewById(R.id.cabily_money_enter_amount_edittext);
-        Bt_cabilymoney_minimum_amount = (Button)findViewById(R.id.cabily_money_minimum_amt_button);
-        Bt_cabilymoney_maximum_amount = (Button)findViewById(R.id.cabily_money_maximum_amt_button);
-        Bt_cabilymoney_between_amount = (Button)findViewById(R.id.cabily_money_between_amt_button);
-        Tv_cabilymoney_current_balnce = (TextView)findViewById(R.id.cabily_money_your_balance_textview);
-        layout_current_transaction = (RelativeLayout)findViewById(R.id.cabily_money_current_balance_layout);
+        Bt_add_cabilymoney = (Button) findViewById(R.id.cabily_money_add_money_button);
+        Et_cabilymoney_enteramount = (EditText) findViewById(R.id.cabily_money_enter_amount_edittext);
+        Bt_cabilymoney_minimum_amount = (Button) findViewById(R.id.cabily_money_minimum_amt_button);
+        Bt_cabilymoney_maximum_amount = (Button) findViewById(R.id.cabily_money_maximum_amt_button);
+        Bt_cabilymoney_between_amount = (Button) findViewById(R.id.cabily_money_between_amt_button);
+        Tv_cabilymoney_current_balnce = (TextView) findViewById(R.id.cabily_money_your_balance_textview);
+        layout_current_transaction = (RelativeLayout) findViewById(R.id.cabily_money_current_balance_layout);
         back = (RelativeLayout) findViewById(R.id.cabily_money_header_back_layout);
-
         Et_cabilymoney_enteramount.addTextChangedListener(EditorWatcher);
-
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
-
         // -----code to refresh drawer using broadcast receiver-----
         refreshReceiver = new RefreshReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.package.ACTION_CLASS_CABILY_MONEY_REFRESH");
         registerReceiver(refreshReceiver, intentFilter);
-
-        if (isInternetPresent)
-        {
+        if (isInternetPresent) {
             postRequest_CabilyMoney(Iconstant.cabily_money_url);
-        }
-        else
-        {
+        } else {
             Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
         }
     }
@@ -242,32 +224,25 @@ public class CabilyMoney extends ActivityHockeyApp
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
         }
+
         @Override
         public void afterTextChanged(Editable s) {
 
             String strEnteredVal = Et_cabilymoney_enteramount.getText().toString();
-            if(!strEnteredVal.equals(""))
-            {
-                if(Et_cabilymoney_enteramount.getText().toString().equals(Str_minimum_amt))
-                {
+            if (!strEnteredVal.equals("")) {
+                if (Et_cabilymoney_enteramount.getText().toString().equals(Str_minimum_amt)) {
                     Bt_cabilymoney_minimum_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                }
-                else if(Et_cabilymoney_enteramount.getText().toString().equals(Str_midle_amt))
-                {
+                } else if (Et_cabilymoney_enteramount.getText().toString().equals(Str_midle_amt)) {
                     Bt_cabilymoney_between_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                }
-                else if(Et_cabilymoney_enteramount.getText().toString().equals(Str_maximum_amt))
-                {
+                } else if (Et_cabilymoney_enteramount.getText().toString().equals(Str_maximum_amt)) {
                     Bt_cabilymoney_maximum_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                }
-                else
-                {
+                } else {
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
@@ -278,8 +253,7 @@ public class CabilyMoney extends ActivityHockeyApp
 
 
     //--------------Alert Method-----------
-    private void Alert(String title, String alert)
-    {
+    private void Alert(String title, String alert) {
         final PkDialog mDialog = new PkDialog(CabilyMoney.this);
         mDialog.setDialogTitle(title);
         mDialog.setDialogMessage(alert);
@@ -310,8 +284,7 @@ public class CabilyMoney extends ActivityHockeyApp
     }
 
 
-    public static void changeButton()
-    {
+    public static void changeButton() {
         Et_cabilymoney_enteramount.setText("");
         Bt_cabilymoney_minimum_amount.setBackground(context.getResources().getDrawable(R.drawable.grey_border_background));
         Bt_cabilymoney_between_amount.setBackground(context.getResources().getDrawable(R.drawable.grey_border_background));
@@ -320,8 +293,7 @@ public class CabilyMoney extends ActivityHockeyApp
 
 
     //-----------------------Cabily Money Post Request-----------------
-    private void postRequest_CabilyMoney(String Url)
-    {
+    private void postRequest_CabilyMoney(String Url) {
         dialog = new Dialog(CabilyMoney.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -329,7 +301,7 @@ public class CabilyMoney extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_loading));
 
 
@@ -345,7 +317,6 @@ public class CabilyMoney extends ActivityHockeyApp
                 System.out.println("-------------CabilyMoney Response----------------" + response);
 
                 String Sstatus = "", Scurrency_code = "", Scurrentbalance = "";
-                Currency currencycode = null;
 
                 try {
                     JSONObject object = new JSONObject(response);
@@ -355,10 +326,9 @@ public class CabilyMoney extends ActivityHockeyApp
                         JSONObject response_object = object.getJSONObject("response");
                         if (response_object.length() > 0) {
                             Scurrency_code = response_object.getString("currency");
-                            currencycode = Currency.getInstance(getLocale(Scurrency_code));
                             Scurrentbalance = response_object.getString("current_balance");
                             Str_currentbalance = response_object.getString("current_balance");
-                            ScurrencySymbol = currencycode.getSymbol();
+                            ScurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(Scurrency_code);
 
                             Object check_recharge_boundary_object = response_object.get("recharge_boundary");
                             if (check_recharge_boundary_object instanceof JSONObject) {
@@ -379,14 +349,14 @@ public class CabilyMoney extends ActivityHockeyApp
 
 
                     if (Sstatus.equalsIgnoreCase("1") && isRechargeAvailable) {
-                        session.createWalletAmount(currencycode.getSymbol() + Str_currentbalance);
+                        session.createWalletAmount(ScurrencySymbol + Str_currentbalance);
                         NavigationDrawer.navigationNotifyChange();
 
-                        Bt_cabilymoney_minimum_amount.setText(currencycode.getSymbol() + Str_minimum_amt);
-                        Bt_cabilymoney_maximum_amount.setText(currencycode.getSymbol() + Str_maximum_amt);
-                        Bt_cabilymoney_between_amount.setText(currencycode.getSymbol() + Str_midle_amt);
-                        Tv_cabilymoney_current_balnce.setText(currencycode.getSymbol() + Scurrentbalance);
-                        Et_cabilymoney_enteramount.setHint(getResources().getString(R.string.cabilymoney_lable_rechargemoney_edittext_hint) + " " + currencycode.getSymbol() + Str_minimum_amt + " " + "-" + " " + currencycode.getSymbol() + Str_maximum_amt);
+                        Bt_cabilymoney_minimum_amount.setText(ScurrencySymbol + Str_minimum_amt);
+                        Bt_cabilymoney_maximum_amount.setText(ScurrencySymbol + Str_maximum_amt);
+                        Bt_cabilymoney_between_amount.setText(ScurrencySymbol + Str_midle_amt);
+                        Tv_cabilymoney_current_balnce.setText(ScurrencySymbol + Scurrentbalance);
+                        Et_cabilymoney_enteramount.setHint(getResources().getString(R.string.cabilymoney_lable_rechargemoney_edittext_hint) + " " + ScurrencySymbol + Str_minimum_amt + " " + "-" + " " + ScurrencySymbol + Str_maximum_amt);
                     } else {
                         String Sresponse = object.getString("response");
                         Alert(getResources().getString(R.string.alert_label_title), Sresponse);
@@ -409,8 +379,7 @@ public class CabilyMoney extends ActivityHockeyApp
 
 
     //-----------------------Cabily Money Add Post Request-----------------
-    private void postRequest_AddMoney(String Url)
-    {
+    private void postRequest_AddMoney(String Url) {
         dialog = new Dialog(CabilyMoney.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -418,22 +387,22 @@ public class CabilyMoney extends ActivityHockeyApp
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        TextView dialog_title=(TextView)dialog.findViewById(R.id.custom_loading_textview);
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
 
         System.out.println("-------------Cabily ADD Money Url----------------" + Url);
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
-        jsonParams.put("total_amount",Et_cabilymoney_enteramount.getText().toString());
+        jsonParams.put("total_amount", Et_cabilymoney_enteramount.getText().toString());
 
         mRequest = new ServiceRequest(CabilyMoney.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-                System.out.println("-------------Cabily ADD Money Response----------------"+response);
+                System.out.println("-------------Cabily ADD Money Response----------------" + response);
 
-                String Sstatus = "", Smessage = "",Swallet_money="";
+                String Sstatus = "", Smessage = "", Swallet_money = "";
 
                 try {
                     JSONObject object = new JSONObject(response);
@@ -441,20 +410,17 @@ public class CabilyMoney extends ActivityHockeyApp
                     Smessage = object.getString("msg");
                     Swallet_money = object.getString("wallet_amount");
 
-                    if (Sstatus.equalsIgnoreCase("1"))
-                    {
-                        session.createWalletAmount(ScurrencySymbol+Swallet_money);
+                    if (Sstatus.equalsIgnoreCase("1")) {
+                        session.createWalletAmount(ScurrencySymbol + Swallet_money);
                         NavigationDrawer.navigationNotifyChange();
 
                         Alert(getResources().getString(R.string.action_success), getResources().getString(R.string.action_loading_cabilymoney_transaction_wallet_success));
                         Et_cabilymoney_enteramount.setText("");
-                        Tv_cabilymoney_current_balnce.setText(ScurrencySymbol+Swallet_money);
+                        Tv_cabilymoney_current_balnce.setText(ScurrencySymbol + Swallet_money);
                         Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                         Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                         Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
-                    }
-                    else
-                    {
+                    } else {
                         Alert(getResources().getString(R.string.action_error), Smessage);
                     }
 
