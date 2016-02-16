@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,11 +28,6 @@ import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -53,19 +47,15 @@ import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.widgets.RoundedImageView;
 import com.mylibrary.xmpp.ChatService;
 import com.squareup.picasso.Picasso;
-
 import org.jivesoftware.smack.chat.Chat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 /**
- * Created by Prem Kumar on 10/5/2015.
  */
 public class TrackYourRide extends ActivitySubClass implements View.OnClickListener {
     private TextView tv_done;
@@ -73,8 +63,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private RoundedImageView driver_image;
     private RelativeLayout rl_callDriver, rl_endTrip;
     private GoogleMap googleMap;
-    MarkerOptions marker;
-    GPSTracker gps;
+    private MarkerOptions marker;
+    private GPSTracker gps;
     private double MyCurrent_lat = 0.0, MyCurrent_long = 0.0;
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
@@ -263,10 +253,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         if (gps.canGetLocation() && gps.isgpsenabled()) {
             double Dlatitude = gps.getLatitude();
             double Dlongitude = gps.getLongitude();
-
             MyCurrent_lat = Dlatitude;
             MyCurrent_long = Dlongitude;
-
             // Move the camera to last position with a zoom level
             CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(Dlatitude, Dlongitude)).zoom(15).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -383,20 +371,17 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             if (result.equalsIgnoreCase("Success")) {
                 googleMap.clear();
                 ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(document);
-                PolylineOptions rectLine = new PolylineOptions().width(5).color(
-                        Color.RED);
-
+                PolylineOptions rectLine = new PolylineOptions().width(10).color(
+                        Color.BLUE);
                 for (int i = 0; i < directionPoint.size(); i++) {
                     rectLine.add(directionPoint.get(i));
                 }
                 // Adding route on the map
-                //googleMap.addPolyline(rectLine);
+                googleMap.addPolyline(rectLine);
                 markerOptions.position(toPosition);
                 markerOptions.position(fromPosition);
                 markerOptions.draggable(true);
                 //googleMap.addMarker(markerOptions);
-
-
                 googleMap.addMarker(new MarkerOptions()
                         .position(toPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));

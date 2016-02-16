@@ -60,11 +60,8 @@ public class ChangePassword extends ActivityHockeyApp {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // close keyboard
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
-
                 onBackPressed();
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();

@@ -29,23 +29,19 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
     private Context context;
     private WebView webview;
     private ProgressBar progressBar;
-
     private String Str_mobileID = "";
     private SessionManager session;
     private String UserID = "";
     private String SrideId_intent = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myride_payment_webview);
         context = getApplicationContext();
         initialize();
-
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 final PkDialog mDialog = new PkDialog(MyRidePaymentWebView.this);
                 mDialog.setDialogTitle(getResources().getString(R.string.cabily_webview_lable_cancel_transaction));
                 mDialog.setDialogMessage(getResources().getString(R.string.cabily_webview_lable_cancel_transaction_proceed));
@@ -53,13 +49,11 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
                     @Override
                     public void onClick(View v) {
                         mDialog.dismiss();
-
                         // close keyboard
                         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
                         finish();
                         overridePendingTransition(R.anim.enter, R.anim.exit);
-
                     }
                 });
                 mDialog.setNegativeButton(getResources().getString(R.string.action_cancel_alert), new View.OnClickListener() {
@@ -81,7 +75,6 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
                     progressBar.setVisibility(ProgressBar.VISIBLE);
                 }
                 progressBar.setProgress(progress);
-
                 if (progress == 100) {
                     progressBar.setVisibility(ProgressBar.GONE);
                 }
@@ -114,7 +107,6 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
         Intent i = getIntent();
         Str_mobileID = i.getStringExtra("MobileID");
         SrideId_intent = i.getStringExtra("RideID");
-
         startWebView(Iconstant.makepayment_webview_url + Str_mobileID);
     }
 

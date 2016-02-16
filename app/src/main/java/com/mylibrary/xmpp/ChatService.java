@@ -143,7 +143,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
                 chatManager = ChatManager.getInstanceFor(connection);
                 chatManager.addChatListener(this);
             }
-
         } catch (XMPPException e) {
             e.printStackTrace();
         } catch (SmackException e) {
@@ -192,7 +191,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     public static void enableChat() {
         isChatEnabled = true;
     }
-
     public static void disableChat() {
         isChatEnabled = false;
     }

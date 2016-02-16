@@ -472,24 +472,18 @@ public class MyRidePaymentList extends ActivitySubClass {
         dialog.setContentView(R.layout.custom_loading);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
-
         System.out.println("-------------MakePayment WebView-MobileID Url----------------" + Url);
-
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("ride_id", SrideId_intent);
         jsonParams.put("gateway", SpaymentCode);
-
         mRequest = new ServiceRequest(MyRidePaymentList.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("-------------MakePayment WebView-MobileID Response----------------" + response);
-
                 String Sstatus = "";
                 try {
                     JSONObject object = new JSONObject(response);

@@ -100,10 +100,8 @@ import java.util.Locale;
 
 import me.drakeet.materialdialog.MaterialDialog;
 
-
 public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
-
     private TextView tv_apply;
     private RelativeLayout drawer_layout;
     private RelativeLayout address_layout, favorite_layout, bottom_layout;
@@ -115,17 +113,15 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private RelativeLayout rideLater_layout, rideNow_layout;
     private TextView rideLater_textview, rideNow_textview;
     private RelativeLayout Rl_Confirm_Back;
-    Context context;
+    private Context context;
     private ProgressWheel progressWheel;
     private TextView Tv_walletAmount;
     private TextView Tv_marker_time, Tv_marker_min;
     private LinearLayout Ll_marker_time;
-
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
-
     private GoogleMap googleMap;
-    MarkerOptions marker;
+    private MarkerOptions marker;
     static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 
     private ServiceRequest mRequest;
@@ -134,13 +130,13 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private String CarAvailable = "";
     private String ScarType = "";
     private String selectedType = "";
-    GPSTracker gps;
+    private GPSTracker gps;
     String SselectedAddress = "";
     String Sselected_latitude = "", Sselected_longitude = "";
 
-    ArrayList<HomePojo> driver_list = new ArrayList<HomePojo>();
-    ArrayList<HomePojo> category_list = new ArrayList<HomePojo>();
-    ArrayList<HomePojo> ratecard_list = new ArrayList<HomePojo>();
+    private  ArrayList<HomePojo> driver_list = new ArrayList<HomePojo>();
+    private  ArrayList<HomePojo> category_list = new ArrayList<HomePojo>();
+    private  ArrayList<HomePojo> ratecard_list = new ArrayList<HomePojo>();
 
     private boolean driver_status = false;
     private boolean category_status = false;
@@ -162,9 +158,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private SimpleDateFormat coupon_mFormatter = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat coupon_time_mFormatter = new SimpleDateFormat("hh:mm aa");
     private SimpleDateFormat mTime_Formatter = new SimpleDateFormat("HH");
-
     private static View rootview;
-
     //------Declaration for Coupon code-----
     private RelativeLayout coupon_apply_layout, coupon_loading_layout,coupon_allowance_layout;
     private MaterialDialog coupon_dialog;
@@ -180,11 +174,8 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
     private int timer_request_code = 100;
     private int placeSearch_request_code = 200;
     private int favoriteList_request_code = 300;
-
     BroadcastReceiver logoutReciver;
     private boolean ratecard_clicked = true;
-
-
     //-----Declaration For Enabling Gps-------
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;

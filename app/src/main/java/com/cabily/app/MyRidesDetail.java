@@ -285,7 +285,8 @@ public class MyRidesDetail extends ActivitySubClass {
         Iv_panic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                System.out.println("----------------panic onclick method-----------------");
+                panic();
             }
         });
 
@@ -533,6 +534,53 @@ public class MyRidesDetail extends ActivitySubClass {
         });
     }
 
+    private void panic(){
+        System.out.println("----------------panic method-----------------");
+        View view = View.inflate(MyRidesDetail.this, R.layout.panic_page, null);
+        final MaterialDialog dialog = new MaterialDialog(MyRidesDetail.this);
+        dialog.setContentView(view).setNegativeButton(getResources().getString(R.string.my_rides_detail_cancel), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }
+        ).show();
+
+        Button call_police = (Button) view.findViewById(R.id.call_police_button);
+        Button call_fire = (Button) view.findViewById(R.id.call_fireservice_button);
+        Button call_ambulance = (Button) view.findViewById(R.id.call_ambulance_button);
+
+
+        call_police.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + "+100"));
+                startActivity(callIntent);
+            }
+        });
+
+        call_fire.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + "101"));
+                startActivity(callIntent);
+            }
+        });
+        call_ambulance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + "108"));
+                startActivity(callIntent);
+            }
+        });
+
+    }
 
     //----------Method for Favourite Address--------
     private void favouriteAddress() {

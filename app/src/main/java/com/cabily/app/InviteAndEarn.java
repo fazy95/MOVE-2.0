@@ -46,7 +46,7 @@ public class InviteAndEarn extends ActivityHockeyApp implements View.OnClickList
     private ServiceRequest mRequest;
     private String UserID = "";
     private boolean isdataPresent = false;
-    String Sstatus = "", friend_earn_amount = "", you_earn_amount = "", friends_rides = "", ScurrencyCode = "", referral_code = "";
+    private String Sstatus = "", friend_earn_amount = "", you_earn_amount = "", friends_rides = "", ScurrencyCode = "", referral_code = "";
     Currency currencycode;
 
     @Override
