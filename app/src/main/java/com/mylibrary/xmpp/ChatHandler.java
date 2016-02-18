@@ -10,10 +10,8 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 
-import com.cabily.app.AboutUs;
 import com.cabily.app.FareBreakUp;
 import com.cabily.app.PushNotificationAlert;
-import com.cabily.app.SingUpAndSignIn;
 import com.cabily.iconstant.Iconstant;
 import com.casperon.app.cabily.R;
 
@@ -67,6 +65,11 @@ public class ChatHandler {
                     paymentPaid(messageObject);
                 }
 
+                else if (action.equalsIgnoreCase(Iconstant.pushNotificationBeginTrip))
+                {
+                    beginTripMessage(messageObject);
+                }
+
             }
 
         } catch (Exception e) {
@@ -100,14 +103,10 @@ public class ChatHandler {
     private void showCabArrivedAlert(JSONObject messageObject) throws Exception
     {
         //refreshMethod();
-
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
         context.sendBroadcast(broadcastIntent);
-
        // sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
-
-
         /*Intent i1=new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
@@ -116,6 +115,26 @@ public class ChatHandler {
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);*/
     }
+
+
+    private void beginTripMessage(JSONObject messageObject) throws Exception
+    {
+        //refreshMethod();
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.putExtra("drop_lat", messageObject.getString("key3"));
+        broadcastIntent.putExtra("drop_lng", messageObject.getString("key4"));
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
+        context.sendBroadcast(broadcastIntent);
+        // sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
+        /*Intent i1=new Intent(context, PushNotificationAlert.class);
+        i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
+        i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
+        i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
+        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);*/
+    }
+
 
     private void rideCancelledAlert(JSONObject messageObject) throws Exception
     {

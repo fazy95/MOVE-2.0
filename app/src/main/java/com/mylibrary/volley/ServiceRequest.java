@@ -66,7 +66,6 @@ public class ServiceRequest {
             public void onResponse(String response) {
                 try {
                     mServiceListener.onCompleteListener(response);
-
                     JSONObject object = new JSONObject(response);
                     if (object.has("is_dead")) {
                         System.out.println("-----------is dead----------------");

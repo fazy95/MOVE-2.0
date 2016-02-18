@@ -87,18 +87,16 @@ public class LoginPage extends ActivityHockeyApp {
     AsyncFacebookRunner mAsyncRunner;
     private SharedPreferences mPrefs;
     private String email="",profile_image="",username1="",userid="";
-    JsonObjectRequest jsonObjReq;
-    StringRequest postrequest;
+    private JsonObjectRequest jsonObjReq;
+    private StringRequest postrequest;
 
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private Context context;
-
     private ServiceRequest mRequest;
-    Dialog dialog;
+    private Dialog dialog;
     private SessionManager session;
-    Handler mHandler;
-
+    private Handler mHandler;
     private String GCM_Id = "";
     private String sCurrencySymbol="";
     private String android_id;
@@ -145,23 +143,17 @@ public class LoginPage extends ActivityHockeyApp {
                 } else if (password.getText().toString().length() == 0) {
                     erroredit(password, getResources().getString(R.string.login_label_alert_password));
                 } else {
-
                     cd = new ConnectionDetector(LoginPage.this);
                     isInternetPresent = cd.isConnectingToInternet();
-
                     if (isInternetPresent) {
-
                         mHandler.post(dialogRunnable);
-
                         //---------Getting GCM Id----------
                         GCMInitializer initializer = new GCMInitializer(LoginPage.this, new GCMInitializer.CallBack() {
                             @Override
                             public void onRegisterComplete(String registrationId) {
-
                                 GCM_Id = registrationId;
                                 PostRequest(Iconstant.loginurl);
                             }
-
                             @Override
                             public void onError(String errorMsg) {
                                 PostRequest(Iconstant.loginurl);
@@ -331,13 +323,11 @@ public class LoginPage extends ActivityHockeyApp {
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("--------------Login reponse-------------------" + response);
-
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
+                String is_alive_other= "";
                 try {
-
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     Smessage = object.getString("message");
@@ -353,9 +343,9 @@ public class LoginPage extends ActivityHockeyApp {
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
                         ScurrencyCode = object.getString("currency");
+                        is_alive_other = object.getString("is_alive_other");
                         sCurrencySymbol =CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
-
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -366,16 +356,21 @@ public class LoginPage extends ActivityHockeyApp {
                     session.setXmppKey(Suser_id, SsecretKey);
 
                     //starting XMPP service
-                    ChatService.startUserAction(LoginPage.this);
-                    SingUpAndSignIn.activty.finish();
-                    Intent intent = new Intent(context, UpdateUserLocation.class);
-                    startActivity(intent);
-                    finish();
-                    overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
-                } else {
-                    Alert(getResources().getString(R.string.login_label_alert_signIn_failed), Smessage);
-                }
+                    if("No".equalsIgnoreCase(is_alive_other)){
 
+
+                        ChatService.startUserAction(LoginPage.this);
+                        SingUpAndSignIn.activty.finish();
+                        Intent intent = new Intent(context, UpdateUserLocation.class);
+                        startActivity(intent);
+                        finish();
+                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                    }else{
+                        Alert(getResources().getString(R.string.alert_multiple_login), Smessage);
+                    }
+                } else {
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_multiple_login));
+                }
                 // close keyboard
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(username.getWindowToken(), 0);
@@ -446,25 +441,20 @@ public class LoginPage extends ActivityHockeyApp {
                         {
                             // Function to handle complete event
                             Toast.makeText(context, "logedin to app successfully", Toast.LENGTH_LONG).show();
-
-
                             // Edit Preferences and update facebook acess_token
                             SharedPreferences.Editor editor = mPrefs.edit();
                             editor.putString("access_token",
                                     facebook.getAccessToken());
                             editor.putLong("access_expires",facebook.getAccessExpires());
                             editor.commit();
-
-                            String accessToken=facebook.getAccessToken();
+                            String accessToken= facebook.getAccessToken();
                             /*FacebookAsyncTask facebook=new FacebookAsyncTask();
                             facebook.execute(accessToken);*/
                             PostRequest_facebook("http://project.dectar.com/fortaxi/api/v1/app/social-check");
-
 								/*Intent i1 = new Intent(context, HomePage.class);
 								startActivity(i1);
 								overridePendingTransition(R.anim.enter, R.anim.exit);
 								finish();*/
-
                         }
                         @Override
                         public void onError(DialogError error) {

@@ -44,29 +44,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * Created by Prem Kumar and Anitha on 11/12/2015.
  */
 public class FavoriteList extends ActivityHockeyApp {
+
     private TextView Tv_selectedlocation;
     private RelativeLayout Rl_back, Rl_favorite, Rl_empty;
     private SwipeMenuListView listview;
-
     private Boolean isInternetPresent = false;
     private ConnectionDetector cd;
     private SessionManager session;
     private String UserID = "";
-    String SselectedAddress = "";
-    String Sselected_latitude = "", Sselected_longitude = "";
-
+    private String SselectedAddress = "";
+    private String Sselected_latitude = "", Sselected_longitude = "";
     private StringRequest postrequest, deleteRequest;
-    Dialog dialog;
+    private Dialog dialog;
     private boolean isFavouriteListAvailable = false;
     private ArrayList<FavoriteListPojo> itemList;
-    FavoriteListAdapter adapter;
-
-    BroadcastReceiver updateReceiver;
+    private FavoriteListAdapter adapter;
+    private BroadcastReceiver updateReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +70,6 @@ public class FavoriteList extends ActivityHockeyApp {
         setContentView(R.layout.favorite_list);
         initialize();
         swipeMenu_Initialize();
-
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.favoriteList.refresh");
         updateReceiver = new BroadcastReceiver() {
@@ -98,11 +93,9 @@ public class FavoriteList extends ActivityHockeyApp {
             }
         });
 
-
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("Selected_Latitude", itemList.get(position).getLatitude());
                 returnIntent.putExtra("Selected_Longitude", itemList.get(position).getLongitude());
@@ -112,7 +105,6 @@ public class FavoriteList extends ActivityHockeyApp {
                 finish();
             }
         });
-
         Rl_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,24 +158,19 @@ public class FavoriteList extends ActivityHockeyApp {
         cd = new ConnectionDetector(FavoriteList.this);
         isInternetPresent = cd.isConnectingToInternet();
         itemList = new ArrayList<FavoriteListPojo>();
-
         listview = (SwipeMenuListView) findViewById(R.id.favorite_list_listView);
         Tv_selectedlocation = (TextView) findViewById(R.id.favorite_list_favorite_location_textview);
         Rl_back = (RelativeLayout) findViewById(R.id.favorite_list_header_back_layout);
         Rl_favorite = (RelativeLayout) findViewById(R.id.favorite_list_favorite_heart_layout);
         Rl_empty = (RelativeLayout) findViewById(R.id.favorite_list_listview_empty_layout);
-
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
-
         Intent intent = getIntent();
         SselectedAddress = intent.getStringExtra("SelectedAddress");
         Sselected_latitude = intent.getStringExtra("SelectedLatitude");
         Sselected_longitude = intent.getStringExtra("SelectedLongitude");
-
         Tv_selectedlocation.setText(SselectedAddress);
-
         if (isInternetPresent) {
             postRequest_FavoriteList(Iconstant.favoritelist_display_url);
         } else {
@@ -262,22 +249,15 @@ public class FavoriteList extends ActivityHockeyApp {
         dialog.setContentView(R.layout.custom_loading);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_loading));
-
-
         System.out.println("-------------Favourite List Url----------------" + Url);
-
         postrequest = new StringRequest(Request.Method.POST, Url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
                         System.out.println("-------------Favourite List Response----------------" + response);
-
                         String Sstatus = "";
-
                         try {
                             JSONObject object = new JSONObject(response);
                             Sstatus = object.getString("status");
@@ -295,7 +275,6 @@ public class FavoriteList extends ActivityHockeyApp {
                                             pojo.setLatitude(location_object.getString("latitude"));
                                             pojo.setLongitude(location_object.getString("longitude"));
                                             pojo.setLocation_key(location_object.getString("location_key"));
-
                                             itemList.add(pojo);
                                         }
                                         isFavouriteListAvailable = true;
@@ -304,8 +283,6 @@ public class FavoriteList extends ActivityHockeyApp {
                             } else {
                                 isFavouriteListAvailable = false;
                             }
-
-
                             if (Sstatus.equalsIgnoreCase("1") && isFavouriteListAvailable) {
                                 listview.setVisibility(View.VISIBLE);
                                 Rl_empty.setVisibility(View.GONE);
@@ -315,14 +292,10 @@ public class FavoriteList extends ActivityHockeyApp {
                                 listview.setVisibility(View.GONE);
                                 Rl_empty.setVisibility(View.VISIBLE);
                             }
-
                         } catch (JSONException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-
                         dialog.dismiss();
-
                     }
                 }, new Response.ErrorListener() {
 

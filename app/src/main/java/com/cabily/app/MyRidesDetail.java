@@ -545,12 +545,9 @@ public class MyRidesDetail extends ActivitySubClass {
                     }
                 }
         ).show();
-
         Button call_police = (Button) view.findViewById(R.id.call_police_button);
         Button call_fire = (Button) view.findViewById(R.id.call_fireservice_button);
         Button call_ambulance = (Button) view.findViewById(R.id.call_ambulance_button);
-
-
         call_police.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {

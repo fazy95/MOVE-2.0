@@ -4,23 +4,19 @@ public interface Iconstant
 {
     /*Local Url*/
 
-        /*String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/";
-        String XMPP_HOST_URL = "192.168.1.150";
-        String XMPP_SERVICE_NAME = "casp83";*/
-     /*Testing Url*/
+       // String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/";
+      //  String XMPP_HOST_URL = "192.168.1.150";
+      //  String XMPP_SERVICE_NAME = "casp83";
 
+     /*Testing Url*/
         String BaseUrl = "http://project.dectar.com/cabilydemo/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";
-
 
     /*Live Url*/
        /* String BaseUrl="http://project.dectar.com/fortaxi/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
-
-
-
         String setUserLocation=BaseUrl+"api/v1/app/set-user-geo";
         String loginurl = BaseUrl + "api/v1/app/login";
         String register_url = BaseUrl + "api/v1/app/check-user";
@@ -101,6 +97,7 @@ public interface Iconstant
         String PushNotification_RideCompleted_Key = "ride_completed";
         String PushNotification_RequestPayment_Key = "requesting_payment";
         String PushNotification_PaymentPaid_Key = "payment_paid";
+        String pushNotificationBeginTrip ="trip_begin";
 
 
         /*Ride Accept Key*/
@@ -161,7 +158,6 @@ public interface Iconstant
         String coupon_Request_Payment = "key19";
         String serviceTax_Request_Payment = "key20";
         String Total_Request_Payment = "key21";
-
 
         /*Payment Paid Key*/
         String Push_Message_Payment_paid = "message";

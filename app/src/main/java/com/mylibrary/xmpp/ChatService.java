@@ -136,7 +136,6 @@ public class ChatService extends IntentService implements ChatManagerListener, C
                 userName = session.getXmppKey().get(SessionManager.KEY_XMPP_USERID);
                 password = session.getXmppKey().get(SessionManager.KEY_XMPP_SEC_KEY);
             }
-
             if(userName.length()>0&&password.length()>0)
             {
                 connection.login(userName, password);

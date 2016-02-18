@@ -140,7 +140,7 @@
             android:windowSoftInputMode="stateHidden|adjustPan"/>
 
         <activity
-            android:name="com.cabily.app.ForgotPasswordOtp"
+            android:name="com.cabily.app.ForgotPassword"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar_Theme"
             android:windowSoftInputMode="stateHidden|adjustPan"/>

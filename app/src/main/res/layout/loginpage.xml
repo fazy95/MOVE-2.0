@@ -51,6 +51,20 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="#00000000">
+            <Button
+                android:id="@+id/login_fb_btn_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="42dp"
+                android:layout_above="@+id/login_signin_layout"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@color/app_color_button"
+                android:text="@string/login_label_facecook_login"
+                android:textColor="#ffffff"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
 
             <RelativeLayout
@@ -128,26 +142,13 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/login_fb_btn_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="42dp"
-                android:layout_below="@+id/login_submit_button"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:layout_marginTop="20dp"
-                android:background="@color/app_color_button"
-                android:text="@string/login_label_facecook_login"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:textStyle="bold" />
 
 
             <RelativeLayout
                 android:id="@+id/login_forgotpwd_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/login_fb_btn_layout"
+                android:layout_below="@+id/login_submit_button"
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="25dp"
@@ -156,6 +157,7 @@
                 <com.mylibrary.widgets.CustomTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:layout_centerInParent="true"
                     android:text="@string/login_label_forgotpwd"
                     android:textColor="#FFFFFF"
