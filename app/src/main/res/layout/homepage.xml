@@ -238,12 +238,6 @@
                 android:background="#ffffff"
                 card_view:cardElevation="5dp">
 
-                <!--<RelativeLayout
-                    android:id="@+id/book_navigation_destination_address_main_layout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="43dp"
-                    android:background="#FFFFFF">
--->
                 <RelativeLayout
                     android:id="@+id/book_navigation_destination_address_layout"
                     android:layout_width="fill_parent"
@@ -254,8 +248,8 @@
 
                     <ImageView
                         android:id="@+id/book_navigation_destination_address_search_imageView"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="10dp"
@@ -265,13 +259,10 @@
                         android:id="@+id/book_navigation_destination_address_search_address"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_toRightOf="@+id/book_navigation_destination_address_search_imageView"
                         android:singleLine="true"
-                        android:text=""
-                        android:textColor="#4e4e4e"
+                        android:layout_centerInParent="true"
+                        android:text="@string/action_enter_drop_location"
+                        android:textColor="#8e8e8e"
                         android:textSize="16sp"/>
                 </RelativeLayout>
                 <!-- <View

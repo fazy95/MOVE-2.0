@@ -257,6 +257,8 @@ public class OtpPage extends ActivityHockeyApp {
                         SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
                  String sCurrencySymbol="";
 
+                String gcmId = "";
+
                 try {
 
                     JSONObject object = new JSONObject(response);
@@ -276,6 +278,10 @@ public class OtpPage extends ActivityHockeyApp {
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
                         ScurrencyCode = object.getString("currency");
+                        gcmId = object.getString("key");
+
+                        //is_alive_other = object.getString("is_alive_other");
+
                         sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
 
@@ -284,11 +290,10 @@ public class OtpPage extends ActivityHockeyApp {
                     e.printStackTrace();
                 }
 
-
                 if (Sstatus.equalsIgnoreCase("1")) {
                     SingUpAndSignIn.activty.finish();
                     System.out.println("--------SsecretKey-----------"+SsecretKey);
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 

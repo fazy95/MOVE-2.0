@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -422,6 +423,8 @@ public class RegisterPage extends FragmentActivityHockeyApp {
             @Override
             public void onCompleteListener(String response) {
 
+                Log.e("registr",response);
+
                 System.out.println("--------------register reponse-------------------" + response);
 
                 String Sstatus = "", Smessage = "", Sotp_status = "", Sotp = "";
@@ -453,6 +456,9 @@ public class RegisterPage extends FragmentActivityHockeyApp {
                     intent.putExtra("CountryCode", Tv_countryCode.getText().toString());
                     intent.putExtra("ReferalCode", Ereferalcode.getText().toString());
                     intent.putExtra("GcmID", GCM_Id);
+
+                    System.out.println("gcm---------"+GCM_Id);
+
                     startActivity(intent);
                     finish();
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

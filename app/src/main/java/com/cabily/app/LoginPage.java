@@ -97,9 +97,12 @@ public class LoginPage extends ActivityHockeyApp {
     private Dialog dialog;
     private SessionManager session;
     private Handler mHandler;
-    private String GCM_Id = "";
     private String sCurrencySymbol="";
     private String android_id;
+
+    private String GCM_Id = "";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -316,17 +319,25 @@ public class LoginPage extends ActivityHockeyApp {
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("email", username.getText().toString());
-        jsonParams.put("password", password.getText().toString());
+        jsonParams.put("password",password.getText().toString());
         jsonParams.put("gcm_id", GCM_Id);
 
         mRequest = new ServiceRequest(LoginPage.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
+
+                Log.e("login",response);
+
                 System.out.println("--------------Login reponse-------------------" + response);
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
-                String is_alive_other= "";
+
+                 String is_alive_other= "";
+
+                String   gcmId="";
+
+
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
@@ -342,6 +353,7 @@ public class LoginPage extends ActivityHockeyApp {
                         Scategory = object.getString("category");
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
+                        gcmId = object.getString("key");
                         ScurrencyCode = object.getString("currency");
                         is_alive_other = object.getString("is_alive_other");
                         sCurrencySymbol =CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
@@ -351,25 +363,39 @@ public class LoginPage extends ActivityHockeyApp {
                     e.printStackTrace();
                 }
                 if (Sstatus.equalsIgnoreCase("1")) {
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 
-                    //starting XMPP service
-                    if("No".equalsIgnoreCase(is_alive_other)){
+                    System.out.println("insidesession gcm--------------"+gcmId);
 
-
+                    if (is_alive_other.equalsIgnoreCase("Yes")){
+                        Alert(getResources().getString(R.string.alert_multiple_login), Smessage);
+                    }else{
                         ChatService.startUserAction(LoginPage.this);
                         SingUpAndSignIn.activty.finish();
                         Intent intent = new Intent(context, UpdateUserLocation.class);
                         startActivity(intent);
                         finish();
                         overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+
+                    }
+
+                  /*  //starting XMPP service
+                    if("No".equalsIgnoreCase(is_alive_other)){
+                        ChatService.startUserAction(LoginPage.this);
+                        SingUpAndSignIn.activty.finish();
+                        Intent intent = new Intent(context, UpdateUserLocation.class);
+                        startActivity(intent);
+                        finish();
+                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+
                     }else{
                         Alert(getResources().getString(R.string.alert_multiple_login), Smessage);
-                    }
+                    }*/
+
                 } else {
-                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_multiple_login));
+                    Alert(getResources().getString(R.string.login_label_alert_signIn_failed), Smessage);
                 }
                 // close keyboard
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -571,6 +597,10 @@ public class LoginPage extends ActivityHockeyApp {
 
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
+
+               String gcmId = "";
+                String is_alive_other = "";
+
                 try {
 
                     JSONObject object = new JSONObject(response);
@@ -588,6 +618,10 @@ public class LoginPage extends ActivityHockeyApp {
                         Scategory = object.getString("category");
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
+
+                        gcmId = object.getString("key");
+                        is_alive_other = object.getString("is_alive_other");
+
                         ScurrencyCode = object.getString("currency");
                         sCurrencySymbol =CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
@@ -597,7 +631,7 @@ public class LoginPage extends ActivityHockeyApp {
                     e.printStackTrace();
                 }
                 if (Sstatus.equalsIgnoreCase("1")) {
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 

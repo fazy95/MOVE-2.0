@@ -33,6 +33,8 @@ public class SessionManager {
     public static final String KEY_USERID = "userid";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_USERIMAGE = "userimage";
+    public static final String KEY_GCM_ID = "gcmId";
+
 
     public static final String KEY_COUNTRYCODE = "countrycode";
     public static final String KEY_PHONENO = "phoneno";
@@ -47,7 +49,6 @@ public class SessionManager {
     public static final String KEY_XMPP_SEC_KEY = "xmppSecKey";
 
 
-
     public SessionManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
@@ -57,7 +58,7 @@ public class SessionManager {
     /**
      * Create login session
      */
-    public void createLoginSession(String email, String userid, String username, String userimage, String countrycode, String phoneno, String referalcode, String category) {
+    public void createLoginSession(String email, String userid, String username, String userimage, String countrycode, String phoneno, String referalcode, String category,String gcmID) {
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
         editor.putString(KEY_EMAIL, email);
@@ -68,6 +69,7 @@ public class SessionManager {
         editor.putString(KEY_PHONENO, phoneno);
         editor.putString(KEY_REFERAL_CODE, referalcode);
         editor.putString(KEY_CATEGORY, category);
+        editor.putString(KEY_GCM_ID, gcmID);
 
         // commit changes
         editor.commit();
@@ -127,6 +129,8 @@ public class SessionManager {
         user.put(KEY_PHONENO, pref.getString(KEY_PHONENO, ""));
         user.put(KEY_REFERAL_CODE, pref.getString(KEY_REFERAL_CODE, ""));
         user.put(KEY_CATEGORY, pref.getString(KEY_CATEGORY, ""));
+        user.put(KEY_GCM_ID, pref.getString(KEY_GCM_ID, ""));
+
 
         return user;
     }

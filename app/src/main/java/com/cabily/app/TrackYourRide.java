@@ -75,6 +75,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private String driverID = "", driverName = "", driverImage = "", driverRating = "",
             driverLat = "", driverLong = "", driverTime = "", rideID = "", driverMobile = "",
             driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
+
+
     private boolean isReasonAvailable = false;
     private ServiceRequest mRequest;
     Dialog dialog;
@@ -109,8 +111,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     mGoogleApiClient, mLocationRequest, this);
         }
     }
-
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -154,27 +154,63 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver")) {
-                Tv_headerTitle.setText("Driver Has Arrived");
+                System.out.println("triparrived----------------------");
+                Tv_headerTitle.setText(getResources().getString(R.string.action_driver_arrived));
+                rl_endTrip.setVisibility(View.GONE);
+                track_your_ride_view1.setVisibility(View.GONE);
+                Rl_arriveLayout.setVisibility(View.INVISIBLE);
+                arriveView.setVisibility(View.INVISIBLE);
+            }else if(intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip")){
+                System.out.println("tripbegin----------------------");
+                Tv_headerTitle.setText(getResources().getString(R.string.action_enjy_your_ride));
                 rl_endTrip.setVisibility(View.GONE);
                 track_your_ride_view1.setVisibility(View.GONE);
                 Rl_arriveLayout.setVisibility(View.INVISIBLE);
                 arriveView.setVisibility(View.INVISIBLE);
             }
-            if (intent.getExtras() != null  && intent.getExtras().containsKey("drop_lat") && intent.getExtras().containsKey("drop_lng")) {
+            System.out.println("check--------------");
+         if (intent.getExtras()!= null  && intent.getExtras().containsKey("drop_lat") && intent.getExtras().containsKey("drop_lng")) {
                 String lat = (String) intent.getExtras().get("drop_lat");
                 String lng = (String) intent.getExtras().get("drop_lng");
                 try {
                     double lat_decimal = Double.parseDouble(lat);
                     double lng_decimal = Double.parseDouble(lng);
                     updateGoogleMapTrackRide(lat_decimal,lng_decimal);
+                    System.out.println("inside updategoogle1--------------");
                 }catch (Exception e){
+                    System.out.println("try--------------"+ e);
+                }
+            }
+             System.out.println("out else--------------");
+            if(intent.getExtras()!= null && intent.getExtras().containsKey(Iconstant.isContinousRide)){
+                String lat = (String) intent.getExtras().get("latitude");
+                String lng = (String) intent.getExtras().get("longitude");
+                String ride_id = (String) intent.getExtras().get("ride_id");
+                try {
+                    double lat_decimal = Double.parseDouble(lat);
+                    double lng_decimal = Double.parseDouble(lng);
+                    updateDriverOnMap(lat_decimal,lng_decimal);
+                    System.out.println("inside updategoogle1--------------");
+                }catch (Exception e){
+                    System.out.println("try--------------"+ e);
                 }
             }
         }
+
+    }
+    private void updateDriverOnMap(double lat_decimal,double lng_decimal ){
+        LatLng dropLatLng  = new LatLng(lat_decimal,lng_decimal);
+        if(curentDriverMarker != null){
+            curentDriverMarker.remove();
+        }
+        curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
+                .position(dropLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
+
     }
 
-
     private void updateGoogleMapTrackRide(double lat_decimal,double lng_decimal ){
+        System.out.println("inside updategoogle--------------");
         if(googleMap != null){
             googleMap.clear();
         }
@@ -195,7 +231,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         MarkerAnimation.animateMarkerToICS(curentDriverMarker, latLng, latLngInterpolator);
     }
 
-
     public static class FragmentMessage extends Handler {
 
         @Override
@@ -210,6 +245,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 if(curentDriverMarker != null){
                     LatLng mLatLng = new LatLng(lat,lng);
                     curentDriverMarker.setPosition(mLatLng);
+
                     updateMap(mLatLng);
                 }
             }catch (Exception e){
@@ -292,6 +328,13 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
         registerReceiver(refreshReceiver, intentFilter);
+
+
+        refreshReceiver = new RefreshReceiver();
+        IntentFilter intentFilterbeign = new IntentFilter();
+        intentFilterbeign.addAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
+        registerReceiver(refreshReceiver, intentFilterbeign);
+
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
@@ -425,7 +468,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
 
 
     //---------------AsyncTask to Draw PolyLine Between Two Point--------------
-    private class GetRouteTask extends AsyncTask<String, Void, String> {
+    public class GetRouteTask extends AsyncTask<String, Void, String> {
 
         String response = "";
         GMapV2GetRouteDirection v2GetRouteDirection = new GMapV2GetRouteDirection();
@@ -450,8 +493,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 googleMap.clear();
                 try {
                     ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(document);
-                    PolylineOptions rectLine = new PolylineOptions().width(25).color(
-                            getResources().getColor(R.color.app_color));
+                    PolylineOptions rectLine = new PolylineOptions().width(18).color(getResources().getColor(R.color.ployline_color));
                     for (int i = 0; i < directionPoint.size(); i++) {
                         rectLine.add(directionPoint.get(i));
                     }
@@ -463,10 +505,11 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     //googleMap.addMarker(markerOptions);
                     googleMap.addMarker(new MarkerOptions()
                             .position(toPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_neww)));
                     curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
                             .position(fromPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_map_icon)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
+
                     //Show path in
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(toPosition);
@@ -626,8 +669,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 googleMap.clear();
                 try {
                     ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(document);
-                    PolylineOptions rectLine = new PolylineOptions().width(21).color(
-                            getResources().getColor(R.color.app_color));
+                    PolylineOptions rectLine = new PolylineOptions().width(18).color(
+                            getResources().getColor(R.color.ployline_color));
                     for (int i = 0; i < directionPoint.size(); i++) {
                         rectLine.add(directionPoint.get(i));
                     }
@@ -636,13 +679,17 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     markerOptions.position(toPosition);
                     markerOptions.position(fromPosition);
                     markerOptions.draggable(true);
+
                     //googleMap.addMarker(markerOptions);
                     googleMap.addMarker(new MarkerOptions()
                             .position(endLocation)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
-                    curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
+                    googleMap.addMarker(new MarkerOptions()
                             .position(currentLocation)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_map_icon)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.flag)));
+
+                    System.out.println("inside---------marker--------------");
+
                     //Show path in
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(endLocation);

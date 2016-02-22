@@ -37,13 +37,13 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     private static final String ACTION_FOO = "com.casperon.smackclient.action.FOO";
     private static SessionManager session;
     private static AbstractXMPPConnection connection;
-    private static  boolean isConnected;
+    private static boolean isConnected;
     //Declaration for Chat
     private static Chat chat;
     private static ChatManager chatManager;
-    static boolean isChatEnabled;
+    private static boolean isChatEnabled;
     private static Messenger chatMessenger;
-    ChatHandler chatHandler;
+    private static ChatHandler chatHandler;
 
     /**
      */
@@ -53,15 +53,18 @@ public class ChatService extends IntentService implements ChatManagerListener, C
         session = new SessionManager(context);
         context.startService(intent);
     }
+
     public ChatService() {
         super("ChatService");
     }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             handleActionFoo();
         }
     }
+
     /**
      * Handle action Foo in the provided background thread with the provided
      * parameters.
@@ -76,9 +79,11 @@ public class ChatService extends IntentService implements ChatManagerListener, C
                 public void checkClientTrusted(X509Certificate[] chain,
                                                String authType) throws CertificateException {
                 }
+
                 public void checkServerTrusted(X509Certificate[] chain,
                                                String authType) throws CertificateException {
                 }
+
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
@@ -96,24 +101,30 @@ public class ChatService extends IntentService implements ChatManagerListener, C
             public void connected(XMPPConnection connection) {
                 isConnected = true;
             }
+
             @Override
             public void authenticated(XMPPConnection connection, boolean resumed) {
             }
+
             @Override
             public void connectionClosed() {
                 isConnected = false;
             }
+
             @Override
             public void connectionClosedOnError(Exception e) {
                 isConnected = false;
             }
+
             @Override
             public void reconnectionSuccessful() {
                 isConnected = true;
             }
+
             @Override
             public void reconnectingIn(int seconds) {
             }
+
             @Override
             public void reconnectionFailed(Exception e) {
                 isConnected = false;
@@ -130,14 +141,13 @@ public class ChatService extends IntentService implements ChatManagerListener, C
             e.printStackTrace();
         }
         try {
-            String userName ="";
-            String password ="";
-            if(session  != null && session.getXmppKey() != null){
+            String userName = "";
+            String password = "";
+            if (session != null && session.getXmppKey() != null) {
                 userName = session.getXmppKey().get(SessionManager.KEY_XMPP_USERID);
                 password = session.getXmppKey().get(SessionManager.KEY_XMPP_SEC_KEY);
             }
-            if(userName.length()>0&&password.length()>0)
-            {
+            if (userName.length() > 0 && password.length() > 0) {
                 connection.login(userName, password);
                 chatManager = ChatManager.getInstanceFor(connection);
                 chatManager.addChatListener(this);
@@ -154,29 +164,16 @@ public class ChatService extends IntentService implements ChatManagerListener, C
 
     @Override
     public void processMessage(Chat chat, final Message message) {
-        if(chatHandler == null){
+        if (chatHandler == null) {
             chatHandler = new ChatHandler(getApplicationContext(), this);
         }
-        if (isChatEnabled && chatMessenger != null) {
-            android.os.Message chatMessage = android.os.Message.obtain();
-            chatMessage.obj = message.getBody();
-            try {
-                if(message.getBody().contains("MI_MESSAGE")){
-                    chatMessenger.send(chatMessage);
-                }else{
-                    chatHandler.onHandleChatMessage(message);
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else {
-            chatHandler.onHandleChatMessage(message);
-        }
+        chatHandler.onHandleChatMessage(message);
     }
 
     public static void setChatMessenger(Messenger messenger) {
         chatMessenger = messenger;
     }
+
     /*
     Need add chat validation object
     */
@@ -190,6 +187,7 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     public static void enableChat() {
         isChatEnabled = true;
     }
+
     public static void disableChat() {
         isChatEnabled = false;
     }

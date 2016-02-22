@@ -4,19 +4,24 @@ public interface Iconstant
 {
     /*Local Url*/
 
-       // String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/";
-      //  String XMPP_HOST_URL = "192.168.1.150";
-      //  String XMPP_SERVICE_NAME = "casp83";
+   /*     String BaseUrl = "http://192.168.1.251:8081/suresh/dectarfortaxi/";
+        String XMPP_HOST_URL = "192.168.1.150";
+        String XMPP_SERVICE_NAME = "casp83";*/
 
-     /*Testing Url*/
+/*
+      /*Testing Url*/
         String BaseUrl = "http://project.dectar.com/cabilydemo/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";
+
+
 
     /*Live Url*/
        /* String BaseUrl="http://project.dectar.com/fortaxi/";
         String XMPP_HOST_URL = "67.219.149.186";
         String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
+
+
         String setUserLocation=BaseUrl+"api/v1/app/set-user-geo";
         String loginurl = BaseUrl + "api/v1/app/login";
         String register_url = BaseUrl + "api/v1/app/check-user";
@@ -77,14 +82,15 @@ public interface Iconstant
         String tip_add_url= BaseUrl+"api/v1/app/apply-tips";
         String tip_remove_url= BaseUrl+"api/v1/app/remove-tips";
 
-
+           String share_trip_url= BaseUrl+"api/v3/track-driver/share-my-ride";
 
 
     //----------------------UserAgent---------------------
        String cabily_userAgent="cabily2k15android";
        String cabily_IsApplication="1";
        String cabily_AppLanguage="en";
-
+      String cabily_AppType="android";
+      String cabily_AppToken="";
 
 
 
@@ -96,9 +102,10 @@ public interface Iconstant
         String PushNotification_RideCancelled_Key = "ride_cancelled";
         String PushNotification_RideCompleted_Key = "ride_completed";
         String PushNotification_RequestPayment_Key = "requesting_payment";
+        String PushNotification_RequestPayment_makepayment_Stripe_Key = "make_payment";
         String PushNotification_PaymentPaid_Key = "payment_paid";
         String pushNotificationBeginTrip ="trip_begin";
-
+        String pushNotificationDriverLoc ="driver_loc";
 
         /*Ride Accept Key*/
         String DriverID = "key1";
@@ -117,8 +124,10 @@ public interface Iconstant
         String UserLong = "key15";
         String Push_Message = "message";
         String Push_Action = "action";
-
-
+        String latitude ="latitude";
+        String longitude ="longitude";
+        String ride_id = "ride_id";
+        String isContinousRide = "isContinousRide";
         /*Ride Arrived Key*/
         String UserID_Arrived = "key1";
         String RideID_Arrived = "key2";
@@ -159,7 +168,15 @@ public interface Iconstant
         String serviceTax_Request_Payment = "key20";
         String Total_Request_Payment = "key21";
 
-        /*Payment Paid Key*/
+         String Make_Payment = "key22";
+         String drop_lat = "key3";
+         String drop_lan = "key4";
+
+
+
+
+
+    /*Payment Paid Key*/
         String Push_Message_Payment_paid = "message";
         String Push_Action_Payment_paid = "action";
         String RideID_Payment_paid = "key1";

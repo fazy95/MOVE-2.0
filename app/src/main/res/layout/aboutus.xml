@@ -116,6 +116,64 @@
                 android:textAlignment="gravity"
                 android:textColor="#4e4e4e"
                 android:textSize="14sp"/>
+
+
+
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/moreinfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView"
+                android:layout_marginTop="25dp"
+                android:gravity="left"
+                android:text="@string/aboutus_lable_moreinfo_textview"
+                android:textAlignment="gravity"
+                android:textColor="@color/app_color"
+                android:layout_marginLeft="25dp"
+                android:textSize="20sp"/>
+
+
+            <RelativeLayout
+                android:id="@+id/layout_moreinfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+               android:layout_below="@+id/moreinfo">
+
+
+                <com.mylibrary.widgets.CustomTextView
+                    android:id="@+id/moreinfobaseurl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:text="@string/aboutus_lable_moreinfo_detail_textview"
+                    android:textAlignment="gravity"
+                    android:textColor="#CC2793ff"
+                    android:layout_marginLeft="25dp"
+                    android:textSize="15sp"/>
+
+
+                <view
+                    android:layout_width="fill_parent"
+                      android:layout_height="5dp"
+                    android:background="#CC2793ff"
+                    android:layout_below="@+id/moreinfobaseurl"
+                    android:layout_marginTop="5dp"
+
+                />
+
+
+
+
+            </RelativeLayout>
+
+
+
+
+
+
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

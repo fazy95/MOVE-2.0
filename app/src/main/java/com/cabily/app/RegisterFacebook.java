@@ -455,6 +455,9 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
                         SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
                 String sCurrencySymbol="";
 
+                String gcmId="";
+
+
                 try {
 
                     JSONObject object = new JSONObject(response);
@@ -473,6 +476,9 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
                         SsecretKey = object.getString("sec_key");
                         SwalletAmount = object.getString("wallet_amount");
                         ScurrencyCode = object.getString("currency");
+
+                        //gcmId = object.getString("key");
+
                         sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
                 } catch (JSONException e) {
@@ -483,7 +489,7 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
                 if (Sstatus.equalsIgnoreCase("1")) {
                     SingUpAndSignIn.activty.finish();
 
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 

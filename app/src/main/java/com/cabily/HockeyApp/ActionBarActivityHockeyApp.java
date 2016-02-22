@@ -1,12 +1,16 @@
 package com.cabily.HockeyApp;
 
+import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
 
 /**
  * Created by Prem Kumar and Anitha on 11/12/2015.
  */
 public class ActionBarActivityHockeyApp extends ActionBarActivity {
-   /* private static String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+ private static String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +48,7 @@ public class ActionBarActivityHockeyApp extends ActionBarActivity {
     private void unregisterManagers() {
         UpdateManager.unregister();
         // unregister other managers if necessary...
-    }*/
+    }
 
 }
 

@@ -13,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,7 +86,7 @@ public class MyRidesDetail extends ActivitySubClass {
     private RelativeLayout Rl_favorite, Rl_priceBottom, Rl_button;
     private RelativeLayout Rl_address, Rl_pickup;
     private ImageView Iv_favorite;
-    private LinearLayout Ll_cancelTrip, Ll_payment, Ll_mailInvoice, Ll_reportIssue, Ll_trackRide;
+    private LinearLayout Ll_cancelTrip, Ll_payment, Ll_mailInvoice, Ll_reportIssue, Ll_trackRide,Ll_share_Ride;
 
     private GoogleMap googleMap;
     private String SrideId_intent = "";
@@ -94,6 +95,11 @@ public class MyRidesDetail extends ActivitySubClass {
     private boolean isReasonAvailable = false;
     private boolean isFareAvailable = false;
     private boolean isTrackRideAvailable = false;
+
+    private MaterialDialog completejob_dialog;
+
+    private EditText Et_share_trip_mobileno;
+
 
     public static MyRidesDetail myrideDetail_class;
 
@@ -228,6 +234,18 @@ public class MyRidesDetail extends ActivitySubClass {
             }
         });
 
+
+        Ll_share_Ride.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                shareTrip();
+
+            }
+        });
+
+
+
         Iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -342,6 +360,9 @@ public class MyRidesDetail extends ActivitySubClass {
         Tv_totalPaid = (TextView) findViewById(R.id.my_rides_detail_total_paid_textview);
         Tv_couponDiscount = (TextView) findViewById(R.id.my_rides_detail_coupon_discount_textview);
         Tv_walletUsuage = (TextView) findViewById(R.id.my_rides_detail_wallet_usuage_textview);
+        Ll_share_Ride = (LinearLayout) findViewById(R.id.my_rides_detail_share_layout);
+
+
 
         Rl_favorite = (RelativeLayout) findViewById(R.id.my_rides_detail_favorite_layout);
         Rl_priceBottom = (RelativeLayout) findViewById(R.id.my_rides_detail_price_layout);
@@ -398,9 +419,43 @@ public class MyRidesDetail extends ActivitySubClass {
             @Override
             public void onClick(View v) {
                 mDialog.dismiss();
+
+                completejob_dialog.dismiss();
+
             }
         });
         mDialog.show();
+
+    }
+
+    private void shareTrip() {
+
+        completejob_dialog  = new MaterialDialog(MyRidesDetail.this);
+        View view = LayoutInflater.from(MyRidesDetail.this).inflate(R.layout.share_trip_popup, null);
+        Et_share_trip_mobileno = (EditText)view.findViewById(R.id.sharetrip_mobilenoEt);
+        Button Bt_Submit = (Button)view.findViewById(R.id.jsharetrip_popup_submit);
+        Button Bt_Cancel = (Button)view.findViewById(R.id.sharetrip_popup_cancel);
+
+        completejob_dialog.setView(view).show();
+
+        Bt_Submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isInternetPresent){
+                    share_trip_postRequest_MyRides(MyRidesDetail.this, Iconstant.share_trip_url, "jobcomplete");
+                    System.out.println("--------------sharetrip url-------------------" + Iconstant.share_trip_url);
+                }else{
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                }
+            }
+        });
+
+        Bt_Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                completejob_dialog.dismiss();
+            }
+        });
 
     }
 
@@ -897,8 +952,11 @@ public class MyRidesDetail extends ActivitySubClass {
                             //------Show and Hide Track Ride Button Layout------
                             if (itemlist.get(0).getDoTrackAction().equalsIgnoreCase("1")) {
                                 Ll_trackRide.setVisibility(View.VISIBLE);
+                                Ll_share_Ride.setVisibility(View.VISIBLE);
+
                             } else {
                                 Ll_trackRide.setVisibility(View.GONE);
+                                Ll_share_Ride.setVisibility(View.GONE);
                             }
                         }
                     } else {
@@ -1224,7 +1282,69 @@ public class MyRidesDetail extends ActivitySubClass {
     }
 
 
-    //-----------------------Tip Post Request-----------------
+    //----------------------------------Share Trip post reques------------------------
+    private void share_trip_postRequest_MyRides(Context mContext, String url,String key) {
+        dialog = new Dialog(MyRidesDetail.this);
+        dialog.getWindow();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.custom_loading);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
+        dialog_title.setText(getResources().getString(R.string.action_loading));
+
+        System.out.println("------------- ride_id----------------" +SrideId_intent);
+        System.out.println("------------- mobile_no----------------" +Et_share_trip_mobileno.getText().toString());
+
+        HashMap<String, String> jsonParams = new HashMap<String, String>();
+        jsonParams.put("ride_id",SrideId_intent);
+        jsonParams.put("mobile_no",Et_share_trip_mobileno.getText().toString());
+
+        mRequest = new ServiceRequest(MyRidesDetail.this);
+        mRequest.makeServiceRequest(url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
+
+            @Override
+            public void onCompleteListener(String response) {
+                Log.e("share trip",response);
+
+                String Str_status = "", Str_response = "";
+                System.out.println("sharetrip response-------------"+response);
+
+                try {
+                    JSONObject object = new JSONObject(response);
+                    Str_status = object.getString("status");
+                    Str_response = object.getString("response");
+
+                    if (Str_status.equalsIgnoreCase("1")){
+
+                        Alert(getResources().getString(R.string.action_success), Str_response);
+
+                    }else{
+                        Alert(getResources().getString(R.string.action_error), Str_response);
+
+                    }
+
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onErrorListener() {
+
+                dialog.dismiss();
+
+            }
+
+
+        });
+
+    }
+
+            //-----------------------Tip Post Request-----------------
     private void postRequest_Tip(String Url, final String tipStatus) {
         dialog = new Dialog(MyRidesDetail.this);
         dialog.getWindow();

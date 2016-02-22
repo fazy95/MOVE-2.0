@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.cabily.app.FareBreakUp;
 import com.cabily.app.PushNotificationAlert;
+import com.cabily.app.TrackYourRide;
 import com.cabily.iconstant.Iconstant;
 import com.casperon.app.cabily.R;
 
@@ -60,6 +61,11 @@ public class ChatHandler {
                 {
                     requestPayment(messageObject);
                 }
+
+                else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_makepayment_Stripe_Key))
+                {
+                    makePaymentStripAni(messageObject);
+                }
                 else if (action.equalsIgnoreCase(Iconstant.PushNotification_PaymentPaid_Key))
                 {
                     paymentPaid(messageObject);
@@ -70,12 +76,27 @@ public class ChatHandler {
                     beginTripMessage(messageObject);
                 }
 
+                else if (action.equalsIgnoreCase(Iconstant.pushNotificationDriverLoc))
+                {
+                    continousPushMessage(messageObject);
+                }
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void continousPushMessage(JSONObject messageObject) throws Exception {
+        Intent local = new Intent();
+        local.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
+        local.putExtra("isContinousRide", messageObject.getString(Iconstant.latitude));
+        local.putExtra("latitude", messageObject.getString(Iconstant.latitude));
+        local.putExtra("longitude", messageObject.getString(Iconstant.longitude));
+        local.putExtra("ride_id", messageObject.getString(Iconstant.ride_id));
+        context.sendBroadcast(local);
     }
 
     private void sendBroadCastToRideConfirm(JSONObject messageObject) throws Exception {
@@ -119,18 +140,18 @@ public class ChatHandler {
 
     private void beginTripMessage(JSONObject messageObject) throws Exception
     {
-        //refreshMethod();
+         //refreshMethod();
         Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
         broadcastIntent.putExtra("drop_lat", messageObject.getString("key3"));
         broadcastIntent.putExtra("drop_lng", messageObject.getString("key4"));
-        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
         context.sendBroadcast(broadcastIntent);
-        // sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
-        /*Intent i1=new Intent(context, PushNotificationAlert.class);
-        i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
+     /*   sendNotification(messageObject.getString(Iconstant.pushNotificationBeginTrip));
+        Intent i1=new Intent(context, TrackYourRide.class);
+      *//*  i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
         i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
-        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));
+        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));*//*
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);*/
     }
@@ -189,6 +210,25 @@ public class ChatHandler {
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);
     }
+
+
+    private void makePaymentStripAni(JSONObject messageObject) throws Exception
+    {
+        refreshMethod();
+
+        System.out.println("makepayment-----------------");
+
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_MakePayment");
+        context.sendBroadcast(broadcastIntent);
+
+
+        Intent i1=new Intent(context, FareBreakUp.class);
+        i1.putExtra("RideID", messageObject.getString(Iconstant.Make_Payment));
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);
+    }
+
 
     private void paymentPaid(JSONObject messageObject) throws Exception
     {

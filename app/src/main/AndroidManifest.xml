@@ -53,6 +53,32 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!--code for app open with-->
+            <!--<data android:scheme="http" />
+            <data android:scheme="http" android:host="com.casperon.app.cabily"/>
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <category android:name="android.intent.category.DEFAULT"/>-->
+
+            <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <category android:name="android.intent.category.BROWSABLE" />
+
+             <data android:scheme="http"
+             android:host="http://project.dectar.com/fortaxi/track-ride?rideId=1455520763"
+             android:pathPrefix="/cabily" />
+
+       <data android:scheme="example"
+         android:host="cabily" />
+
+
+  <!--   <data android:scheme="http"
+         android:host="play.google.com"
+         android:pathPrefix="/store/apps/details?id=com.casperon.app.cabily" />-->
+
+
+
         </activity>
 
 
@@ -96,8 +122,10 @@
             android:value="AIzaSyDX3ihFwLTKgZcrIL-NhZVP7ejdemZaIFk"/>
 
 
-        <!--<activity android:name="net.hockeyapp.android.UpdateActivity" />-->
-        <action android:name="android.intent.action.VIEW" />
+        <activity android:name="net.hockeyapp.android.UpdateActivity" />
+
+
+       <!-- <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="http"
@@ -109,10 +137,7 @@
 
         <data android:scheme="http"
             android:host="play.google.com"
-            android:pathPrefix="/store/apps/details?id=com.casperon.plumbal" />
-
-
-
+            android:pathPrefix="/store/apps/details?id=com.casperon.plumbal" />-->
 
 
         <activity

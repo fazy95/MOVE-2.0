@@ -16,16 +16,14 @@ import java.util.ArrayList;
 /**
  * Created by Prem Kumar and Anitha on 10/23/2015.
  */
-public class CabilyMoneyTransactionAdapter extends BaseAdapter
-{
+public class CabilyMoneyTransactionAdapter extends BaseAdapter {
 
     private ArrayList<CabilyMoneyTransactionPojo> data;
     private LayoutInflater mInflater;
     private Context context;
 
-    public CabilyMoneyTransactionAdapter(Context c,ArrayList<CabilyMoneyTransactionPojo> d)
-    {
-        context=c;
+    public CabilyMoneyTransactionAdapter(Context c, ArrayList<CabilyMoneyTransactionPojo> d) {
+        context = c;
         mInflater = LayoutInflater.from(context);
         data = d;
     }
@@ -46,26 +44,22 @@ public class CabilyMoneyTransactionAdapter extends BaseAdapter
     }
 
     @Override
-    public int getViewTypeCount()
-    {
+    public int getViewTypeCount() {
         return 1;
     }
 
 
-    public class ViewHolder
-    {
+    public class ViewHolder {
         private ImageView type_image;
         private TextView type_name;
-        private TextView trans_price,title,date,balance;
+        private TextView trans_price, title, date, balance;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if (convertView == null) {
             view = mInflater.inflate(R.layout.cabily_money_transaction_single, parent, false);
             holder = new ViewHolder();
             holder.type_name = (TextView) view.findViewById(R.id.cabily_money_transaction_single_type_textview);
@@ -74,36 +68,24 @@ public class CabilyMoneyTransactionAdapter extends BaseAdapter
             holder.title = (TextView) view.findViewById(R.id.cabily_money_transaction_single_description);
             holder.date = (TextView) view.findViewById(R.id.cabily_money_transaction_single_date);
             holder.balance = (TextView) view.findViewById(R.id.cabily_money_transaction_single_balance_price);
-
             view.setTag(holder);
-        }
-        else
-        {
+        } else {
             view = convertView;
-            holder = (ViewHolder)view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
-
-
-            if(data.get(position).getTrans_type().equalsIgnoreCase("CREDIT"))
-            {
-                holder.type_name.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_credit));
-                holder.type_name.setTextColor(0xFF006301);
-                holder.type_image.setImageResource(R.drawable.up_arrow);
-            }
-            else
-            {
-                holder.type_name.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_debit));
-                holder.type_name.setTextColor(0xFFcc0000);
-                holder.type_image.setImageResource(R.drawable.down_arrow);
-            }
-
-
-            holder.trans_price.setText(data.get(position).getCurrencySymbol()+data.get(position).getTrans_amount());
-            holder.title.setText(data.get(position).getTitle());
-            holder.date.setText(data.get(position).getTrans_date());
-            holder.balance.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_balance)+" "+data.get(position).getCurrencySymbol()+data.get(position).getBalance_amount());
-
-
+        if (data.get(position).getTrans_type().equalsIgnoreCase("CREDIT")) {
+            holder.type_name.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_credit));
+            holder.type_name.setTextColor(0xFF006301);
+            holder.type_image.setImageResource(R.drawable.up_arrow);
+        } else {
+            holder.type_name.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_debit));
+            holder.type_name.setTextColor(0xFFcc0000);
+            holder.type_image.setImageResource(R.drawable.down_arrow);
+        }
+        holder.trans_price.setText(data.get(position).getCurrencySymbol() + data.get(position).getTrans_amount());
+        holder.title.setText(data.get(position).getTitle());
+        holder.date.setText(data.get(position).getTrans_date());
+        holder.balance.setText(context.getResources().getString(R.string.cabily_money_lable_transaction_list_balance) + " " + data.get(position).getCurrencySymbol() + data.get(position).getBalance_amount());
         return view;
     }
 }

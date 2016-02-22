@@ -240,6 +240,12 @@
     <string name="aboutus_lable_poweredby_textview">POWERED BY :</string>
     <string name="aboutus_lable_company_textview">CABILY</string>
     <string name="aboutus_lable_version_code_textview">VERSION 2.0</string>
+    <string name="aboutus_lable_moreinfo_textview">More Info</string>
+
+    <string name="aboutus_lable_moreinfo_detail_textview">http://192.168.1.251:8081/suresh/dectarfortaxi/</string>
+
+
+
     <string name="aboutus_lable_aboutus_description_textview">Cabily – a taxi booking app that will take the hassle out of getting to your destination quickly and without having to spend too much. Using highly advanced taxi booking software, it will provide you with a quick quote to help you avoid any surprises when you get to your destination, and assign you to a professional and responsible driver.</string>
 
     <!--Emergency Contact-->
@@ -388,6 +394,9 @@
     <string name="my_rides_detail_tip_empty_label">Invalid tip amount</string>
     <string name="my_rides_detail_tip_amount_label">Tips</string>
     <string name="my_rides_detail_tip_amount_message">Are you willing to provide tips to driver</string>
+    <string name="my_rides_detail_share_message">Share</string>
+
+
 
     <!--MyRides cancel Trip -->
     <string name="my_rides_cancel_trip_header_textview">CANCEL RIDE</string>
@@ -462,4 +471,29 @@
     <string name="call_fireservice_lable">Call Fire Service</string>
     <string name="call_ambulance_lable">Call Ambulance</string>
     <string name="alert_multiple_login">Already Logged into another device</string>
+
+
+
+    <!--Share-->
+
+    <string name="action_share_header">Share</string>
+    <string name="action_share_summery">Share Your Trip</string>
+    <string name="action_complete_submit">Submit</string>
+    <string name="action_complete_cancel">Cancel</string>
+
+
+
+    <!--Track your ride-->
+
+    <string name="action_driver_arrived">Driver Has Arrived</string>
+    <string name="action_enjy_your_ride">Enjoy Your Ride !!</string>
+
+
+
+    <!--Home page-->
+    <string name="action_enter_drop_location">Enter drop location</string>
+
+
+
+
 </resources>

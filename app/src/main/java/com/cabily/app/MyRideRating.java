@@ -3,12 +3,15 @@ package com.cabily.app;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.cabily.HockeyApp.ActivityHockeyApp;
@@ -59,11 +62,9 @@ public class MyRideRating extends ActivityHockeyApp {
         skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction("com.pushnotification.updateBottom_view");
                 sendBroadcast(broadcastIntent);
-
                 finish();
                 onBackPressed();
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -100,9 +101,7 @@ public class MyRideRating extends ActivityHockeyApp {
                                     jsonParams.put("ratings[" + i + "][option_title]", itemlist.get(i).getRatingName());
                                     jsonParams.put("ratings[" + i + "][rating]", itemlist.get(i).getRatingcount());
                                 }
-
                                 System.out.println("------------jsonParams-------------" + jsonParams);
-
                                 postRequest_SubmitRating(Iconstant.myride_rating_submit_url, jsonParams);
                             } else {
                                 Alert(getResources().getString(R.string.my_rides_rating_header_sorry_textview), getResources().getString(R.string.my_rides_rating_header_comment_textview));
@@ -124,20 +123,16 @@ public class MyRideRating extends ActivityHockeyApp {
         cd = new ConnectionDetector(MyRideRating.this);
         isInternetPresent = cd.isConnectingToInternet();
         itemlist = new ArrayList<RatingPojo>();
-
         skip = (RelativeLayout) findViewById(R.id.my_rides_rating_header_skip_layout);
         listview = (ExpandableHeightListView) findViewById(R.id.my_rides_rating_listView);
         submit = (RelativeLayout) findViewById(R.id.my_rides_rating_submit_layout);
         Et_comment = (EditText) findViewById(R.id.my_rides_rating_comment_edittext);
-
-
+        Et_comment.setImeOptions(EditorInfo.IME_ACTION_DONE);
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();
         UserID = user.get(SessionManager.KEY_USERID);
-
         Intent intent = getIntent();
         SrideId_intent = intent.getStringExtra("RideID");
-
         if (isInternetPresent) {
             postRequest_RatingList(Iconstant.myride_rating_url);
         } else {
@@ -177,18 +172,28 @@ public class MyRideRating extends ActivityHockeyApp {
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("optionsFor", "driver");
+        jsonParams.put("ride_id",SrideId_intent);
+
+        System.out.println("rideid-----------"+SrideId_intent);
 
         mRequest = new ServiceRequest(MyRideRating.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
 
+                Log.e("rateing",response);
+
                 System.out.println("-------------Rating List Response----------------" + response);
 
                 String Sstatus = "";
+                String SRating_status="";
+
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
+
+                    SRating_status  = object.getString("ride_ratting_status");
+
                     if (Sstatus.equalsIgnoreCase("1")) {
                         JSONArray payment_array = object.getJSONArray("review_options");
                         if (payment_array.length() > 0) {
@@ -207,11 +212,19 @@ public class MyRideRating extends ActivityHockeyApp {
                         }
                     }
 
-
                     if (Sstatus.equalsIgnoreCase("1") && isDataAvailable) {
-                        adapter = new RatingAdapter(MyRideRating.this, itemlist);
-                        listview.setAdapter(adapter);
-                        listview.setExpanded(true);
+
+                        if (SRating_status.equalsIgnoreCase("1")){
+
+                            Toast.makeText(getApplicationContext(),"Already submitted your rating",Toast.LENGTH_SHORT).show();
+
+                        }else{
+
+                            adapter = new RatingAdapter(MyRideRating.this, itemlist);
+                            listview.setAdapter(adapter);
+                            listview.setExpanded(true);
+                        }
+
                     }
 
                 } catch (JSONException e) {

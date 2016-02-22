@@ -32,6 +32,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -523,7 +524,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     if (isInternetPresent) {
                        /* HashMap<String, String> code = session.getCouponCode();
                         String coupon = code.get(SessionManager.KEY_COUPON_CODE);*/
-
                         riderId="";
                         ConfirmRideRequest(Iconstant.confirm_ride_url, Str_couponCode, coupon_selectedDate, coupon_selectedTime, selectedType, CategoryID, map_address.getText().toString(), String.valueOf(Recent_lat), String.valueOf(Recent_long), "",destination_address.getText().toString(),SdestinationLatitude,SdestinationLongitude);
                     } else {
@@ -794,7 +794,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
 
     }
 
-
     //-------------------Show Coupon Code Method--------------------
     private void showCoupon() {
         coupon_dialog = new MaterialDialog(getActivity());
@@ -820,8 +819,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         coupon_apply_layout.setVisibility(View.VISIBLE);
         coupon_loading_layout.setVisibility(View.GONE);
         coupon_edittext.addTextChangedListener(EditorWatcher);
-
-
 
 
         coupon_edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -850,7 +847,10 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                     Animation shake = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
                     coupon_edittext.startAnimation(shake);
                 } else {
-                    cd = new ConnectionDetector(getActivity());
+
+
+
+               /*     cd = new ConnectionDetector(getActivity());
                     isInternetPresent = cd.isConnectingToInternet();
 
                     if (isInternetPresent) {
@@ -867,13 +867,49 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         }
                     } else {
                         tv_nointernet.setVisibility(View.VISIBLE);
-                    }
+                    }*/
 
                 }
             }
         });
         coupon_dialog.setView(view).show();
     }
+
+
+
+/*
+
+    //-----------------------coupon code detail-------------------\
+    private void shareTrip() {
+        completejob_dialog  = new MaterialDialog(getActivity());
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.share_trip_popup, null);
+        Et_share_trip_mobileno = (EditText)view.findViewById(R.id.sharetrip_mobilenoEt);
+        Button Bt_Submit = (Button)view.findViewById(R.id.jsharetrip_popup_submit);
+        Button Bt_Cancel = (Button)view.findViewById(R.id.sharetrip_popup_cancel);
+
+        completejob_dialog.setView(view).show();
+
+        Bt_Submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isInternetPresent){
+                    share_trip_postRequest_MyRides(getActivity(), Iconstant.share_trip_url, "jobcomplete");
+                    System.out.println("--------------sharetrip url-------------------" + Iconstant.share_trip_url);
+                }else{
+                    Alert(getResources().getString(R.string.alert_label_title), getResources().getString(R.string.alert_nointernet));
+                }
+            }
+        });
+
+        Bt_Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                completejob_dialog.dismiss();
+            }
+        });
+
+    }
+*/
 
 
     //-------------------Show RateCard Method--------------------
@@ -1504,9 +1540,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         jsonParams.put("drop_loc", destination_location);
         jsonParams.put("drop_lat", destination_lat);
         jsonParams.put("drop_lon", destination_lon);
-
-
-
         System.out.println("---------------user_id----------" + UserID);
         System.out.println("---------------code----------" + code);
         System.out.println("---------------pickpudate----------" + pickUpDate);
@@ -1526,8 +1559,12 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("--------------Confirm Ride reponse-------------------" + response);
+
+                if(destination_address != null){
+                    destination_address.setText("");
+                }
+
 
                 String selected_type = "", Sacceptance = "";
                 String Str_driver_id = "", Str_driver_name = "", Str_driver_email = "", Str_driver_image = "", Str_driver_review = "",
