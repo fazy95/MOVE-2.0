@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+
+        <RelativeLayout
+            android:id="@+id/job_complete_label_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="@color/app_color">
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="@string/action_share_header"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:typeface="sans" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/job_complete_details_label_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/job_complete_label_layout">
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/job_complete_fareTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/action_share_summery"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+
+            <EditText
+                android:id="@+id/sharetrip_mobilenoEt"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/job_complete_fareTv"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="15dp"
+                android:background="@xml/custom_curv_layout_grey"
+                android:gravity="top|left"
+                android:hint="enter your mobileno"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
+                android:textColor="#000000"
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:typeface="sans">
+
+            </EditText>
+
+
+
+
+            <RelativeLayout
+                android:id="@+id/layout_jobcomplete_btns"
+                android:layout_width="fill_parent"
+                android:layout_height="45dp"
+                android:layout_below="@+id/sharetrip_mobilenoEt"
+                android:layout_marginTop="23dp">
+
+                <View
+                    android:id="@+id/jobcompletey_popup_view1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1px"
+                    android:layout_alignParentTop="true"
+                    android:background="#cdcdcd" />
+
+                <Button
+                    android:id="@+id/sharetrip_popup_cancel"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/jobcompletey_popup_view1"
+                    android:layout_toLeftOf="@+id/jobcompletey__popup_view2"
+                    android:background="#ffffff"
+                    android:imeOptions="actionDone"
+                    android:text="@string/action_cancel"
+                    android:textColor="#cc0000"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:id="@+id/jobcompletey__popup_view2"
+                    android:layout_width="1px"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:background="#cdcdcd" />
+
+                <Button
+                    android:id="@+id/jsharetrip_popup_submit"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/jobcompletey_popup_view1"
+                    android:layout_toRightOf="@+id/jobcompletey__popup_view2"
+                    android:background="#ffffff"
+                    android:text="@string/action_ok"
+                    android:textColor="#000000"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

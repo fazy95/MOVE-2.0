@@ -75,26 +75,24 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private String driverID = "", driverName = "", driverImage = "", driverRating = "",
             driverLat = "", driverLong = "", driverTime = "", rideID = "", driverMobile = "",
             driverCar_no = "", driverCar_model = "", userLat = "", userLong = "";
-
-
     private boolean isReasonAvailable = false;
     private ServiceRequest mRequest;
-    Dialog dialog;
+    private Dialog dialog;
     private SessionManager session;
     private String UserID = "";
-    ArrayList<CancelTripPojo> itemlist_reason;
+    private ArrayList<CancelTripPojo> itemlist_reason;
     public static TrackYourRide trackyour_ride_class;
     private TextView Tv_headerTitle;
     private View track_your_ride_view1;
     private View arriveView;
     private RelativeLayout Rl_arriveLayout;
-    LatLng fromPosition;
-    LatLng toPosition;
-    MarkerOptions markerOptions;
+    private LatLng fromPosition;
+    private LatLng toPosition;
+    private MarkerOptions markerOptions;
     private static Marker curentDriverMarker;
     private static Marker movingMarker;
     LocationRequest mLocationRequest;
-    GoogleApiClient mGoogleApiClient;
+    private  GoogleApiClient mGoogleApiClient;
     final static int REQUEST_LOCATION = 199;
     private Location currentLocation;
 
