@@ -64,6 +64,7 @@ public interface Iconstant
         String cancel_myride_reason_url= BaseUrl+"api/v1/app/cancellation-reason";
         String cancel_myride_url= BaseUrl+"api/v1/app/cancel-ride";
         String paymentList_url= BaseUrl+"api/v1/app/payment-list";
+        String getfareBreakUpURL = BaseUrl + "api/v1/app/get-fare-breakup";
 
         String makepayment_cash_url= BaseUrl+"api/v1/app/payment/by-cash";
         String makepayment_wallet_url= BaseUrl+"api/v1/app/payment/by-wallet";

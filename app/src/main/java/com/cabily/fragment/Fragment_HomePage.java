@@ -1,7 +1,6 @@
 package com.cabily.fragment;
 
 /**
- * Created by Prem Kumar on 10/1/2015.
  */
 
 import android.app.Activity;
@@ -840,19 +839,14 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         tv_apply.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-
                 if (coupon_edittext.length() == 0) {
                     coupon_edittext.setHint(getResources().getString(R.string.couponcode_label_invalid_code));
                     coupon_edittext.setHintTextColor(Color.RED);
                     Animation shake = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
                     coupon_edittext.startAnimation(shake);
                 } else {
-
-
-
-               /*     cd = new ConnectionDetector(getActivity());
+                   cd = new ConnectionDetector(getActivity());
                     isInternetPresent = cd.isConnectingToInternet();
-
                     if (isInternetPresent) {
                         tv_nointernet.setVisibility(View.INVISIBLE);
                         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -867,7 +861,7 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                         }
                     } else {
                         tv_nointernet.setVisibility(View.VISIBLE);
-                    }*/
+                    }
 
                 }
             }
@@ -917,7 +911,6 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
         if (ratecard_status) {
             final MaterialDialog dialog = new MaterialDialog(getActivity());
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.ratecard_dialog, null);
-
             TextView tv_cartype = (TextView) view.findViewById(R.id.ratecard_caretype_textview);
             TextView tv_firstprice = (TextView) view.findViewById(R.id.first_price_textView);
             TextView tv_firstKm = (TextView) view.findViewById(R.id.first_km_textView);

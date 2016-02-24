@@ -45,18 +45,12 @@ public class ServiceRequest {
 
     public ServiceRequest(Context context) {
         this.context = context;
-
         session=new SessionManager(context);
-
         HashMap<String, String> user = session.getUserDetails();
         userID = user.get(SessionManager.KEY_USERID);
         gcmID = user.get(SessionManager.KEY_GCM_ID);
-
         System.out.println("topuserid2--------"+userID);
-
         System.out.println("topgcmID2--------"+gcmID);
-
-
     }
 
     public void cancelRequest()

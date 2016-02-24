@@ -1,7 +1,9 @@
 package com.cabily.HockeyApp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -9,14 +11,18 @@ import net.hockeyapp.android.UpdateManager;
 /**
  * Created by Prem Kumar and Anitha on 11/12/2015.
  */
-public class ActivityHockeyApp extends Activity
-{
-   private static  String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+public class ActivityHockeyApp extends Activity {
+    private static String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+    PowerManager.WakeLock mWakeLock;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final PowerManager pm
+                = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        this.mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        this.mWakeLock.acquire();
+
         checkForUpdates();
     }
 
@@ -35,6 +41,9 @@ public class ActivityHockeyApp extends Activity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(mWakeLock != null){
+            mWakeLock.release();
+        }
         unregisterManagers();
     }
 

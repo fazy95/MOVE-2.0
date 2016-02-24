@@ -26,9 +26,7 @@ public class SingUpAndSignIn extends ActivityHockeyApp
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.signin_and_signup);
 		activty=this;
-		
 		initialize();
-		
 		signin.setOnClickListener(new OnClickListener()
 		{
 			@Override

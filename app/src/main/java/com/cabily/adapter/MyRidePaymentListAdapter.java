@@ -15,17 +15,15 @@ import java.util.ArrayList;
 /**
  * Created by Prem Kumar and Anitha on 11/2/2015.
  */
-public class MyRidePaymentListAdapter extends BaseAdapter
-{
+public class MyRidePaymentListAdapter extends BaseAdapter {
 
     private ArrayList<PaymentListPojo> data;
     private LayoutInflater mInflater;
     private Context context;
 
-    public MyRidePaymentListAdapter(Context c,ArrayList<PaymentListPojo
-            > d)
-    {
-        context=c;
+    public MyRidePaymentListAdapter(Context c, ArrayList<PaymentListPojo
+            > d) {
+        context = c;
         mInflater = LayoutInflater.from(context);
         data = d;
     }
@@ -46,33 +44,27 @@ public class MyRidePaymentListAdapter extends BaseAdapter
     }
 
     @Override
-    public int getViewTypeCount()
-    {
+    public int getViewTypeCount() {
         return 1;
     }
 
 
-    public class ViewHolder
-    {
+    public class ViewHolder {
         private TextView reason;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if (convertView == null) {
             view = mInflater.inflate(R.layout.myride_payment_list_single, parent, false);
             holder = new ViewHolder();
             holder.reason = (TextView) view.findViewById(R.id.myride_payment_list_textview);
             view.setTag(holder);
-        }
-        else
-        {
+        } else {
             view = convertView;
-            holder = (ViewHolder)view.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
         holder.reason.setText(data.get(position).getPaymentName());

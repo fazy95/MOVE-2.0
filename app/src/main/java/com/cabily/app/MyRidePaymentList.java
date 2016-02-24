@@ -3,6 +3,7 @@ package com.cabily.app;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -43,11 +44,10 @@ public class MyRidePaymentList extends ActivitySubClass {
     private ConnectionDetector cd;
     private SessionManager session;
     private String UserID = "";
-
     private ServiceRequest mRequest;
-    Dialog dialog;
-    ArrayList<PaymentListPojo> itemlist;
-    MyRidePaymentListAdapter adapter;
+    private Dialog dialog;
+    private ArrayList<PaymentListPojo> itemlist;
+    private MyRidePaymentListAdapter adapter;
     private ExpandableHeightListView listview;
     private String SrideId_intent = "";
     private boolean isPaymentAvailable = false;
@@ -61,7 +61,6 @@ public class MyRidePaymentList extends ActivitySubClass {
         setContentView(R.layout.myride_payment_list);
         myride_paymentList_class = MyRidePaymentList.this;
         initialize();
-
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +75,6 @@ public class MyRidePaymentList extends ActivitySubClass {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 cd = new ConnectionDetector(MyRidePaymentList.this);
                 isInternetPresent = cd.isConnectingToInternet();
-
                 if (isInternetPresent) {
                     if (itemlist.get(position).getPaymentCode().equalsIgnoreCase("cash")) {
                         MakePayment_Cash(Iconstant.makepayment_cash_url);
@@ -93,7 +91,7 @@ public class MyRidePaymentList extends ActivitySubClass {
                 }
             }
         });
-
+        //makeFareBreakUp(Iconstant.getfareBreakUpURL);
     }
 
     private void initialize() {
@@ -154,24 +152,17 @@ public class MyRidePaymentList extends ActivitySubClass {
         dialog.setContentView(R.layout.custom_loading);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_pleasewait));
-
-
         System.out.println("-------------PaymentList Url----------------" + Url);
-
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("ride_id", SrideId_intent);
-
         mRequest = new ServiceRequest(MyRidePaymentList.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("-------------PaymentList Response----------------" + response);
-
                 String Sstatus = "";
                 try {
                     JSONObject object = new JSONObject(response);
@@ -187,10 +178,8 @@ public class MyRidePaymentList extends ActivitySubClass {
                                     PaymentListPojo pojo = new PaymentListPojo();
                                     pojo.setPaymentName(reason_object.getString("name"));
                                     pojo.setPaymentCode(reason_object.getString("code"));
-
                                     itemlist.add(pojo);
                                 }
-
                                 isPaymentAvailable = true;
                             } else {
                                 isPaymentAvailable = false;
@@ -200,13 +189,11 @@ public class MyRidePaymentList extends ActivitySubClass {
                         String Sresponse = object.getString("response");
                         Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-
                     if (Sstatus.equalsIgnoreCase("1") && isPaymentAvailable) {
                         adapter = new MyRidePaymentListAdapter(MyRidePaymentList.this, itemlist);
                         listview.setAdapter(adapter);
                         listview.setExpanded(true);
                     }
-
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -222,25 +209,26 @@ public class MyRidePaymentList extends ActivitySubClass {
     }
 
 
-    //-----------------------MakePayment Cash Post Request-----------------
-    private void MakePayment_Cash(String Url) {
+
+    public void showLoadingDialog() {
         dialog = new Dialog(MyRidePaymentList.this);
         dialog.getWindow();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.custom_loading);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+    }
 
+
+    //-----------------------MakePayment Cash Post Request-----------------
+    private void MakePayment_Cash(String Url) {
+        showLoadingDialog();
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
-
-
         System.out.println("-------------MakePayment Cash Url----------------" + Url);
-
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("ride_id", SrideId_intent);
-
         mRequest = new ServiceRequest(MyRidePaymentList.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
@@ -253,7 +241,6 @@ public class MyRidePaymentList extends ActivitySubClass {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     if (Sstatus.equalsIgnoreCase("1")) {
-
                         final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
                         mDialog.setDialogTitle(getResources().getString(R.string.my_rides_payment_cash_success));
                         mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_driver_confirm_label));
@@ -269,15 +256,11 @@ public class MyRidePaymentList extends ActivitySubClass {
                             }
                         });
                         mDialog.show();
-
                     } else {
                         String Sresponse = object.getString("response");
                         Alert(getResources().getString(R.string.alert_label_title), Sresponse);
                     }
-
                 } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
                 dialog.dismiss();
             }
@@ -293,21 +276,13 @@ public class MyRidePaymentList extends ActivitySubClass {
     //-----------------------MakePayment Wallet Post Request-----------------
 
     private void MakePayment_Wallet(String Url) {
-        dialog = new Dialog(MyRidePaymentList.this);
-        dialog.getWindow();
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.custom_loading);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
+        showLoadingDialog();
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
-
         System.out.println("-------------MakePayment Wallet Url----------------" + Url);
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("ride_id", SrideId_intent);
-
         mRequest = new ServiceRequest(MyRidePaymentList.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
@@ -316,22 +291,19 @@ public class MyRidePaymentList extends ActivitySubClass {
                 System.out.println("-------------MakePayment Wallet Response----------------" + response);
 
                 String Sstatus = "", Scurrency_code = "", Scurrent_wallet_balance = "";
-                String sCurrencySymbol="";
+                String sCurrencySymbol = "";
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     if (Sstatus.equalsIgnoreCase("0")) {
                         Alert(getResources().getString(R.string.my_rides_payment_empty_wallet_sorry), getResources().getString(R.string.my_rides_payment_empty_wallet));
                     } else if (Sstatus.equalsIgnoreCase("1")) {
-
                         //Updating wallet amount on Navigation Drawer Slide
                         Scurrency_code = object.getString("currency");
                         sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(Scurrency_code);
                         Scurrent_wallet_balance = object.getString("wallet_amount");
-
                         session.createWalletAmount(sCurrencySymbol + Scurrent_wallet_balance);
                         NavigationDrawer.navigationNotifyChange();
-
                         final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
                         mDialog.setDialogTitle(getResources().getString(R.string.action_success));
                         mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_wallet_success));
@@ -356,7 +328,7 @@ public class MyRidePaymentList extends ActivitySubClass {
                         sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(Scurrency_code);
                         Scurrent_wallet_balance = object.getString("wallet_amount");
 
-                        session.createWalletAmount(sCurrencySymbol+ Scurrent_wallet_balance);
+                        session.createWalletAmount(sCurrencySymbol + Scurrent_wallet_balance);
                         NavigationDrawer.navigationNotifyChange();
 
                         Intent broadcastIntent = new Intent();
@@ -393,6 +365,9 @@ public class MyRidePaymentList extends ActivitySubClass {
         });
     }
 
+    private void getFareBreakUp() {
+    }
+
 
     //-----------------------MakePayment Auto-Detect Post Request-----------------
 
@@ -403,29 +378,22 @@ public class MyRidePaymentList extends ActivitySubClass {
         dialog.setContentView(R.layout.custom_loading);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
-
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_processing));
-
         System.out.println("-------------MakePayment Auto-Detect Url----------------" + Url);
-
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
         jsonParams.put("ride_id", SrideId_intent);
-
         mRequest = new ServiceRequest(MyRidePaymentList.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("-------------MakePayment Auto-Detect Response----------------" + response);
-
                 String Sstatus = "";
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     if (Sstatus.equalsIgnoreCase("1")) {
-
                         final PkDialog mDialog = new PkDialog(MyRidePaymentList.this);
                         mDialog.setDialogTitle(getResources().getString(R.string.action_success));
                         mDialog.setDialogMessage(getResources().getString(R.string.my_rides_payment_cash_success));
@@ -449,8 +417,6 @@ public class MyRidePaymentList extends ActivitySubClass {
                     }
 
                 } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
                 dialog.dismiss();
             }

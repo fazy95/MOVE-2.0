@@ -1,6 +1,8 @@
 package com.cabily.HockeyApp;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 
 import net.hockeyapp.android.CrashManager;
@@ -11,11 +13,17 @@ import net.hockeyapp.android.UpdateManager;
  */
 public class ActionBarActivityHockeyApp extends ActionBarActivity {
  private static String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+    PowerManager.WakeLock mWakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkForUpdates();
+        final PowerManager pm
+                = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        this.mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        this.mWakeLock.acquire();
+
     }
 
     @Override
@@ -34,6 +42,9 @@ public class ActionBarActivityHockeyApp extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterManagers();
+        if(mWakeLock != null){
+            mWakeLock.release();
+        }
     }
 
     private void checkForCrashes() {

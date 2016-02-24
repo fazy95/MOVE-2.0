@@ -92,6 +92,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     LatLng toPosition;
     MarkerOptions markerOptions;
     private static Marker curentDriverMarker;
+    private static Marker movingMarker;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     final static int REQUEST_LOCATION = 199;
@@ -130,7 +131,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     @Override
     public void onLocationChanged(Location location) {
         this.currentLocation = location;
-
     }
 
     @Override
@@ -196,17 +196,21 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 }
             }
         }
-
     }
+
+    static LatLngInterpolator latLngInterpolator = new LatLngInterpolator.Spherical();
+    public static void updateMap(LatLng latLng) {
+        MarkerAnimation.animateMarkerToICS(movingMarker, latLng, latLngInterpolator);
+    }
+
     private void updateDriverOnMap(double lat_decimal,double lng_decimal ){
         LatLng dropLatLng  = new LatLng(lat_decimal,lng_decimal);
         if(curentDriverMarker != null){
             curentDriverMarker.remove();
+            curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
+                    .position(dropLatLng)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
         }
-        curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
-                .position(dropLatLng)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
-
     }
 
     private void updateGoogleMapTrackRide(double lat_decimal,double lng_decimal ){
@@ -226,10 +230,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         draw_route_asyncTask.execute();
     }
     private RefreshReceiver refreshReceiver;
-    static LatLngInterpolator latLngInterpolator = new LatLngInterpolator.Spherical();
-    public static void updateMap(LatLng latLng) {
-        MarkerAnimation.animateMarkerToICS(curentDriverMarker, latLng, latLngInterpolator);
-    }
 
     public static class FragmentMessage extends Handler {
 
@@ -535,22 +535,15 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
 
         TextView dialog_title = (TextView) dialog.findViewById(R.id.custom_loading_textview);
         dialog_title.setText(getResources().getString(R.string.action_pleasewait));
-
-
         System.out.println("-------------MyRide Cancel Reason Url----------------" + Url);
-
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("user_id", UserID);
-
         mRequest = new ServiceRequest(TrackYourRide.this);
         mRequest.makeServiceRequest(Url, Request.Method.POST, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
-
                 System.out.println("-------------MyRide Cancel Reason Response----------------" + response);
-
                 String Sstatus = "";
-
                 try {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
@@ -565,10 +558,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                                     CancelTripPojo pojo = new CancelTripPojo();
                                     pojo.setReason(reason_object.getString("reason"));
                                     pojo.setReasonId(reason_object.getString("id"));
-
                                     itemlist_reason.add(pojo);
                                 }
-
                                 isReasonAvailable = true;
                             } else {
                                 isReasonAvailable = false;

@@ -33,6 +33,7 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
     private SessionManager session;
     private String UserID = "";
     private String SrideId_intent = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,11 +86,9 @@ public class MyRidePaymentWebView extends ActivityHockeyApp {
 
     private void initialize() {
         session = new SessionManager(MyRidePaymentWebView.this);
-
         back = (RelativeLayout) findViewById(R.id.myride_payment_webview_header_back_layout);
         webview = (WebView) findViewById(R.id.myride_payment_webview);
         progressBar = (ProgressBar) findViewById(R.id.myride_payment_webview_progressbar);
-
         // Enable Javascript to run in WebView
         webview.getSettings().setJavaScriptEnabled(true);
 

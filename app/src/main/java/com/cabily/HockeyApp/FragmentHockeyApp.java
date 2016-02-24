@@ -1,6 +1,9 @@
 package com.cabily.HockeyApp;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,16 @@ import net.hockeyapp.android.UpdateManager;
 public class FragmentHockeyApp extends Fragment
 {
     private static  String APP_ID = "9f8e1861d5cc413ba593e3367676bca3";
+    PowerManager.WakeLock mWakeLock;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        final PowerManager pm
+                = (PowerManager)getActivity().getSystemService(Context.POWER_SERVICE);
+        this.mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+        this.mWakeLock.acquire();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +52,9 @@ public class FragmentHockeyApp extends Fragment
     public void onDestroy() {
         super.onDestroy();
         unregisterManagers();
+        if(mWakeLock != null){
+            mWakeLock.release();
+        }
     }
 
     private void checkForCrashes() {

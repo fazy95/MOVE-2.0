@@ -58,7 +58,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="#00000000">
-
             <com.mylibrary.widgets.CustomTextView
                 android:id="@+id/my_rides_payment_why_label"
                 android:layout_width="wrap_content"
@@ -68,7 +67,6 @@
                 android:text="@string/my_rides_payment_mode_label"
                 android:textColor="#4e4e4e"
                 android:textSize="17sp"/>
-
             <com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView
                 android:id="@+id/my_rides_payment_listView"
                 android:layout_width="fill_parent"
@@ -78,6 +76,15 @@
                 android:background="#ffffff"
                 android:divider="@null">
             </com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView>
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/loadGifImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:visibility="gone"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/loading"
+                />
 
         </RelativeLayout>
     </ScrollView>
