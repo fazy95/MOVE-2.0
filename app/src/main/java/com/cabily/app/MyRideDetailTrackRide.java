@@ -17,7 +17,6 @@ import com.cabily.subclass.ActivitySubClass;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -25,7 +24,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mylibrary.dialog.PkDialog;
@@ -121,6 +119,7 @@ public class MyRideDetailTrackRide extends ActivitySubClass implements View.OnCl
             userLat = intent.getStringExtra("userLat");
             userLong = intent.getStringExtra("userLong");
         }
+
 
         // get user data from session
         HashMap<String, String> user = session.getUserDetails();

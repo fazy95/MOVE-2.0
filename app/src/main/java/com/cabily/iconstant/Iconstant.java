@@ -10,22 +10,25 @@ public interface Iconstant
 
 /*
       /*Testing Url*/
-        String BaseUrl = "http://project.dectar.com/cabilydemo/";
+        /*String BaseUrl = "http://project.dectar.com/cabilydemo/";
         String XMPP_HOST_URL = "67.219.149.186";
-        String XMPP_SERVICE_NAME = "messaging.dectar.com";
+        String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
 
 
 
     /*Live Url*/
-       /* String BaseUrl="http://project.dectar.com/fortaxi/";
+        String BaseUrl="http://project.dectar.com/fortaxi/";
         String XMPP_HOST_URL = "67.219.149.186";
-        String XMPP_SERVICE_NAME = "messaging.dectar.com";*/
+        String XMPP_SERVICE_NAME = "messaging.dectar.com";
 
 
         String setUserLocation=BaseUrl+"api/v1/app/set-user-geo";
         String loginurl = BaseUrl + "api/v1/app/login";
         String register_url = BaseUrl + "api/v1/app/check-user";
-        String faceboo_register_url = BaseUrl + "api/v1/app/social-login";
+        String facebook_register_url = BaseUrl + "api/v1/app/social-login";
+        String social_check_url = BaseUrl + "api/v1/app/social-check";
+
+
 
         String register_otp_url = BaseUrl + "api/v1/app/register";
         String forgot_password_url = BaseUrl + "api/v1/app/user/reset-password";

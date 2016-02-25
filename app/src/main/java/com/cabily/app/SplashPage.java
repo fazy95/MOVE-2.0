@@ -8,13 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,8 +37,6 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 
@@ -76,7 +69,7 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
         avLoadingIndicatorView = (AVLoadingIndicatorView) findViewById(R.id.splash_avLoadingIndicatorView);
 
 
-        try {
+        /*try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     getPackageName(),
                     PackageManager.GET_SIGNATURES);
@@ -91,7 +84,7 @@ public class SplashPage extends Activity implements GoogleApiClient.ConnectionCa
         }
         catch (NoSuchAlgorithmException e) {
 
-        }
+        }*/
 
         // Session class instance
         session = new SessionManager(getApplicationContext());

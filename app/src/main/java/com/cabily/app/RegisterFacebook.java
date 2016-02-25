@@ -7,6 +7,7 @@ package com.cabily.app;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
@@ -36,6 +37,7 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.android.volley.Request;
 import com.cabily.HockeyApp.FragmentActivityHockeyApp;
+import com.mylibrary.facebook.Util;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.CountryDialCode;
@@ -108,6 +110,8 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
 
+                logoutFromFacebook();
+
                 onBackPressed();
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish();
@@ -162,12 +166,12 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
                             public void onRegisterComplete(String registrationId) {
 
                                 GCM_Id = registrationId;
-                                PostRequest(Iconstant.faceboo_register_url);
+                                PostRequest(Iconstant.facebook_register_url);
                             }
 
                             @Override
                             public void onError(String errorMsg) {
-                                PostRequest(Iconstant.faceboo_register_url);
+                                PostRequest(Iconstant.facebook_register_url);
                             }
                         });
                         initializer.init();
@@ -312,6 +316,14 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
     private void CloseKeyboard(EditText edittext) {
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(edittext.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    public void logoutFromFacebook() {
+        Util.clearCookies(RegisterFacebook.this);
+        // your sharedPrefrence
+        SharedPreferences.Editor editor = context.getSharedPreferences("CASPreferences",Context.MODE_PRIVATE).edit();
+        editor.clear();
+        editor.commit();
     }
 
     //--------------Alert Method-----------
@@ -551,6 +563,12 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        logoutFromFacebook();
+    }
+
     //-----------------Move Back on pressed phone back button------------------
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -559,6 +577,8 @@ public class RegisterFacebook extends FragmentActivityHockeyApp {
             // close keyboard
             InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             mgr.hideSoftInputFromWindow(back.getWindowToken(), 0);
+
+            logoutFromFacebook();
 
             RegisterFacebook.this.finish();
             RegisterFacebook.this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

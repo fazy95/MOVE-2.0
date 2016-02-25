@@ -18,7 +18,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -934,7 +933,7 @@ public class MyRidesDetail extends ActivitySubClass {
 
 
                             //------Show and Hide the Button Layout------
-                            if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing") || itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")) {
+                            if (itemlist.get(0).getPay_status().equalsIgnoreCase("Pending") || itemlist.get(0).getPay_status().equalsIgnoreCase("Processing") || itemlist.get(0).getDoCancelAction().equalsIgnoreCase("1") || itemlist.get(0).getRideStatus().equalsIgnoreCase("Completed")||itemlist.get(0).getRideStatus().equalsIgnoreCase("Onride")) {
                                 Rl_button.setVisibility(View.VISIBLE);
                             } else {
                                 Rl_button.setVisibility(View.GONE);
@@ -953,7 +952,6 @@ public class MyRidesDetail extends ActivitySubClass {
                             if (itemlist.get(0).getDoTrackAction().equalsIgnoreCase("1")) {
                                 Ll_trackRide.setVisibility(View.VISIBLE);
                                 Ll_share_Ride.setVisibility(View.VISIBLE);
-
                             } else {
                                 Ll_trackRide.setVisibility(View.GONE);
                                 Ll_share_Ride.setVisibility(View.GONE);

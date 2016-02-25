@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cabily.facebook;
+package com.mylibrary.facebook;
 
 /**
  * Encapsulation of Dialog Error.

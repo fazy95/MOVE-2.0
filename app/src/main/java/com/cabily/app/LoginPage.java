@@ -35,23 +35,14 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.cabily.HockeyApp.ActivityHockeyApp;
-import com.cabily.facebook.AsyncFacebookRunner;
-import com.cabily.facebook.DialogError;
-import com.cabily.facebook.Facebook;
-import com.cabily.facebook.FacebookError;
+import com.mylibrary.facebook.AsyncFacebookRunner;
+import com.mylibrary.facebook.DialogError;
+import com.mylibrary.facebook.Facebook;
+import com.mylibrary.facebook.FacebookError;
 import com.cabily.iconstant.Iconstant;
 import com.cabily.utils.ConnectionDetector;
 import com.cabily.utils.CurrencySymbolConverter;
@@ -59,7 +50,6 @@ import com.cabily.utils.SessionManager;
 import com.casperon.app.cabily.R;
 import com.mylibrary.dialog.PkDialog;
 import com.mylibrary.pushnotification.GCMInitializer;
-import com.mylibrary.volley.AppController;
 import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.xmpp.ChatService;
 
@@ -86,7 +76,7 @@ public class LoginPage extends ActivityHockeyApp {
     private final Facebook facebook = new Facebook(APP_ID);
     AsyncFacebookRunner mAsyncRunner;
     private SharedPreferences mPrefs;
-    private String email="",profile_image="",username1="",userid="";
+    private String email = "", profile_image = "", username1 = "", userid = "";
     private JsonObjectRequest jsonObjReq;
     private StringRequest postrequest;
 
@@ -97,11 +87,10 @@ public class LoginPage extends ActivityHockeyApp {
     private Dialog dialog;
     private SessionManager session;
     private Handler mHandler;
-    private String sCurrencySymbol="";
+    private String sCurrencySymbol = "";
     private String android_id;
 
     private String GCM_Id = "";
-
 
 
     @Override
@@ -112,7 +101,6 @@ public class LoginPage extends ActivityHockeyApp {
         mAsyncRunner = new AsyncFacebookRunner(facebook);
         android_id = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
-        System.out.println("-------android_id----------"+android_id);
         initialize();
         back.setOnClickListener(new OnClickListener() {
             @Override
@@ -157,6 +145,7 @@ public class LoginPage extends ActivityHockeyApp {
                                 GCM_Id = registrationId;
                                 PostRequest(Iconstant.loginurl);
                             }
+
                             @Override
                             public void onError(String errorMsg) {
                                 PostRequest(Iconstant.loginurl);
@@ -191,12 +180,9 @@ public class LoginPage extends ActivityHockeyApp {
             }
         });
 
-        facebooklayout.setOnClickListener(new OnClickListener()
-        {
+        facebooklayout.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                System.out.println("--------------facebook login----------");
+            public void onClick(View v) {
                 loginToFacebook();
             }
         });
@@ -214,7 +200,7 @@ public class LoginPage extends ActivityHockeyApp {
         password = (EditText) findViewById(R.id.login_password_editText);
         submit = (Button) findViewById(R.id.login_submit_button);
 
-        facebooklayout=(Button)findViewById(R.id.login_fb_btn_layout);
+        facebooklayout = (Button) findViewById(R.id.login_facebook_button);
 
         submit.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Roboto-Medium.ttf"));
 
@@ -238,8 +224,7 @@ public class LoginPage extends ActivityHockeyApp {
     }
 
     //--------------Alert Method-----------
-    private void Alert(String title, String alert)
-    {
+    private void Alert(String title, String alert) {
         final PkDialog mDialog = new PkDialog(LoginPage.this);
         mDialog.setDialogTitle(title);
         mDialog.setDialogMessage(alert);
@@ -315,11 +300,11 @@ public class LoginPage extends ActivityHockeyApp {
 
     private void PostRequest(final String Url) {
 
-        System.out.println("-------GCM_Id-------"+GCM_Id);
+        System.out.println("-------GCM_Id-------" + GCM_Id);
 
         HashMap<String, String> jsonParams = new HashMap<String, String>();
         jsonParams.put("email", username.getText().toString());
-        jsonParams.put("password",password.getText().toString());
+        jsonParams.put("password", password.getText().toString());
         jsonParams.put("gcm_id", GCM_Id);
 
         mRequest = new ServiceRequest(LoginPage.this);
@@ -327,15 +312,15 @@ public class LoginPage extends ActivityHockeyApp {
             @Override
             public void onCompleteListener(String response) {
 
-                Log.e("login",response);
+                Log.e("login", response);
 
                 System.out.println("--------------Login reponse-------------------" + response);
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
 
-                 String is_alive_other= "";
+                String is_alive_other = "";
 
-                String   gcmId="";
+                String gcmId = "";
 
 
                 try {
@@ -356,28 +341,28 @@ public class LoginPage extends ActivityHockeyApp {
                         gcmId = object.getString("key");
                         ScurrencyCode = object.getString("currency");
                         is_alive_other = object.getString("is_alive_other");
-                        sCurrencySymbol =CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
+                        sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 if (Sstatus.equalsIgnoreCase("1")) {
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory, gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 
-                    System.out.println("insidesession gcm--------------"+gcmId);
+                    System.out.println("insidesession gcm--------------" + gcmId);
 
-                    if (is_alive_other.equalsIgnoreCase("Yes")){
+                    if (is_alive_other.equalsIgnoreCase("Yes")) {
                         Alert(getResources().getString(R.string.alert_multiple_login), Smessage);
-                    }else{
+                    } else {
                         ChatService.startUserAction(LoginPage.this);
                         SingUpAndSignIn.activty.finish();
                         Intent intent = new Intent(context, UpdateUserLocation.class);
                         startActivity(intent);
                         finish();
-                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
 
@@ -428,12 +413,9 @@ public class LoginPage extends ActivityHockeyApp {
     }
 
 
-
-
     //--------------------------------code for faceBook------------------------------
 
-    public void loginToFacebook()
-    {
+    public void loginToFacebook() {
 
         System.out.println("---------------facebook login1-----------------------");
         mPrefs = context.getSharedPreferences("CASPreferences", Context.MODE_PRIVATE);
@@ -445,48 +427,43 @@ public class LoginPage extends ActivityHockeyApp {
         }
 
 
-        System.out.println("---------------facebook expires-----------------------"+expires);
+        System.out.println("---------------facebook expires-----------------------" + expires);
 
         if (expires != 0) {
             facebook.setAccessExpires(expires);
         }
 
-        System.out.println("---------------facebook isSessionValid-----------------------"+facebook.isSessionValid());
+        System.out.println("---------------facebook isSessionValid-----------------------" + facebook.isSessionValid());
         if (!facebook.isSessionValid()) {
             facebook.authorize(LoginPage.this,
-                    new String[] { "email" },
+                    new String[]{"email"},
                     new Facebook.DialogListener() {
 
                         @Override
-                        public void onCancel()
-                        {
+                        public void onCancel() {
                             // Function to handle cancel event
                         }
+
                         @Override
-                        public void onComplete(Bundle values)
-                        {
+                        public void onComplete(Bundle values) {
                             // Function to handle complete event
                             Toast.makeText(context, "logedin to app successfully", Toast.LENGTH_LONG).show();
                             // Edit Preferences and update facebook acess_token
                             SharedPreferences.Editor editor = mPrefs.edit();
                             editor.putString("access_token",
                                     facebook.getAccessToken());
-                            editor.putLong("access_expires",facebook.getAccessExpires());
+                            editor.putLong("access_expires", facebook.getAccessExpires());
                             editor.commit();
-                            String accessToken= facebook.getAccessToken();
-                            /*FacebookAsyncTask facebook=new FacebookAsyncTask();
-                            facebook.execute(accessToken);*/
-                            PostRequest_facebook("http://project.dectar.com/fortaxi/api/v1/app/social-check");
-								/*Intent i1 = new Intent(context, HomePage.class);
-								startActivity(i1);
-								overridePendingTransition(R.anim.enter, R.anim.exit);
-								finish();*/
+                            String accessToken = facebook.getAccessToken();
+                            PostRequest_facebook(Iconstant.social_check_url);
                         }
+
                         @Override
                         public void onError(DialogError error) {
                             // Function to handle error
 
                         }
+
                         @Override
                         public void onFacebookError(FacebookError fberror) {
                             // Function to handle Facebook errors
@@ -524,17 +501,21 @@ public class LoginPage extends ActivityHockeyApp {
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onIOException(IOException e, Object state) {
             }
+
             @Override
             public void onFileNotFoundException(FileNotFoundException e,
                                                 Object state) {
             }
+
             @Override
             public void onMalformedURLException(MalformedURLException e,
                                                 Object state) {
             }
+
             @Override
             public void onFacebookError(FacebookError e, Object state) {
             }
@@ -552,7 +533,7 @@ public class LoginPage extends ActivityHockeyApp {
 
             @Override
             public void onComplete(String response, Object state) {
-                System.out.println("----------facebook response---------------"+response);
+                System.out.println("----------facebook response---------------" + response);
                 if (Boolean.parseBoolean(response) == true) {
                     // User successfully Logged out
                     System.out.println("-----------facebook logout---------------");
@@ -598,7 +579,7 @@ public class LoginPage extends ActivityHockeyApp {
                 String Sstatus = "", Smessage = "", Suser_image = "", Suser_id = "", Suser_name = "",
                         Semail = "", Scountry_code = "", SphoneNo = "", Sreferal_code = "", Scategory = "", SsecretKey = "", SwalletAmount = "", ScurrencyCode = "";
 
-               String gcmId = "";
+                String gcmId = "";
                 String is_alive_other = "";
 
                 try {
@@ -606,7 +587,7 @@ public class LoginPage extends ActivityHockeyApp {
                     JSONObject object = new JSONObject(response);
                     Sstatus = object.getString("status");
                     Smessage = object.getString("message");
-                    System.out.println("---------Sstatus--------"+Sstatus);
+                    System.out.println("---------Sstatus--------" + Sstatus);
                     if (Sstatus.equalsIgnoreCase("1")) {
                         Suser_image = object.getString("user_image");
                         Suser_id = object.getString("user_id");
@@ -623,7 +604,7 @@ public class LoginPage extends ActivityHockeyApp {
                         is_alive_other = object.getString("is_alive_other");
 
                         ScurrencyCode = object.getString("currency");
-                        sCurrencySymbol =CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
+                        sCurrencySymbol = CurrencySymbolConverter.getCurrencySymbol(ScurrencyCode);
                     }
 
                 } catch (JSONException e) {
@@ -631,7 +612,7 @@ public class LoginPage extends ActivityHockeyApp {
                     e.printStackTrace();
                 }
                 if (Sstatus.equalsIgnoreCase("1")) {
-                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory,gcmId);
+                    session.createLoginSession(Semail, Suser_id, Suser_name, Suser_image, Scountry_code, SphoneNo, Sreferal_code, Scategory, gcmId);
                     session.createWalletAmount(sCurrencySymbol + SwalletAmount);
                     session.setXmppKey(Suser_id, SsecretKey);
 
@@ -641,13 +622,13 @@ public class LoginPage extends ActivityHockeyApp {
                     Intent intent = new Intent(context, UpdateUserLocation.class);
                     startActivity(intent);
                     finish();
-                    overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
-                } else if(Sstatus.equalsIgnoreCase("2")){
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                } else if (Sstatus.equalsIgnoreCase("2")) {
 
-                    String accessToken=facebook.getAccessToken();
-                    JsonRequest("https://graph.facebook.com/me?fields=id,name,picture,email&access_token="+accessToken);
+                    String accessToken = facebook.getAccessToken();
+                    JsonRequest("https://graph.facebook.com/me?fields=id,name,picture,email&access_token=" + accessToken);
 
-                }else {
+                } else {
                     Alert(getResources().getString(R.string.login_label_alert_signIn_failed), Smessage);
                 }
 
@@ -677,7 +658,7 @@ public class LoginPage extends ActivityHockeyApp {
         HashMap<String, String> jsonParams = new HashMap<String, String>();
 
         mRequest = new ServiceRequest(LoginPage.this);
-        mRequest.makeServiceRequest(Url, Request.Method.GET,jsonParams, new ServiceRequest.ServiceListener() {
+        mRequest.makeServiceRequest(Url, Request.Method.GET, jsonParams, new ServiceRequest.ServiceListener() {
             @Override
             public void onCompleteListener(String response) {
 
@@ -686,45 +667,41 @@ public class LoginPage extends ActivityHockeyApp {
                 try {
 
                     JSONObject object = new JSONObject(response);
-                    System.out.println("---------facebook profile------------"+response);
+                    System.out.println("---------facebook profile------------" + response);
 
 
-                        userid=object.getString("id");
-                        profile_image="https://graph.facebook.com/"+ object.getString("id")+ "/picture?type=large";
-                        username1= object.getString("name");
-                        username1 = username1 .replaceAll("\\s+", "");
+                    userid = object.getString("id");
+                    profile_image = "https://graph.facebook.com/" + object.getString("id") + "/picture?type=large";
+                    username1 = object.getString("name");
+                    username1 = username1.replaceAll("\\s+", "");
 
 
-                        if(object.has("email"))
-                        {
-                            email = object.getString("email");
-                        }
-
-                        else
-                        {
-                            email="";
-                        }
-                        System.out.println("-------email------------------"+email);
-                        System.out.println("-----------------userid-------------------------------"+userid);
-                        System.out.println("----------------profile_image-----------------"+profile_image);
-                        System.out.println("-----------username----------"+username1);
+                    if (object.has("email")) {
+                        email = object.getString("email");
+                    } else {
+                        email = "";
+                    }
+                    System.out.println("-------email------------------" + email);
+                    System.out.println("-----------------userid-------------------------------" + userid);
+                    System.out.println("----------------profile_image-----------------" + profile_image);
+                    System.out.println("-----------username----------" + username1);
 
 
-                    } catch (JSONException e) {
+                } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-             //post execute
+                //post execute
                 progress.dismiss();
 
-                Intent intent = new Intent(context, RegisterFacebook.class);
-                intent.putExtra("userId",userid);
-                intent.putExtra("userName",username1);
-                intent.putExtra("userEmail",email);
-                intent.putExtra("media","facebook");
+                Intent intent = new Intent(LoginPage.this, RegisterFacebook.class);
+                intent.putExtra("userId", userid);
+                intent.putExtra("userName", username1);
+                intent.putExtra("userEmail", email);
+                intent.putExtra("media", "facebook");
                 startActivity(intent);
                 finish();
-                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
 
                 // close keyboard
@@ -739,257 +716,4 @@ public class LoginPage extends ActivityHockeyApp {
             }
         });
     }
-
-
-
-   /* private void JsonRequest(String Url)
-    {
-
-        ProgressDialog progress;
-        progress = new ProgressDialog(LoginPage.this);
-        progress.setMessage("Please Wait...");
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setIndeterminate(false);
-        progress.show();
-
-        System.out.println("--------------facebook access token url-------------------"+Url);
-
-
-
-        jsonObjReq = new JsonObjectRequest(Request.Method.GET,Url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response)
-            {
-                System.out.println("---------facebook profile------------"+response);
-
-                try {
-                    userid=response.getString("id");
-                    profile_image="https://graph.facebook.com/"+ response.getString("id")+ "/picture?type=large";
-                    username1= response.getString("name");
-                    username1 = username1 .replaceAll("\\s+", "");
-
-
-                if(response.has("email"))
-                {
-                    email = response.getString("email");
-//						email="";
-                }
-
-                else
-                {
-                    email="";
-                }
-                System.out.println("-------email------------------"+email);
-                System.out.println("-----------------userid-------------------------------"+userid);
-                System.out.println("----------------profile_image-----------------"+profile_image);
-                System.out.println("-----------username----------"+username);
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                //------on post execute-----
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error)
-            {
-
-//                stopload();
-
-                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-                    Toast.makeText(context,"Unable to fetch data from server",Toast.LENGTH_LONG).show();
-                } else if (error instanceof AuthFailureError) {
-                    //TODO
-                    Toast.makeText(context,"AuthFailureError",Toast.LENGTH_LONG).show();
-                } else if (error instanceof ServerError) {
-                    //TODO
-                    Toast.makeText(context,"ServerError",Toast.LENGTH_LONG).show();
-                } else if (error instanceof NetworkError) {
-
-                    Toast.makeText(context,"NetworkError",Toast.LENGTH_LONG).show();
-                    //TODO
-                }
-                else if (error instanceof ParseError) {
-                    //TODO
-                    Toast.makeText(context,"ParseError",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(7000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(jsonObjReq);
-    }
-*/
-
-
-
-
-    //------------------------------code for FaceBook AsynTask----------------------------------
-
-   /* class FacebookAsyncTask extends AsyncTask<String, Void, Boolean>
-    {
-        String msg;
-        int status;
-        ProgressDialog progress;
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-            progress = new ProgressDialog(LoginPage.this);
-            progress.setMessage("Please Wait...");
-            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progress.setIndeterminate(false);
-            progress.show();
-
-        }
-
-        @Override
-        protected Boolean doInBackground(String... urls)
-        {
-
-            String facebookResponse="";
-            String email="",profile_image="",username="",userid="";
-            String status="";
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpGet httpget = new HttpGet("https://graph.facebook.com/me?fields=id,name,picture,email&access_token="+urls[0]);
-                System.out.println("-----------------------https://graph.facebook.com/me?fields=id,name,picture,email&access_token="+urls[0]);
-
-                HttpResponse responsepost = httpclient.execute(httpget);
-                HttpEntity entity = responsepost.getEntity();
-                facebookResponse = EntityUtils.toString(entity);
-
-                JSONObject profile = new JSONObject(facebookResponse);
-                System.out.println("---------profile------------"+facebookResponse);
-
-                userid=profile.getString("id");
-                profile_image="https://graph.facebook.com/"+ profile.getString("id")+ "/picture?type=large";
-                username= profile.getString("name");
-                username = username .replaceAll("\\s+", "");
-
-
-                if(profile.has("email"))
-                {
-                    email = profile.getString("email");
-//						email="";
-                }
-
-                else
-                {
-                    email="";
-                }
-                System.out.println("-------email------------------"+email);
-                System.out.println("-----------------userid-------------------------------"+userid);
-                System.out.println("----------------profile_image-----------------"+profile_image);
-                System.out.println("-----------username----------"+username);
-
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-
-
-            if(email.length()>0)
-            {
-                // code to post data to server
-                String Response = null;
-                try {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpPost httppost = new HttpPost(Iconstant.facebookurl);
-
-                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(0);
-                    nameValuePairs.add(new BasicNameValuePair("email", email));
-                    nameValuePairs.add(new BasicNameValuePair("profile_image", profile_image));
-                    nameValuePairs.add(new BasicNameValuePair("username", username));
-                    nameValuePairs.add(new BasicNameValuePair("api_id", APP_ID));
-
-                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                    HttpResponse responsepost = httpclient.execute(httppost);
-                    HttpEntity entity = responsepost.getEntity();
-                    Response = EntityUtils.toString(entity);
-                    System.out.println("-----------Response-----------"+Response);
-
-                    JSONObject object = new JSONObject(Response);
-
-                    status=object.getString("status_code");
-                    System.out.println("------------status-----------------"+status);
-
-                    JSONObject object1 = object.getJSONObject("user_details");
-                    System.out.println("-----------object1------------------"+object1);
-
-                    Jusername = object1.getString("user_name");
-                    Juserid = object1.getString("user_id");
-                    Juserprofileimage = object1.getString("profile_image");
-
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if(status.equalsIgnoreCase("success")){
-                    session.createLoginSession(Jusername, email, Juserid, Juserprofileimage);
-
-                    Intent i1 = new Intent(context, HomePage.class);
-                    startActivity(i1);
-                    overridePendingTransition(R.anim.enter, R.anim.exit);
-                    finish();
-
-                }
-                else
-                {
-                    Toast toast = Toast.makeText(LoginPage.this,"Invalid Login", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
-            }
-            else
-            {
-
-                Intent i = new Intent(LoginPage.this,FacebookLogin.class);
-                i.putExtra("profile_image", profile_image);
-                i.putExtra("username", username);
-                i.putExtra("APP_ID", APP_ID);
-                startActivity(i);
-                overridePendingTransition(R.anim.enter,R.anim.exit);
-
-
-            }
-
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Boolean result)
-        {
-            progress.dismiss();
-        }
-    }*/
-
-
-
-
-
 }

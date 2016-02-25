@@ -1,18 +1,11 @@
 package com.mylibrary.xmpp;
 
 import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
-import android.support.v4.app.NotificationCompat;
 
 import com.cabily.app.FareBreakUp;
 import com.cabily.app.PushNotificationAlert;
-import com.cabily.app.TrackYourRide;
 import com.cabily.iconstant.Iconstant;
 import com.casperon.app.cabily.R;
 
@@ -61,7 +54,6 @@ public class ChatHandler {
                 {
                     requestPayment(messageObject);
                 }
-
                 else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_makepayment_Stripe_Key))
                 {
                     makePaymentStripAni(messageObject);
@@ -70,15 +62,13 @@ public class ChatHandler {
                 {
                     paymentPaid(messageObject);
                 }
-
                 else if (action.equalsIgnoreCase(Iconstant.pushNotificationBeginTrip))
                 {
                     beginTripMessage(messageObject);
                 }
-
                 else if (action.equalsIgnoreCase(Iconstant.pushNotificationDriverLoc))
                 {
-                    continousPushMessage(messageObject);
+                    updateDriverLocation_TrackRide(messageObject);
                 }
 
             }
@@ -87,16 +77,6 @@ public class ChatHandler {
             e.printStackTrace();
         }
 
-    }
-
-    private void continousPushMessage(JSONObject messageObject) throws Exception {
-        Intent local = new Intent();
-        local.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
-        local.putExtra("isContinousRide", messageObject.getString(Iconstant.latitude));
-        local.putExtra("latitude", messageObject.getString(Iconstant.latitude));
-        local.putExtra("longitude", messageObject.getString(Iconstant.longitude));
-        local.putExtra("ride_id", messageObject.getString(Iconstant.ride_id));
-        context.sendBroadcast(local);
     }
 
     private void sendBroadCastToRideConfirm(JSONObject messageObject) throws Exception {
@@ -123,39 +103,12 @@ public class ChatHandler {
 
     private void showCabArrivedAlert(JSONObject messageObject) throws Exception
     {
-        //refreshMethod();
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
+        broadcastIntent.putExtra("driverLat", messageObject.getString("key3"));
+        broadcastIntent.putExtra("driverLong", messageObject.getString("key4"));
         context.sendBroadcast(broadcastIntent);
-       // sendNotification(messageObject.getString(Iconstant.Push_Message_Arrived));
-        /*Intent i1=new Intent(context, PushNotificationAlert.class);
-        i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
-        i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
-        i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
-        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));
-        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(i1);*/
     }
-
-
-    private void beginTripMessage(JSONObject messageObject) throws Exception
-    {
-         //refreshMethod();
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
-        broadcastIntent.putExtra("drop_lat", messageObject.getString("key3"));
-        broadcastIntent.putExtra("drop_lng", messageObject.getString("key4"));
-        context.sendBroadcast(broadcastIntent);
-     /*   sendNotification(messageObject.getString(Iconstant.pushNotificationBeginTrip));
-        Intent i1=new Intent(context, TrackYourRide.class);
-      *//*  i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Arrived));
-        i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Arrived));
-        i1.putExtra("UserID", messageObject.getString(Iconstant.UserID_Arrived));
-        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Arrived));*//*
-        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(i1);*/
-    }
-
 
     private void rideCancelledAlert(JSONObject messageObject) throws Exception
     {
@@ -211,25 +164,6 @@ public class ChatHandler {
         context.startActivity(i1);
     }
 
-
-    private void makePaymentStripAni(JSONObject messageObject) throws Exception
-    {
-        refreshMethod();
-
-        System.out.println("makepayment-----------------");
-
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_MakePayment");
-        context.sendBroadcast(broadcastIntent);
-
-
-        Intent i1=new Intent(context, FareBreakUp.class);
-        i1.putExtra("RideID", messageObject.getString(Iconstant.Make_Payment));
-        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(i1);
-    }
-
-
     private void paymentPaid(JSONObject messageObject) throws Exception
     {
         refreshMethod();
@@ -251,6 +185,38 @@ public class ChatHandler {
         context.startActivity(i1);
     }
 
+
+    private void updateDriverLocation_TrackRide(JSONObject messageObject) throws Exception {
+        Intent local = new Intent();
+        local.setAction("com.package.ACTION_CLASS_TrackYourRide_Update_Driver_Location");
+        local.putExtra("latitude", messageObject.getString(Iconstant.latitude));
+        local.putExtra("longitude", messageObject.getString(Iconstant.longitude));
+        local.putExtra("ride_id", messageObject.getString(Iconstant.ride_id));
+        context.sendBroadcast(local);
+    }
+
+    private void beginTripMessage(JSONObject messageObject) throws Exception
+    {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
+        broadcastIntent.putExtra("drop_lat", messageObject.getString("key3"));
+        broadcastIntent.putExtra("drop_lng", messageObject.getString("key4"));
+        context.sendBroadcast(broadcastIntent);
+    }
+
+    private void makePaymentStripAni(JSONObject messageObject) throws Exception
+    {
+        refreshMethod();
+
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_MakePayment");
+        context.sendBroadcast(broadcastIntent);
+
+        Intent i1=new Intent(context, FareBreakUp.class);
+        i1.putExtra("RideID", messageObject.getString(Iconstant.Make_Payment));
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);
+    }
 
 
     private void refreshMethod()
@@ -302,35 +268,6 @@ public class ChatHandler {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.pushnotification.updateBottom_view");
         context.sendBroadcast(broadcastIntent);
-
-    }
-
-
-
-    private void sendNotification(String msg) {
-        Intent notificationIntent = null;
-      
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Resources res = context.getResources();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.app_logo)
-                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.app_logo))
-                .setTicker(msg)
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true)
-                .setContentTitle("Cabily")
-                .setLights(0xffff0000, 100, 2000)
-                .setPriority(Notification.DEFAULT_SOUND)
-                .setContentText(msg);
-
-        Notification n = builder.getNotification();
-
-        n.defaults |= Notification.DEFAULT_ALL;
-        nm.notify(0, n);
 
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cabily.facebook;
+package com.mylibrary.facebook;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

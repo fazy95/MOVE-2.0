@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cabily.facebook;
+package com.mylibrary.facebook;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.webkit.WebView;

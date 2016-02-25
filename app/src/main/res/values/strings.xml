@@ -42,6 +42,8 @@
     <string name="login_label_alert_password">Password can\'t be empty</string>
     <string name="login_label_alert_signIn_failed">Sign In Failed</string>
     <string name="login_label_facecook_login">Facebook Login</string>
+    <string name="login_label_or">OR</string>
+
 
     <!-- Register Page -->
     <string name="register_label">REGISTER</string>
@@ -473,26 +475,19 @@
     <string name="alert_multiple_login">Already Logged into another device</string>
 
 
-
     <!--Share-->
-
     <string name="action_share_header">Share</string>
     <string name="action_share_summery">Share Your Trip</string>
     <string name="action_complete_submit">Submit</string>
     <string name="action_complete_cancel">Cancel</string>
 
 
-
     <!--Track your ride-->
-
     <string name="action_driver_arrived">Driver Has Arrived</string>
     <string name="action_enjy_your_ride">Enjoy Your Ride !!</string>
 
-
-
     <!--Home page-->
-    <string name="action_enter_drop_location">Enter drop location</string>
-
+    <string name="action_enter_drop_location">Enter destination</string>
 
 
 
