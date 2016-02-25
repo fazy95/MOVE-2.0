@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -51,17 +50,19 @@ import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.widgets.RoundedImageView;
 import com.mylibrary.xmpp.ChatService;
 import com.squareup.picasso.Picasso;
+
 import org.jivesoftware.smack.chat.Chat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  */
-public class TrackYourRide extends ActivitySubClass implements View.OnClickListener, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
+public class TrackYourRide extends ActivitySubClass implements View.OnClickListener, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private TextView tv_done;
     private TextView tv_drivername, tv_carModel, tv_carNo, tv_rating, tv_time, tv_timeMinute;
     private RoundedImageView driver_image;
@@ -92,7 +93,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private static Marker curentDriverMarker;
     private static Marker movingMarker;
     LocationRequest mLocationRequest;
-    private  GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient;
     final static int REQUEST_LOCATION = 199;
     private Location currentLocation;
 
@@ -110,6 +111,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     mGoogleApiClient, mLocationRequest, this);
         }
     }
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -142,6 +144,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
             mGoogleApiClient.connect();
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -158,7 +161,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 track_your_ride_view1.setVisibility(View.GONE);
                 Rl_arriveLayout.setVisibility(View.INVISIBLE);
                 arriveView.setVisibility(View.INVISIBLE);
-            }else if(intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip")){
+            } else if (intent.getAction().equals("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip")) {
                 System.out.println("tripbegin----------------------");
                 Tv_headerTitle.setText(getResources().getString(R.string.action_enjy_your_ride));
                 rl_endTrip.setVisibility(View.GONE);
@@ -167,66 +170,77 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                 arriveView.setVisibility(View.INVISIBLE);
             }
             System.out.println("check--------------");
-         if (intent.getExtras()!= null  && intent.getExtras().containsKey("drop_lat") && intent.getExtras().containsKey("drop_lng")) {
+            if (intent.getExtras() != null && intent.getExtras().containsKey("drop_lat") && intent.getExtras().containsKey("drop_lng")) {
                 String lat = (String) intent.getExtras().get("drop_lat");
                 String lng = (String) intent.getExtras().get("drop_lng");
                 try {
                     double lat_decimal = Double.parseDouble(lat);
                     double lng_decimal = Double.parseDouble(lng);
-                    updateGoogleMapTrackRide(lat_decimal,lng_decimal);
+                    updateGoogleMapTrackRide(lat_decimal, lng_decimal);
                     System.out.println("inside updategoogle1--------------");
-                }catch (Exception e){
-                    System.out.println("try--------------"+ e);
+                } catch (Exception e) {
+                    System.out.println("try--------------" + e);
                 }
             }
-             System.out.println("out else--------------");
-            if(intent.getExtras()!= null && intent.getExtras().containsKey(Iconstant.isContinousRide)){
+            System.out.println("out else--------------");
+            if (intent.getExtras() != null && intent.getExtras().containsKey(Iconstant.isContinousRide)) {
                 String lat = (String) intent.getExtras().get("latitude");
                 String lng = (String) intent.getExtras().get("longitude");
                 String ride_id = (String) intent.getExtras().get("ride_id");
                 try {
                     double lat_decimal = Double.parseDouble(lat);
                     double lng_decimal = Double.parseDouble(lng);
-                    updateDriverOnMap(lat_decimal,lng_decimal);
+                    updateDriverOnMap(lat_decimal, lng_decimal);
                     System.out.println("inside updategoogle1--------------");
-                }catch (Exception e){
-                    System.out.println("try--------------"+ e);
+                } catch (Exception e) {
+                    System.out.println("try--------------" + e);
                 }
             }
         }
     }
 
     static LatLngInterpolator latLngInterpolator = new LatLngInterpolator.Spherical();
-    public static void updateMap(LatLng latLng) {
-        MarkerAnimation.animateMarkerToICS(movingMarker, latLng, latLngInterpolator);
-    }
 
-    private void updateDriverOnMap(double lat_decimal,double lng_decimal ){
-        LatLng dropLatLng  = new LatLng(lat_decimal,lng_decimal);
-        if(curentDriverMarker != null){
-            curentDriverMarker.remove();
-            curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
-                    .position(dropLatLng)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
+    public static void updateMap(LatLng latLng) {
+        try {
+            MarkerAnimation.animateMarkerToICS(curentDriverMarker, latLng, latLngInterpolator);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void updateGoogleMapTrackRide(double lat_decimal,double lng_decimal ){
+
+    private boolean isFirstTime = false;
+    private void updateDriverOnMap(double lat_decimal, double lng_decimal) {
+        LatLng dropLatLng = new LatLng(lat_decimal, lng_decimal);
+        if (curentDriverMarker != null && !isFirstTime) {
+            curentDriverMarker.remove();
+            isFirstTime = true;
+            curentDriverMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(dropLatLng).draggable(true)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_lux)));
+        }else{
+            updateMap(dropLatLng);
+        }
+    }
+
+    private void updateGoogleMapTrackRide(double lat_decimal, double lng_decimal) {
         System.out.println("inside updategoogle--------------");
-        if(googleMap != null){
+        if (googleMap != null) {
             googleMap.clear();
         }
-        LatLng dropLatLng  = new LatLng(lat_decimal,lng_decimal);
+        LatLng dropLatLng = new LatLng(lat_decimal, lng_decimal);
         LatLng pickUpLatLng;
-        if(currentLocation  != null){
-            pickUpLatLng = new  LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
-        }else{
-            pickUpLatLng = new  LatLng(MyCurrent_lat,MyCurrent_long);
+        if (currentLocation != null) {
+            pickUpLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        } else {
+            pickUpLatLng = new LatLng(MyCurrent_lat, MyCurrent_long);
         }
         GetDropRouteTask draw_route_asyncTask = new GetDropRouteTask();
-        draw_route_asyncTask.setToAndFromLocation(dropLatLng,pickUpLatLng);
+        draw_route_asyncTask.setToAndFromLocation(dropLatLng, pickUpLatLng);
         draw_route_asyncTask.execute();
     }
+
     private RefreshReceiver refreshReceiver;
 
     public static class FragmentMessage extends Handler {
@@ -234,28 +248,28 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         @Override
         public void handleMessage(Message message) {
             String data = message.obj.toString();
-            Log.d("Hello","Message +++++++++++++++++++++++"+ data);
-            try{
+            Log.d("Hello", "Message +++++++++++++++++++++++" + data);
+            try {
                 String[] array = data.split(",");
-                float lat =  Float.valueOf(array[1]);
+                float lat = Float.valueOf(array[1]);
                 float lng = Float.valueOf(array[2]);
                 float bearing = Float.valueOf(array[3]);
-                if(curentDriverMarker != null){
-                    LatLng mLatLng = new LatLng(lat,lng);
+                if (curentDriverMarker != null) {
+                    LatLng mLatLng = new LatLng(lat, lng);
                     curentDriverMarker.setPosition(mLatLng);
 
                     updateMap(mLatLng);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void createChat(){
+    private void createChat() {
         ChatService.startUserAction(getApplicationContext());
-        String sSenderID=""+driverID;
-        String  sToID = sSenderID + "@" + Iconstant.XMPP_SERVICE_NAME;
+        String sSenderID = "" + driverID;
+        String sToID = sSenderID + "@" + Iconstant.XMPP_SERVICE_NAME;
         Chat chat = ChatService.createChat(sToID);
         ChatService.setChatMessenger(new Messenger(new FragmentMessage()));
         ChatService.enableChat();
@@ -268,7 +282,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         setContentView(R.layout.track_your_ride);
         trackyour_ride_class = TrackYourRide.this;
         initialize();
-        try{
+        try {
             setLocationRequest();
             buildGoogleApiClient();
         } catch (Exception e) {
@@ -279,7 +293,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         createChat();
 
     }
-
 
 
     private void initialize() {
@@ -462,9 +475,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     }
 
 
-
-
-
     //---------------AsyncTask to Draw PolyLine Between Two Point--------------
     public class GetRouteTask extends AsyncTask<String, Void, String> {
 
@@ -504,7 +514,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     googleMap.addMarker(new MarkerOptions()
                             .position(toPosition)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_neww)));
-                    curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
+                    curentDriverMarker = googleMap.addMarker(new MarkerOptions()
                             .position(fromPosition)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
 
@@ -514,7 +524,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     builder.include(fromPosition);
                     LatLngBounds bounds = builder.build();
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 21));
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -625,7 +635,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     }
 
 
-
     //---------------AsyncTask to Draw PolyLine Between Two Point--------------
     private class GetDropRouteTask extends AsyncTask<String, Void, String> {
 
@@ -633,9 +642,10 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         GMapV2GetRouteDirection v2GetRouteDirection = new GMapV2GetRouteDirection();
         Document document;
         private LatLng currentLocation;
-        private  LatLng endLocation;
-        public void setToAndFromLocation(LatLng currentLocation,LatLng endLocation){
-            this.currentLocation= currentLocation;
+        private LatLng endLocation;
+
+        public void setToAndFromLocation(LatLng currentLocation, LatLng endLocation) {
+            this.currentLocation = currentLocation;
             this.endLocation = endLocation;
         }
 
@@ -685,7 +695,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     builder.include(currentLocation);
                     LatLngBounds bounds = builder.build();
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 162));
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
