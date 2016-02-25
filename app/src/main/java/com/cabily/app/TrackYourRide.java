@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -51,11 +50,13 @@ import com.mylibrary.volley.ServiceRequest;
 import com.mylibrary.widgets.RoundedImageView;
 import com.mylibrary.xmpp.ChatService;
 import com.squareup.picasso.Picasso;
+
 import org.jivesoftware.smack.chat.Chat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -479,7 +480,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         @Override
         protected String doInBackground(String... urls) {
             //Get All Route values
-            document = v2GetRouteDirection.getDocument(fromPosition, toPosition, GMapV2GetRouteDirection.MODE_DRIVING);
+            document = v2GetRouteDirection.getDocument(toPosition, fromPosition, GMapV2GetRouteDirection.MODE_DRIVING);
             response = "Success";
             return response;
 
@@ -497,29 +498,33 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     }
                     // Adding route on the map
                     googleMap.addPolyline(rectLine);
-                    markerOptions.position(toPosition);
                     markerOptions.position(fromPosition);
+                    markerOptions.position(toPosition);
                     markerOptions.draggable(true);
                     //googleMap.addMarker(markerOptions);
                     googleMap.addMarker(new MarkerOptions()
-                            .position(toPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_icon_neww)));
-                    curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
                             .position(fromPosition)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(toPosition)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.flag)));
+                    curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
+                            .position(toPosition)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
 
                     //Show path in
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(toPosition);
                     builder.include(fromPosition);
+                    builder.include(toPosition);
                     LatLngBounds bounds = builder.build();
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 21));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 162));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
         }
     }
+
 
 
     //-----------------------MyRide Cancel Reason Post Request-----------------
@@ -646,7 +651,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         @Override
         protected String doInBackground(String... urls) {
             //Get All Route values
-            document = v2GetRouteDirection.getDocument(currentLocation, endLocation, GMapV2GetRouteDirection.MODE_DRIVING);
+            document = v2GetRouteDirection.getDocument(endLocation, currentLocation, GMapV2GetRouteDirection.MODE_DRIVING);
             response = "Success";
             return response;
 
@@ -665,8 +670,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     }
                     // Adding route on the map
                     googleMap.addPolyline(rectLine);
-                    markerOptions.position(toPosition);
-                    markerOptions.position(fromPosition);
+                    markerOptions.position(endLocation);
+                    markerOptions.position(currentLocation);
                     markerOptions.draggable(true);
 
                     //googleMap.addMarker(markerOptions);
@@ -675,7 +680,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
                     googleMap.addMarker(new MarkerOptions()
                             .position(currentLocation)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.flag)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.green_flag)));
 
                     System.out.println("inside---------marker--------------");
 

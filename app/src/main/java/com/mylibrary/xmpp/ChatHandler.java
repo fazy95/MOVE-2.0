@@ -189,6 +189,7 @@ public class ChatHandler {
     private void updateDriverLocation_TrackRide(JSONObject messageObject) throws Exception {
         Intent local = new Intent();
         local.setAction("com.package.ACTION_CLASS_TrackYourRide_Update_Driver_Location");
+        local.putExtra("isContinousRide", messageObject.getString(Iconstant.latitude));
         local.putExtra("latitude", messageObject.getString(Iconstant.latitude));
         local.putExtra("longitude", messageObject.getString(Iconstant.longitude));
         local.putExtra("ride_id", messageObject.getString(Iconstant.ride_id));
