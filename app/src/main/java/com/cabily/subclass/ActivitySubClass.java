@@ -11,11 +11,11 @@ import android.os.PowerManager;
 import com.cabily.HockeyApp.ActivityHockeyApp;
 
 /**
- * Created by Prem Kumar and Anitha on 11/6/2015.
  */
 public class ActivitySubClass extends ActivityHockeyApp {
     BroadcastReceiver receiver;
     protected PowerManager.WakeLock mWakeLock;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

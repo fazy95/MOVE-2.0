@@ -94,12 +94,8 @@ public class MyRidesDetail extends ActivitySubClass {
     private boolean isReasonAvailable = false;
     private boolean isFareAvailable = false;
     private boolean isTrackRideAvailable = false;
-
     private MaterialDialog completejob_dialog;
-
     private EditText Et_share_trip_mobileno;
-
-
     public static MyRidesDetail myrideDetail_class;
 
     private String Str_LocationLatitude = "", Str_LocationLongitude = "";
@@ -428,15 +424,12 @@ public class MyRidesDetail extends ActivitySubClass {
     }
 
     private void shareTrip() {
-
         completejob_dialog  = new MaterialDialog(MyRidesDetail.this);
         View view = LayoutInflater.from(MyRidesDetail.this).inflate(R.layout.share_trip_popup, null);
         Et_share_trip_mobileno = (EditText)view.findViewById(R.id.sharetrip_mobilenoEt);
         Button Bt_Submit = (Button)view.findViewById(R.id.jsharetrip_popup_submit);
         Button Bt_Cancel = (Button)view.findViewById(R.id.sharetrip_popup_cancel);
-
         completejob_dialog.setView(view).show();
-
         Bt_Submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

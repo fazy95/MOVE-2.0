@@ -96,6 +96,8 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
     private  GoogleApiClient mGoogleApiClient;
     final static int REQUEST_LOCATION = 199;
     private Location currentLocation;
+    private RefreshReceiver refreshReceiver;
+    private Handler realTimeTrackYourRideHandler = new Handler();
 
 
     private void setLocationRequest() {
@@ -189,9 +191,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     double lat_decimal = Double.parseDouble(lat);
                     double lng_decimal = Double.parseDouble(lng);
                     updateDriverOnMap(lat_decimal,lng_decimal);
-                    System.out.println("inside updategoogle1--------------");
                 }catch (Exception e){
-                    System.out.println("try--------------"+ e);
                 }
             }
         }
@@ -228,7 +228,6 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
         draw_route_asyncTask.setToAndFromLocation(dropLatLng,pickUpLatLng);
         draw_route_asyncTask.execute();
     }
-    private RefreshReceiver refreshReceiver;
 
     public static class FragmentMessage extends Handler {
 
@@ -504,10 +503,10 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     //googleMap.addMarker(markerOptions);
                     googleMap.addMarker(new MarkerOptions()
                             .position(fromPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.green_flag)));
                     googleMap.addMarker(new MarkerOptions()
                             .position(toPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.flag)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.blue_flag)));
                     curentDriverMarker =  googleMap.addMarker(new MarkerOptions()
                             .position(toPosition)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.carmove)));
@@ -677,7 +676,7 @@ public class TrackYourRide extends ActivitySubClass implements View.OnClickListe
                     //googleMap.addMarker(markerOptions);
                     googleMap.addMarker(new MarkerOptions()
                             .position(endLocation)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.man_street_view)));
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.blue_flag)));
                     googleMap.addMarker(new MarkerOptions()
                             .position(currentLocation)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.green_flag)));
