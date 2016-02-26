@@ -540,6 +540,9 @@ public class Fragment_HomePage extends FragmentHockeyApp implements GoogleApiCli
                 if (!CarAvailable.equalsIgnoreCase("no cabs")) {
                     selectedType = "0";
 
+                    source_address.setText(map_address.getText().toString());
+                    destination_address.setText(getResources().getString(R.string.action_enter_drop_location));
+
                     //-------getting current date and time---------
                     coupon_selectedDate = coupon_mFormatter.format(new Date());
                     coupon_selectedTime = coupon_time_mFormatter.format(new Date());

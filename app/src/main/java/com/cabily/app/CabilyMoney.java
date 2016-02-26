@@ -125,6 +125,9 @@ public class CabilyMoney extends ActivityHockeyApp {
                 Bt_cabilymoney_minimum_amount.setBackgroundColor(0xFF009788);
                 Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                 Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                Bt_cabilymoney_minimum_amount.setTextColor(0xFFFFFFFF);
+                Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+                Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
                 Et_cabilymoney_enteramount.setSelection(Et_cabilymoney_enteramount.getText().length());
             }
         });
@@ -136,6 +139,9 @@ public class CabilyMoney extends ActivityHockeyApp {
                 Bt_cabilymoney_between_amount.setBackgroundColor(0xFF009788);
                 Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                 Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+                Bt_cabilymoney_between_amount.setTextColor(0xFFFFFFFF);
+                Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
                 Et_cabilymoney_enteramount.setSelection(Et_cabilymoney_enteramount.getText().length());
             }
         });
@@ -147,6 +153,9 @@ public class CabilyMoney extends ActivityHockeyApp {
                 Bt_cabilymoney_maximum_amount.setBackgroundColor(0xFF009788);
                 Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                 Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+                Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+                Bt_cabilymoney_maximum_amount.setTextColor(0xFFFFFFFF);
                 Et_cabilymoney_enteramount.setSelection(Et_cabilymoney_enteramount.getText().length());
             }
         });
@@ -234,18 +243,30 @@ public class CabilyMoney extends ActivityHockeyApp {
                     Bt_cabilymoney_minimum_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                    Bt_cabilymoney_minimum_amount.setTextColor(0xFFFFFFFF);
+                    Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
                 } else if (Et_cabilymoney_enteramount.getText().toString().equals(Str_midle_amt)) {
                     Bt_cabilymoney_between_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                    Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_between_amount.setTextColor(0xFFFFFFFF);
+                    Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
                 } else if (Et_cabilymoney_enteramount.getText().toString().equals(Str_maximum_amt)) {
                     Bt_cabilymoney_maximum_amount.setBackgroundColor(0xFF009788);
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                    Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_maximum_amount.setTextColor(0xFFFFFFFF);
                 } else {
                     Bt_cabilymoney_minimum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_between_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
                     Bt_cabilymoney_maximum_amount.setBackground(getResources().getDrawable(R.drawable.grey_border_background));
+                    Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+                    Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
                 }
             }
         }
@@ -289,6 +310,9 @@ public class CabilyMoney extends ActivityHockeyApp {
         Bt_cabilymoney_minimum_amount.setBackground(context.getResources().getDrawable(R.drawable.grey_border_background));
         Bt_cabilymoney_between_amount.setBackground(context.getResources().getDrawable(R.drawable.grey_border_background));
         Bt_cabilymoney_maximum_amount.setBackground(context.getResources().getDrawable(R.drawable.grey_border_background));
+        Bt_cabilymoney_minimum_amount.setTextColor(0xFF4E4E4E);
+        Bt_cabilymoney_between_amount.setTextColor(0xFF4E4E4E);
+        Bt_cabilymoney_maximum_amount.setTextColor(0xFF4E4E4E);
     }
 
 

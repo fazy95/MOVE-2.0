@@ -472,7 +472,7 @@
     <string name="call_police_lable">Call Police</string>
     <string name="call_fireservice_lable">Call Fire Service</string>
     <string name="call_ambulance_lable">Call Ambulance</string>
-    <string name="alert_multiple_login">Already Logged into another device</string>
+    <string name="alert_multiple_login">SignedOut on all other devices</string>
 
 
     <!--Share-->
