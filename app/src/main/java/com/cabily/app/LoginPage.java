@@ -355,7 +355,25 @@ public class LoginPage extends ActivityHockeyApp {
                     System.out.println("insidesession gcm--------------" + gcmId);
 
                     if (is_alive_other.equalsIgnoreCase("Yes")) {
-                        Alert(getResources().getString(R.string.alert_multiple_login), Smessage);
+
+                        final PkDialog mDialog = new PkDialog(LoginPage.this);
+                        mDialog.setDialogTitle(getResources().getString(R.string.app_name));
+                        mDialog.setDialogMessage(getResources().getString(R.string.alert_multiple_login));
+                        mDialog.setPositiveButton(getResources().getString(R.string.action_ok), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDialog.dismiss();
+
+                                ChatService.startUserAction(LoginPage.this);
+                                SingUpAndSignIn.activty.finish();
+                                Intent intent = new Intent(context, UpdateUserLocation.class);
+                                startActivity(intent);
+                                finish();
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            }
+                        });
+                        mDialog.show();
+
                     } else {
                         ChatService.startUserAction(LoginPage.this);
                         SingUpAndSignIn.activty.finish();
