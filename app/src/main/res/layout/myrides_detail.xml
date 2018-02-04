@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="#ffffff">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff">
 
     <RelativeLayout
         android:id="@+id/my_rides_detail_layout_header"
@@ -27,7 +27,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:background="@null"
-                android:src="@drawable/back_arrow"/>
+                android:src="@drawable/back_arrow" />
         </RelativeLayout>
 
         <com.mylibrary.widgets.CustomTextView
@@ -38,7 +38,7 @@
             android:layout_centerVertical="true"
             android:text="@string/my_rides_detail_header_textview"
             android:textColor="#ffffff"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
     </RelativeLayout>
 
 
@@ -61,26 +61,53 @@
                 android:layout_height="fill_parent"
                 android:background="#ffffff">
 
-                <fragment
-                    android:id="@+id/my_rides_detail_mapview"
-                    android:name="com.google.android.gms.maps.MapFragment"
+                <RelativeLayout
+                    android:id="@+id/my_rides_detail_web_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="220dp"
-                    android:clickable="false"/>
+                    android:background="#ffffff">
+
+                    <RelativeLayout
+                        android:id="@+id/my_rides_detail_mapview_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="220dp"
+                        android:background="#ffffff">
+                        <fragment
+                            android:id="@+id/my_rides_detail_mapview"
+                            android:name="com.google.android.gms.maps.MapFragment"
+                            android:layout_width="fill_parent"
+                            android:layout_height="240dp"
+                            android:clickable="false"
+                            android:visibility="visible" />
+
+                        <ProgressBar
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:id="@+id/my_rides_detail_mapview_progressBar"
+                            android:layout_centerVertical="true"
+                            android:layout_centerHorizontal="true"
+                            android:visibility="gone"/>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/my_rides_detail_panic_cardview_layout"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_alignTop="@+id/my_rides_detail_web_layout"
+                    android:layout_margin="10dp"
+                    android:visibility="gone"
                     card_view:cardBackgroundColor="#ccffffff"
-                    android:layout_alignTop="@+id/my_rides_detail_mapview"
-                    card_view:cardElevation="4dp"
-                    android:layout_margin="10dp">
+                    card_view:cardElevation="4dp">
+
                     <ImageView
                         android:id="@+id/panic_image"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/panic1"/>
+                        android:src="@drawable/panic1" />
                 </android.support.v7.widget.CardView>
 
 
@@ -88,7 +115,7 @@
                     android:id="@+id/my_rides_detail_cardview_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="50dp"
-                    android:layout_alignBottom="@+id/my_rides_detail_mapview"
+                    android:layout_alignBottom="@+id/my_rides_detail_web_layout"
                     card_view:cardBackgroundColor="#ccffffff"
                     card_view:cardElevation="4dp">
 
@@ -106,7 +133,7 @@
                             android:layout_marginTop="5dp"
                             android:text=""
                             android:textColor="#4e4e4e"
-                            android:textSize="13sp"/>
+                            android:textSize="13sp" />
 
                         <com.mylibrary.widgets.CustomTextView
                             android:id="@+id/my_rides_detail_car_number"
@@ -116,7 +143,7 @@
                             android:layout_marginLeft="10dp"
                             android:text=""
                             android:textColor="#918e8e"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp" />
 
 
                         <com.mylibrary.widgets.CustomTextView
@@ -129,7 +156,7 @@
                             android:layout_toLeftOf="@+id/my_rides_detail_favorite_layout"
                             android:text=""
                             android:textColor="#4e4e4e"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp" />
 
                         <RelativeLayout
                             android:id="@+id/my_rides_detail_favorite_layout"
@@ -148,7 +175,7 @@
                                 android:layout_marginRight="7dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_toLeftOf="@+id/my_rides_detail_favorite_imageView"
-                                android:background="#4e4e4e"/>
+                                android:background="#4e4e4e" />
 
                             <ImageView
                                 android:id="@+id/my_rides_detail_favorite_imageView"
@@ -157,17 +184,70 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
                                 android:layout_marginRight="10dp"
-                                android:src="@drawable/heart_grey_icon"/>
+                                android:src="@drawable/heart_grey_icon" />
 
                         </RelativeLayout>
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
 
+
+
+
+
+                <RelativeLayout
+                    android:id="@+id/layout_trip_summery_details_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/my_rides_detail_cardview_layout"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/button_background_black"
+
+                    >
+
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/tripdetail_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text=""
+                        android:visibility="gone"
+                        android:textColor="#cc0000"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
+
+<!--                <RelativeLayout
+                    android:id="@+id/layout_tripdetail_payment_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/layout_trip_summery_details_status"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/button_background_black"
+                    >
+
+
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/payment_paid_Textview_tripdetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text=""
+                        android:textColor="#00bb27"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>-->
+
                 <RelativeLayout
                     android:id="@+id/my_rides_detail_address_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/my_rides_detail_mapview"
+                    android:layout_below="@+id/my_rides_detail_web_layout"
                     android:background="#ffffff"
                     android:visibility="gone">
 
@@ -177,7 +257,7 @@
                         android:layout_height="21dp"
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="15dp"
-                        android:src="@drawable/location_icon_ride_detail"/>
+                        android:src="@drawable/location_icon_ride_detail" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_location_textview"
@@ -189,7 +269,19 @@
                         android:layout_toRightOf="@+id/my_rides_detail_address_location_imageView"
                         android:text=""
                         android:textColor="#606060"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" />
+                    <com.mylibrary.widgets.CustomTextView
+                        android:id="@+id/my_rides_detail_Droplocation_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/my_rides_detail_location_textview"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_toRightOf="@+id/my_rides_detail_address_location_imageView"
+                        android:text=""
+                        android:visibility="gone"
+                        android:textColor="#606060"
+                        android:textSize="14sp" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -197,7 +289,7 @@
                         android:layout_alignStart="@+id/my_rides_detail_location_textview"
                         android:layout_below="@+id/my_rides_detail_address_location_imageView"
                         android:layout_marginTop="10dp"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                 </RelativeLayout>
 
@@ -216,7 +308,7 @@
                         android:layout_height="17dp"
                         android:layout_marginLeft="12dp"
                         android:layout_marginTop="3dp"
-                        android:src="@drawable/clock_icon"/>
+                        android:src="@drawable/clock_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_pickup_time_textview"
@@ -228,7 +320,7 @@
                         android:layout_toRightOf="@+id/my_rides_detail_clock_imageView"
                         android:text=""
                         android:textColor="#606060"
-                        android:textSize="13sp"/>
+                        android:textSize="13sp" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_drop_time_textview"
@@ -242,7 +334,7 @@
                         android:text=""
                         android:textColor="#606060"
                         android:textSize="13sp"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -250,7 +342,7 @@
                         android:layout_below="@+id/my_rides_detail_drop_time_textview"
                         android:layout_marginTop="8dp"
                         android:layout_toRightOf="@+id/my_rides_detail_clock_imageView"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                 </RelativeLayout>
 
@@ -262,12 +354,12 @@
                     android:layout_below="@+id/my_rides_detail_time_layout"
                     android:layout_marginTop="5dp"
                     android:background="#ffffff"
-                    android:visibility="gone">
+                    >
 
                     <RelativeLayout
                         android:id="@+id/my_rides_detail_price_inner_layout"
                         android:layout_width="fill_parent"
-                        android:layout_height="55dp"
+                        android:layout_height="wrap_content"
                         android:background="#ffffff">
 
                         <View
@@ -276,12 +368,12 @@
                             android:layout_height="1px"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
-                            android:background="#918e8e"/>
+                             android:background="#918e8e" />
 
                         <LinearLayout
                             android:id="@+id/my_rides_detail_price_linear_layout"
                             android:layout_width="fill_parent"
-                            android:layout_height="53dp"
+                            android:layout_height="wrap_content"
                             android:layout_below="@+id/my_rides_detail_location_view"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
@@ -299,10 +391,10 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
                                     android:layout_marginTop="10dp"
-                                    android:text="@string/my_rides_detail_ride_distance_textview"
+                                    android:text="@string/fare_breakup_label_timeTravel"
                                     android:textColor="#918e8e"
                                     android:textSize="12sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                                 <com.mylibrary.widgets.CustomTextView
                                     android:id="@+id/my_rides_detail_ride_distance_textview"
@@ -313,7 +405,7 @@
                                     android:text=""
                                     android:textColor="#606060"
                                     android:textSize="13sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                             </LinearLayout>
 
@@ -332,7 +424,7 @@
                                     android:text="@string/my_rides_detail_time_taken_textview"
                                     android:textColor="#918e8e"
                                     android:textSize="12sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                                 <com.mylibrary.widgets.CustomTextView
                                     android:id="@+id/my_rides_detail_time_taken_textview"
@@ -343,7 +435,7 @@
                                     android:text=""
                                     android:textColor="#606060"
                                     android:textSize="13sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -361,7 +453,7 @@
                                     android:text="@string/my_rides_detail_wait_time_textview"
                                     android:textColor="#918e8e"
                                     android:textSize="12sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                                 <com.mylibrary.widgets.CustomTextView
                                     android:id="@+id/my_rides_detail_wait_time_textview"
@@ -372,7 +464,7 @@
                                     android:text=""
                                     android:textColor="#606060"
                                     android:textSize="13sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -385,7 +477,7 @@
                         android:layout_below="@+id/my_rides_detail_price_inner_layout"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:background="#918e8e"/>
+                        android:background="#918e8e" />
 
                     <ImageView
                         android:id="@+id/my_rides_detail_bill_imageView"
@@ -394,7 +486,7 @@
                         android:layout_below="@+id/my_rides_detail_price_view"
                         android:layout_marginLeft="11dp"
                         android:layout_marginTop="13dp"
-                        android:src="@drawable/bill_icon"/>
+                        android:src="@drawable/bill_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_total_bill_label"
@@ -407,7 +499,7 @@
                         android:text="@string/my_rides_detail_total_bill_textview"
                         android:textColor="#4e4e4e"
                         android:textSize="13sp"
-                        android:visibility="visible"/>
+                        android:visibility="visible" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_total_bill_textview"
@@ -420,20 +512,20 @@
                         android:text=""
                         android:textColor="#606060"
                         android:textSize="13sp"
-                        android:visibility="visible"/>
+                        android:visibility="visible" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:id="@+id/my_rides_detail_total_paid_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/my_rides_detail_total_bill_label"
+                        android:layout_below="@+id/my_rides_detail_display_tip_layout"
                         android:layout_marginLeft="7dp"
                         android:layout_marginTop="5dp"
                         android:layout_toRightOf="@+id/my_rides_detail_bill_imageView"
                         android:text="@string/my_rides_detail_total_paid_textview"
                         android:textColor="#4e4e4e"
                         android:textSize="13sp"
-                        android:visibility="visible"/>
+                        android:visibility="visible" />
 
 
                     <com.mylibrary.widgets.CustomTextView
@@ -441,21 +533,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_below="@+id/my_rides_detail_total_bill_textview"
+                        android:layout_below="@+id/my_rides_detail_display_tip_layout"
                         android:layout_marginRight="15dp"
                         android:layout_marginTop="7dp"
                         android:text=""
                         android:textColor="#606060"
                         android:textSize="13sp"
-                        android:visibility="visible"/>
+                        android:visibility="visible" />
 
 
                     <RelativeLayout
                         android:id="@+id/my_rides_detail_display_tip_layout"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/my_rides_detail_total_paid_label"
-                        android:layout_marginLeft="30dp">
+                        android:layout_below="@+id/my_rides_detail_total_bill_label"
+                        android:layout_toRightOf="@+id/my_rides_detail_bill_imageView">
 
                         <LinearLayout
                             android:layout_width="fill_parent"
@@ -467,8 +559,8 @@
                                 android:id="@+id/my_rides_detail_tip_amount_layout"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="6dp"
-                                android:layout_marginRight="10dp"
+                                android:layout_marginLeft="7dp"
+                                android:layout_marginRight="15dp"
                                 android:layout_marginTop="5dp"
                                 android:orientation="vertical"
                                 android:visibility="visible">
@@ -485,7 +577,7 @@
                                         android:layout_alignParentLeft="true"
                                         android:text="@string/my_rides_detail_tips_textview"
                                         android:textColor="#4e4e4e"
-                                        android:textSize="13sp"/>
+                                        android:textSize="13sp" />
 
                                     <com.mylibrary.widgets.CustomTextView
                                         android:id="@+id/my_rides_detail_tip_amount_textView"
@@ -495,9 +587,9 @@
                                         android:layout_marginTop="2dp"
                                         android:layout_weight="1"
                                         android:gravity="right"
-                                        android:text="5555"
+                                        android:text=""
                                         android:textColor="#606060"
-                                        android:textSize="13sp"/>
+                                        android:textSize="13sp" />
 
                                     <LinearLayout
                                         android:id="@+id/my_rides_detail_tip_amount_remove_layout"
@@ -513,7 +605,7 @@
                                             android:layout_height="20dp"
                                             android:layout_gravity="center_horizontal|top"
                                             android:layout_weight="1"
-                                            android:src="@drawable/minus_icon"/>
+                                            android:src="@drawable/minus_icon" />
 
                                     </LinearLayout>
 
@@ -538,7 +630,7 @@
                                     android:text=""
                                     android:textColor="#918e8e"
                                     android:textSize="11sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                                 <com.mylibrary.widgets.CustomTextView
                                     android:id="@+id/my_rides_detail_wallet_usuage_textview"
@@ -552,7 +644,7 @@
                                     android:text=""
                                     android:textColor="#918e8e"
                                     android:textSize="11sp"
-                                    android:visibility="visible"/>
+                                    android:visibility="visible" />
 
                             </LinearLayout>
 
@@ -577,7 +669,7 @@
                         android:layout_height="1px"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:background="#918e8e"/>
+                        android:background="#918e8e" />
 
                     <CheckBox
                         android:id="@+id/my_rides_detail_tip_checkBox"
@@ -591,7 +683,8 @@
                         android:gravity="center"
                         android:text="@string/my_rides_detail_tip_amount_message"
                         android:textColor="#4e4e4e"
-                        android:textSize="13sp" android:textStyle="bold"/>
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
 
                     <RelativeLayout
@@ -609,15 +702,16 @@
                             android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
                             android:background="@xml/edittext_border_grey_background"
-                            android:digits="0123456789."
+                            android:maxLength="10"
                             android:hint="@string/my_rides_detail_tip_label"
                             android:imeOptions="actionDone"
-                            android:inputType="number"
+
+                            android:inputType="number|numberDecimal"
                             android:paddingLeft="10dp"
                             android:textColor="#3f3e3e"
                             android:textColorHint="#918e8e"
                             android:textCursorDrawable="@drawable/edittext_cursor_color"
-                            android:textSize="13sp"/>
+                            android:textSize="13sp" />
 
                         <Button
                             android:id="@+id/my_rides_detail_tip_apply_button"
@@ -629,7 +723,7 @@
                             android:background="#76CDE1"
                             android:text="@string/my_rides_detail_tip_apply_label"
                             android:textColor="#ffffff"
-                            android:textSize="13sp"/>
+                            android:textSize="13sp" />
 
 
                     </RelativeLayout>
@@ -642,7 +736,7 @@
                     android:layout_below="@+id/my_rides_detail_tip_top_layout"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible" />
 
             </RelativeLayout>
         </RelativeLayout>
@@ -683,7 +777,7 @@
                     <ImageView
                         android:layout_width="17dp"
                         android:layout_height="17dp"
-                        android:src="@drawable/shutdown_icon"/>
+                        android:src="@drawable/shutdown_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -692,7 +786,7 @@
                         android:text="@string/my_rides_detail_cancel_trip_textview"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -716,7 +810,7 @@
                     <ImageView
                         android:layout_width="25dp"
                         android:layout_height="25dp"
-                        android:src="@drawable/track_ride_icon"/>
+                        android:src="@drawable/track_ride_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -726,7 +820,7 @@
                         android:text="@string/my_rides_detail_track_ride_textview"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -750,7 +844,7 @@
                     <ImageView
                         android:layout_width="17dp"
                         android:layout_height="17dp"
-                        android:src="@drawable/payment_icon"/>
+                        android:src="@drawable/payment_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -759,8 +853,7 @@
                         android:text="@string/my_rides_detail_payment_textview"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        />
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -784,7 +877,7 @@
                     <ImageView
                         android:layout_width="21dp"
                         android:layout_height="21dp"
-                        android:src="@drawable/mail_invoice_icon"/>
+                        android:src="@drawable/mail_invoice_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -794,11 +887,10 @@
                         android:text="@string/my_rides_detail_mail_invoice_textview"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
-
 
 
             <LinearLayout
@@ -821,7 +913,7 @@
                     <ImageView
                         android:layout_width="21dp"
                         android:layout_height="21dp"
-                        android:src="@drawable/share"/>
+                        android:src="@drawable/share" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -831,30 +923,10 @@
                         android:text="@string/my_rides_detail_share_message"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             <LinearLayout
@@ -877,7 +949,7 @@
                     <ImageView
                         android:layout_width="19dp"
                         android:layout_height="19dp"
-                        android:src="@drawable/bug_icon"/>
+                        android:src="@drawable/bug_icon" />
 
                     <com.mylibrary.widgets.CustomTextView
                         android:layout_width="wrap_content"
@@ -887,7 +959,7 @@
                         android:text="@string/my_rides_detail_report_issue_textview"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

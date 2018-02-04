@@ -12,20 +12,108 @@
 
     <RelativeLayout
         android:id="@+id/drawer"
-        android:layout_width="match_parent"
+        android:layout_width="290dp"
         android:layout_height="match_parent"
         android:layout_gravity="left|start"
-        android:background="#ECECEC" >
+        android:background="#ffffff" >
 
         <ListView
             android:id="@+id/drawer_listview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:background="@color/app_color"
+            android:background="#ffffff"
             android:choiceMode="singleChoice"
+
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp" />
+
+        <RelativeLayout
+            android:id="@+id/vki"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/drawer_listview">
+
+            <View
+                android:id="@+id/v1"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_alignParentBottom="true"
+                android:background="#ffffff"
+
+
+                />
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/verion_no"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/v1"
+                android:layout_centerInParent="true"
+                android:text="Version 2.0"
+                android:background="#ffffff"
+                android:gravity="center"
+                android:textColor="#c9c9c9"
+                android:textSize="15sp"
+                android:typeface="sans"/>
+
+            <View
+                android:id="@+id/v3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#f7f7f7"
+                android:layout_marginBottom="15dp"
+                android:layout_above="@+id/verion_no"
+
+                />
+
+       <!-- <View
+            android:id="@+id/v1"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="#ffffff"
+
+
+            />
+        <View
+            android:id="@+id/v3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#f7f7f7"
+            android:layout_below="@+id/v1"
+
+            />
+        <View
+            android:id="@+id/v4"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="#ffffff"
+            android:layout_below="@+id/v3"
+
+            />
+        <com.mylibrary.widgets.CustomTextView
+            android:id="@+id/verion_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/v4"
+            android:layout_centerInParent="true"
+            android:text="Version 2.0"
+            android:background="#ffffff"
+            android:gravity="center"
+
+            android:textColor="#c9c9c9"
+            android:textSize="15sp"
+            android:typeface="sans"/>
+        <View
+            android:id="@+id/v2"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:background="#ffffff"
+            android:layout_below="@+id/verion_no"
+
+            />-->
+        </RelativeLayout>
     </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>

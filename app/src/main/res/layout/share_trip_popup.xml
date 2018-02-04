@@ -54,23 +54,54 @@
             <EditText
                 android:id="@+id/sharetrip_mobilenoEt"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_below="@+id/job_complete_fareTv"
                 android:layout_centerHorizontal="true"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="15dp"
+
+                android:layout_toRightOf="@+id/sharetrip_country_codeEt"
                 android:background="@xml/custom_curv_layout_grey"
                 android:gravity="top|left"
-                android:hint="enter your mobileno"
+                android:hint="@string/profile_lable_error_mobile"
+                android:textColorHint="#4e4e4e"
                 android:imeOptions="actionDone"
-                android:inputType="textMultiLine"
+                android:inputType="phone"
+                android:digits="0987654321+"
+                android:maxLength="15"
                 android:textColor="#000000"
                 android:padding="10dp"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:typeface="sans">
 
             </EditText>
+
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/sharetrip_country_codeEt"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/job_complete_fareTv"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="15dp"
+                android:background="@xml/custom_curv_layout_grey"
+                android:gravity="top|left|center_vertical"
+                android:hint="@string/profile_lable_signin_hint_code"
+                android:textColorHint="#4e4e4e"
+                android:digits="0987654321+"
+                android:maxLength="5"
+                android:textColor="#000000"
+                android:paddingLeft="5dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textSize="13sp"
+                android:typeface="sans">
+
+            </com.mylibrary.widgets.CustomTextView>
 
 
 

@@ -72,7 +72,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="#f3f3f3"
-            android:visibility="gone">
+            >
 
             <ImageView
                 android:id="@+id/favorite_list_listview_empty_heart_image"
@@ -117,7 +117,7 @@
         android:layout_width="fill_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true"
-        android:background="#ffffff">
+        android:background="@color/app_color">
 
         <View
             android:id="@+id/favorite_list_favorite_view"
@@ -139,7 +139,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="5dp"
                 android:text="@string/favorite_list_label_add_favorite"
-                android:textColor="#4e4e4e"
+                android:textColor="#ffffff"
                 android:textSize="14sp"/>
 
 
@@ -157,7 +157,7 @@
                 android:maxLines="2"
                 android:singleLine="true"
                 android:text=""
-                android:textColor="#8c8c8c"
+                android:textColor="#ffffff"
                 android:textSize="13sp"/>
 
 
@@ -167,7 +167,7 @@
                 android:layout_height="fill_parent"
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="1px"
-                android:background="#ffffff">
+                android:background="@color/app_color">
 
                 <View
                     android:id="@+id/favorite_list_favorite_heart_view"
@@ -176,14 +176,14 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
-                    android:background="#939290"/>
+                    android:background="#ffffff"/>
 
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/add_to_favourite_icon"/>
+                    android:src="@drawable/fav_add"/>
 
             </RelativeLayout>
 

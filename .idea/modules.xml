@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Cabily.iml" filepath="$PROJECT_DIR$/Cabily.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CountryCodePicker/CountryCodePicker.iml" filepath="$PROJECT_DIR$/CountryCodePicker/CountryCodePicker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dectarcabilyuser.iml" filepath="$PROJECT_DIR$/dectarcabilyuser.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dectarcabilyuser.iml" filepath="$PROJECT_DIR$/dectarcabilyuser.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slideDateTimePicker/slideDateTimePicker.iml" filepath="$PROJECT_DIR$/slideDateTimePicker/slideDateTimePicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MOVE.iml" filepath="$PROJECT_DIR$/MOVE.iml" />
     </modules>
   </component>
 </project>
-

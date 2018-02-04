@@ -35,7 +35,7 @@
             android:id="@+id/favorite_add_header_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/favorite_add_header_back_layout"
             android:layout_centerInParent="true"
             android:text="@string/favorite_add_label_title"
             android:textColor="#ffffff"
@@ -96,6 +96,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="10dp"
+
                 android:layout_toRightOf="@+id/favorite_add_heart_image"
                 android:background="@drawable/edittext_background"
                 android:hint="@string/favorite_add_label_name"
@@ -175,7 +176,7 @@
             android:layout_height="fill_parent"
             android:clickable="false"/>
 
-        <android.support.v7.widget.CardView
+       <!-- <android.support.v7.widget.CardView
             android:id="@+id/favorite_add_cardview_current_location_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -184,14 +185,17 @@
             android:layout_marginTop="10dp"
             card_view:cardBackgroundColor="#ffffff"
             card_view:cardCornerRadius="4dp"
-            card_view:cardElevation="5dp">
+            card_view:cardElevation="5dp">-->
 
             <ImageView
                 android:id="@+id/favorite_add_current_location_imageview"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
-                android:src="@drawable/current_location_icon"/>
-        </android.support.v7.widget.CardView>
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/navi_cur_loc"/>
+        <!--</android.support.v7.widget.CardView>-->
 
 
         <View
@@ -208,7 +212,7 @@
             android:layout_height="45dp"
             android:layout_above="@+id/favorite_add_center_view1"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/user_marker_icon2"
+            android:src="@drawable/cur_position"
             android:visibility="visible"/>
 
     </RelativeLayout>

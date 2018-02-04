@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.casperon.app.cabily.R;
+import com.move.app.user.R;
 
 
 /**
@@ -40,6 +40,8 @@ public class PkDialog {
         dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(view);
+        dialog.setCancelable(false);
+
         dialog.setCanceledOnTouchOutside(false);
         dialog.getWindow().setLayout(screenWidth, LinearLayout.LayoutParams.WRAP_CONTENT);
 

@@ -4,10 +4,11 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.cabily.app.FareBreakUp;
-import com.cabily.app.PushNotificationAlert;
-import com.cabily.iconstant.Iconstant;
-import com.casperon.app.cabily.R;
+import com.move.app.AdsPage;
+import com.move.app.FareBreakUp;
+import com.move.app.PushNotificationAlert;
+import com.move.iconstant.Iconstant;
+import com.move.app.user.R;
 
 import org.jivesoftware.smack.packet.Message;
 import org.json.JSONObject;
@@ -29,46 +30,36 @@ public class ChatHandler {
     public void onHandleChatMessage(Message message) {
         try {
             String data = URLDecoder.decode(message.getBody(), "UTF-8");
+            System.out.println("--------------xmpp service data----------------------" + data);
             JSONObject messageObject = new JSONObject(data);
 
             if (messageObject.length() > 0) {
                 System.out.println("--------------xmpp service data----------------------" + data);
                 String action = (String) messageObject.get(Iconstant.Push_Action);
-                if (action.equalsIgnoreCase(Iconstant.PushNotification_AcceptRide_Key))
-                {
+                if (action.equalsIgnoreCase(Iconstant.PushNotification_AcceptRide_Key)) {
                     sendBroadCastToRideConfirm(messageObject);
                 }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_CabArrived_Key))
-                {
+                if (action.equalsIgnoreCase(Iconstant.PushNotification_AcceptRideLater_Key)) {
+                    rideLaterAlert(messageObject);
+                }else if (action.equalsIgnoreCase(Iconstant.PushNotification_CabArrived_Key)) {
                     showCabArrivedAlert(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_RideCancelled_Key))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.PushNotification_RideCancelled_Key)) {
                     rideCancelledAlert(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_RideCompleted_Key))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.PushNotification_RideCompleted_Key)) {
                     rideCompletedAlert(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_Key))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_Key)) {
                     requestPayment(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_makepayment_Stripe_Key))
-                {
-                    makePaymentStripAni(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.PushNotification_PaymentPaid_Key))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.PushNotification_RequestPayment_makepayment_Stripe_Key)) {
+                    rideCompletedAlert(messageObject);
+                    //makePaymentStripAni(messageObject);
+                } else if (action.equalsIgnoreCase(Iconstant.PushNotification_PaymentPaid_Key)) {
                     paymentPaid(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.pushNotificationBeginTrip))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.pushNotificationBeginTrip)) {
                     beginTripMessage(messageObject);
-                }
-                else if (action.equalsIgnoreCase(Iconstant.pushNotificationDriverLoc))
-                {
+                } else if (action.equalsIgnoreCase(Iconstant.pushNotificationDriverLoc)) {
                     updateDriverLocation_TrackRide(messageObject);
+                } else if (action.equalsIgnoreCase(Iconstant.pushNotification_Ads)) {
+                    display_Ads(messageObject);
                 }
 
             }
@@ -80,6 +71,7 @@ public class ChatHandler {
     }
 
     private void sendBroadCastToRideConfirm(JSONObject messageObject) throws Exception {
+
         Intent local = new Intent();
         local.setAction("com.app.pushnotification.RideAccept");
         local.putExtra("driverID", messageObject.getString(Iconstant.DriverID));
@@ -99,10 +91,11 @@ public class ChatHandler {
         local.putExtra("message", messageObject.getString(Iconstant.Push_Message));
         local.putExtra("Action", messageObject.getString(Iconstant.Push_Action));
         context.sendBroadcast(local);
+
+
     }
 
-    private void showCabArrivedAlert(JSONObject messageObject) throws Exception
-    {
+    private void showCabArrivedAlert(JSONObject messageObject) throws Exception {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_Arrived_Driver");
         broadcastIntent.putExtra("driverLat", messageObject.getString("key3"));
@@ -110,24 +103,37 @@ public class ChatHandler {
         context.sendBroadcast(broadcastIntent);
     }
 
-    private void rideCancelledAlert(JSONObject messageObject) throws Exception
-    {
+    private void rideCancelledAlert(JSONObject messageObject) throws Exception {
+
+        Intent handler_intent = new Intent();
+        handler_intent.setAction("com.handler.stop");
+        context.sendBroadcast(handler_intent);
+
         refreshMethod();
 
-        Intent i1=new Intent(context, PushNotificationAlert.class);
+        Intent i1 = new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Cancelled));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Cancelled));
         i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Cancelled));
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);
+
     }
-
-
-    private void rideCompletedAlert(JSONObject messageObject) throws Exception
-    {
+    private void rideLaterAlert(JSONObject messageObject) throws Exception {
         refreshMethod();
 
-        Intent i1=new Intent(context, PushNotificationAlert.class);
+        Intent i1 = new Intent(context, PushNotificationAlert.class);
+        i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Cancelled));
+        i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Cancelled));
+        i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Later));
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);
+    }
+
+    private void rideCompletedAlert(JSONObject messageObject) throws Exception {
+        refreshMethod();
+
+        Intent i1 = new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", context.getResources().getString(R.string.pushnotification_alert_label_ride_completed));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Completed));
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -135,11 +141,10 @@ public class ChatHandler {
 
     }
 
-    private void requestPayment(JSONObject messageObject) throws Exception
-    {
+    private void requestPayment(JSONObject messageObject) throws Exception {
         refreshMethod();
 
-        Intent i1=new Intent(context, FareBreakUp.class);
+        Intent i1 = new Intent(context, FareBreakUp.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Request_Payment));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Request_Payment));
         i1.putExtra("CurrencyCode", messageObject.getString(Iconstant.CurrencyCode_Request_Payment));
@@ -164,8 +169,7 @@ public class ChatHandler {
         context.startActivity(i1);
     }
 
-    private void paymentPaid(JSONObject messageObject) throws Exception
-    {
+    private void paymentPaid(JSONObject messageObject) throws Exception {
         refreshMethod();
 
         Intent finish_fareBreakUp = new Intent();
@@ -176,7 +180,7 @@ public class ChatHandler {
         finish_fareBreakUp.setAction("com.pushnotification.finish.MyRidePaymentList");
         context.sendBroadcast(finish_MyRidePaymentList);
 
-        Intent i1=new Intent(context, PushNotificationAlert.class);
+        Intent i1 = new Intent(context, PushNotificationAlert.class);
         i1.putExtra("message", messageObject.getString(Iconstant.Push_Message_Payment_paid));
         i1.putExtra("Action", messageObject.getString(Iconstant.Push_Action_Payment_paid));
         i1.putExtra("RideID", messageObject.getString(Iconstant.RideID_Payment_paid));
@@ -187,41 +191,58 @@ public class ChatHandler {
 
 
     private void updateDriverLocation_TrackRide(JSONObject messageObject) throws Exception {
+
+        System.out.println("--------chat handler driver update----------------");
+
         Intent local = new Intent();
-        local.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
-        local.putExtra("isContinousRide", messageObject.getString(Iconstant.latitude));
+        local.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_UpdateDriver");
+        local.putExtra("isContinousRide", "");
         local.putExtra("latitude", messageObject.getString(Iconstant.latitude));
         local.putExtra("longitude", messageObject.getString(Iconstant.longitude));
+        local.putExtra("bearing", messageObject.getString(Iconstant.bearing));
         local.putExtra("ride_id", messageObject.getString(Iconstant.ride_id));
         context.sendBroadcast(local);
     }
 
-    private void beginTripMessage(JSONObject messageObject) throws Exception
-    {
+    private void beginTripMessage(JSONObject messageObject) throws Exception {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_BeginTrip");
         broadcastIntent.putExtra("drop_lat", messageObject.getString("key3"));
         broadcastIntent.putExtra("drop_lng", messageObject.getString("key4"));
+        broadcastIntent.putExtra("pickUp_lat", messageObject.getString("key5"));
+        broadcastIntent.putExtra("pickUp_lng", messageObject.getString("key6"));
+        broadcastIntent.putExtra("drop_locc", messageObject.getString("key7"));
         context.sendBroadcast(broadcastIntent);
     }
 
-    private void makePaymentStripAni(JSONObject messageObject) throws Exception
-    {
+    private void makePaymentStripAni(JSONObject messageObject) throws Exception {
         refreshMethod();
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("com.package.ACTION_CLASS_TrackYourRide_REFRESH_MakePayment");
         context.sendBroadcast(broadcastIntent);
 
-        Intent i1=new Intent(context, FareBreakUp.class);
+        Intent i1 = new Intent(context, FareBreakUp.class);
         i1.putExtra("RideID", messageObject.getString(Iconstant.Make_Payment));
         i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i1);
     }
 
 
-    private void refreshMethod()
-    {
+    private void display_Ads(JSONObject messageObject) throws Exception {
+        Intent i1 = new Intent(context, AdsPage.class);
+        i1.putExtra("AdsTitle", messageObject.getString(Iconstant.Ads_title));
+        i1.putExtra("AdsMessage", messageObject.getString(Iconstant.Ads_Message));
+        if (messageObject.has(Iconstant.Ads_image)) {
+            i1.putExtra("AdsBanner", messageObject.getString(Iconstant.Ads_image));
+        }
+        i1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i1);
+    }
+
+
+    private void refreshMethod() {
+
         Intent finish_fareBreakUp = new Intent();
         finish_fareBreakUp.setAction("com.pushnotification.finish.FareBreakUp");
         context.sendBroadcast(finish_fareBreakUp);
@@ -248,8 +269,7 @@ public class ChatHandler {
 
     }
 
-    private void trackRideRefreshMethod()
-    {
+    private void trackRideRefreshMethod() {
         Intent finish_fareBreakUp = new Intent();
         finish_fareBreakUp.setAction("com.pushnotification.finish.FareBreakUp");
         context.sendBroadcast(finish_fareBreakUp);

@@ -156,10 +156,11 @@
                 android:layout_marginRight="15dp"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/grey_border_background"
-                android:hint="@string/cabilymoney_lable_rechargemoney_edittext"
+                android:hint="@string/cabilymoney_lable_rechargemoney_edittext_hinr"
                 android:imeOptions="actionDone"
                 android:inputType="number"
-                android:maxLength="5"
+
+                android:maxLength="15"
                 android:paddingLeft="8dp"
                 android:textColor="#4e4e4e"
                 android:textColorHint="#9d9d99"

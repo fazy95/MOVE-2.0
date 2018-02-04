@@ -23,7 +23,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import com.casperon.app.cabily.R;
+import com.move.app.user.R;
 
 
 /**

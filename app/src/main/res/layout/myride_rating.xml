@@ -25,6 +25,7 @@
             android:id="@+id/my_rides_rating_header_skip_layout"
             android:layout_width="55dp"
             android:layout_height="fill_parent"
+            android:layout_toRightOf="@+id/my_rides_rating_textview_header"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true">
 
@@ -32,10 +33,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="5dp"
                 android:layout_centerVertical="true"
                 android:text="@string/my_rides_rating_header_skip_textview"
                 android:textColor="#ffffff"
-                android:textSize="18sp"/>
+                android:textSize="16sp"/>
         </RelativeLayout>
 
     </RelativeLayout>
@@ -78,6 +82,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/edittext_curve_background_grey"
                 android:gravity="top|left"
+
                 android:hint="@string/my_rides_rating_header_comment_textview"
                 android:inputType="textMultiLine"
                 android:imeOptions="actionDone"
@@ -108,7 +113,7 @@
         android:layout_width="fill_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        android:background="#076435">
+        android:background="@color/app_color">
 
         <com.mylibrary.widgets.CustomTextView
             android:layout_width="wrap_content"

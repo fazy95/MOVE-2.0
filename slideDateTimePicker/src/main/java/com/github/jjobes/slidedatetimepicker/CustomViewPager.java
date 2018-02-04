@@ -98,7 +98,9 @@ public class CustomViewPager extends ViewPager
                {
                    // When the user is scrolling the ViewPager horizontally,
                    // block the pickers from scrolling vertically.
-                   return super.dispatchTouchEvent(event);
+
+                   //return super.dispatchTouchEvent(event);
+                   return false;
                }
 
                break;

@@ -8,15 +8,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 
-import com.cabily.app.SingUpAndSignIn;
-import com.cabily.iconstant.Iconstant;
-import com.casperon.app.cabily.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.move.app.SplashPage;
+import com.move.app.user.R;
+import com.move.iconstant.Iconstant;
+import com.move.utils.SessionManager;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Anitha
@@ -30,7 +37,8 @@ public class GCMNotificationIntentService extends IntentService {
     private String driverID = "", driverName = "", driverEmail = "", driverImage = "", driverRating = "",
             driverLat = "", driverLong = "", driverTime = "",rideID = "", driverMobile = "",
             driverCar_no = "", driverCar_model = "", message = "";
-
+    String action="",msg1,title,banner;
+    private static SessionManager session;
     public GCMNotificationIntentService() {
         super("GcmIntentService");
     }
@@ -41,6 +49,7 @@ public class GCMNotificationIntentService extends IntentService {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
 
         String messageType = gcm.getMessageType(intent);
+        session = new SessionManager(context);
 
         if (!extras.isEmpty()) {
             if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
@@ -48,14 +57,14 @@ public class GCMNotificationIntentService extends IntentService {
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
                 sendNotification("Deleted messages on server: " + extras.toString());
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                for (int i = 0; i < 3; i++) {
+               /* for (int i = 0; i < 3; i++) {
                     Log.d("Messsage Coming... ", "" + (i + 1) + "/5 @ " + SystemClock.elapsedRealtime());
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
 
                     }
-                }
+                }*/
                 Log.e("Message Completed work @ ", "" + SystemClock.elapsedRealtime());
 
                 Log.e("Received: ", "" + extras.toString());
@@ -64,6 +73,8 @@ public class GCMNotificationIntentService extends IntentService {
                 if (extras != null) {
 
                     try {
+                        action  = (String) extras.get(Iconstant.Push_Action);
+
                         if (extras.containsKey(Iconstant.DriverID)) {
                             driverID = extras.get(Iconstant.DriverID).toString();
                         }
@@ -103,8 +114,15 @@ public class GCMNotificationIntentService extends IntentService {
                         if (extras.containsKey(Iconstant.Push_Message)) {
                             message = extras.get(Iconstant.Push_Message).toString();
                         }
+                        if (action.equalsIgnoreCase(Iconstant.pushNotification_Ads)) {
+                            title = extras.get("key1").toString();
+                            msg1 = extras.get("key2").toString();
+                            banner = extras.get("key3").toString();
 
-                        //sendNotification(message.toString());
+                        }
+
+
+                        sendNotification(message.toString());
 
                         /*Intent local = new Intent();
                         local.setAction("com.app.pushnotification");
@@ -136,11 +154,29 @@ public class GCMNotificationIntentService extends IntentService {
     @SuppressWarnings("deprecation")
     private void sendNotification(String msg) {
         Intent notificationIntent = null;
-        notificationIntent = new Intent(GCMNotificationIntentService.this, SingUpAndSignIn.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        int id=createID();
+        if (action.equalsIgnoreCase(Iconstant.pushNotification_Ads)) {
+
+            /*session.setADS(true);
+            session.setAds(title, msg1, banner);*/
 
 
-        PendingIntent contentIntent = PendingIntent.getActivity(GCMNotificationIntentService.this, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            notificationIntent = new Intent(GCMNotificationIntentService.this, SplashPage.class);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            notificationIntent.putExtra("title", title);
+            notificationIntent.putExtra("msg", msg1);
+            notificationIntent.putExtra("banner", banner);
+            notificationIntent.putExtra("ad", "true");
+        }
+        else
+        {
+            notificationIntent = new Intent(GCMNotificationIntentService.this, SplashPage.class);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            notificationIntent.putExtra("ad", "false");
+        }
+
+        PendingIntent contentIntent = PendingIntent.getActivity(GCMNotificationIntentService.this, id, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationManager nm = (NotificationManager) GCMNotificationIntentService.this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -150,18 +186,41 @@ public class GCMNotificationIntentService extends IntentService {
                 .setSmallIcon(R.drawable.app_logo)
                 .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.app_logo))
                 .setTicker(msg)
+                .setColor(0xFFE72F75)
                 .setWhen(System.currentTimeMillis())
                 .setAutoCancel(true)
-                .setContentTitle("Cabily")
+                .setContentTitle("MOVE")
                 .setLights(0xffff0000, 100, 2000)
                 .setPriority(Notification.DEFAULT_SOUND)
                 .setContentText(msg);
 
         Notification n = builder.getNotification();
 
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int smallIconViewId = getResources().getIdentifier("right_icon", "id", android.R.class.getPackage().getName());
+
+            if (smallIconViewId != 0) {
+                if (n.contentView != null)
+                    n.contentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+
+                if (n.headsUpContentView != null)
+                    n.headsUpContentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+
+                if (n.bigContentView != null)
+                    n.bigContentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+            }
+        }
+
+
+
         n.defaults |= Notification.DEFAULT_ALL;
-        nm.notify(0, n);
+        nm.notify(id , n);
 
     }
-
+    public int createID(){
+        Date now = new Date();
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
+        return id;
+    }
 }

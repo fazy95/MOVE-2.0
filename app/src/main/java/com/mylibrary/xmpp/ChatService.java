@@ -4,10 +4,8 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Messenger;
-import android.os.RemoteException;
 
-import com.cabily.iconstant.Iconstant;
-import com.cabily.utils.SessionManager;
+import com.move.utils.SessionManager;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -44,7 +42,8 @@ public class ChatService extends IntentService implements ChatManagerListener, C
     private static boolean isChatEnabled;
     private static Messenger chatMessenger;
     private static ChatHandler chatHandler;
-
+    String hostURL = "", hostName = "";
+    Boolean isLogin;
     /**
      */
     public static void startUserAction(Context context) {
@@ -92,8 +91,14 @@ public class ChatService extends IntentService implements ChatManagerListener, C
             e.printStackTrace();
         } catch (KeyManagementException e) {
         }
-        configBuilder.setHost(Iconstant.XMPP_HOST_URL);//http://192.168.1.116/67.219.149.186
-        configBuilder.setServiceName(Iconstant.XMPP_SERVICE_NAME);
+        if (session != null && session.getUserDetails() != null) {
+            hostURL = session.getXmpp().get(SessionManager.KEY_HOST_URL);
+            hostName = session.getXmpp().get(SessionManager.KEY_HOST_NAME);
+        }
+        isLogin=session.isLoggedIn();
+        System.out.println("Xmpp URL and NAME"+hostName+" "+hostURL);
+        configBuilder.setHost(hostURL);//http://192.168.1.116/67.219.149.186
+        configBuilder.setServiceName(hostName);
         //sec_key
         connection = new XMPPTCPConnection(configBuilder.build());
         connection.addConnectionListener(new ConnectionListener() {
@@ -133,11 +138,23 @@ public class ChatService extends IntentService implements ChatManagerListener, C
 
         connection.setPacketReplyTimeout(30000);
         try {
-            connection.connect();
+            if(isLogin) {
+                if (hostName.length() > 0 && hostURL.length() > 0) {
+                    connection.connect();
+                }
+
+            }
+            else
+            {
+                System.out.println("crash------jai-----------");
+            }
         } catch (SmackException e) {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (XMPPException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         try {

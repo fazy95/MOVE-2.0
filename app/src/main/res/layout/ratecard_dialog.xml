@@ -31,7 +31,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="35dp"
             android:layout_toLeftOf="@+id/ratecard_fare_label"
-            android:background="#01A7CD"/>
+            android:background="@color/app_color"/>
 
         <com.mylibrary.widgets.CustomTextView
             android:id="@+id/ratecard_fare_label"
@@ -53,7 +53,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="35dp"
             android:layout_toRightOf="@+id/ratecard_fare_label"
-            android:background="#01A7CD"/>
+            android:background="@color/app_color"/>
 
         <RelativeLayout
             android:id="@+id/ratecard_display_layout"
@@ -108,7 +108,7 @@
                     android:layout_height="110dp"
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
-                    android:background="#01A7CD"/>
+                    android:background="@color/app_color"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -148,7 +148,7 @@
                     android:layout_height="110dp"
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
-                    android:background="#01A7CD"/>
+                    android:background="@color/app_color"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

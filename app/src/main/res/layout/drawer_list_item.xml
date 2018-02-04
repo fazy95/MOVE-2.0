@@ -3,14 +3,15 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:background="@color/app_color">
+               >
 
     <RelativeLayout
         android:id="@+id/drawer_list_item_normal_layout"
         android:layout_width="fill_parent"
-        android:layout_height="43dp"
+        android:layout_height="40dp"
         android:layout_centerVertical="true"
-        android:visibility="gone">
+        android:background="#ffffff"
+       >
 
         <ImageView
             android:id="@+id/icon"
@@ -31,9 +32,9 @@
             android:layout_toLeftOf="@+id/drawer_item_list_wallet_money"
             android:layout_toRightOf="@+id/icon"
             android:text=""
-            android:textColor="#ffffff"
+            android:textColor="#5b5b5b"
             android:textSize="15sp"
-            android:typeface="sans"/>
+            />
 
         <com.mylibrary.widgets.CustomTextView
             android:id="@+id/drawer_item_list_wallet_money"
@@ -43,7 +44,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="6dp"
             android:text=""
-            android:textColor="#EEDB00"
+            android:textColor="@color/app_color"
             android:textSize="13sp"
             android:typeface="sans"
             android:visibility="gone"/>
@@ -53,7 +54,7 @@
     <View
         android:id="@+id/drawer_list_view"
         android:layout_width="fill_parent"
-        android:layout_height="2px"
+        android:layout_height="0dp"
         android:layout_below="@+id/drawer_list_item_normal_layout"
         android:layout_marginTop="10dp"
         android:background="#ffffff"/>
@@ -61,8 +62,9 @@
     <RelativeLayout
         android:id="@+id/drawer_list_item_profile_layout"
         android:layout_width="fill_parent"
-        android:layout_height="155dp"
+        android:layout_height="175dp"
         android:layout_centerVertical="true"
+        android:background="@color/app_color"
         android:visibility="visible">
 
 
@@ -73,10 +75,10 @@
 
             <com.mylibrary.widgets.RoundedImageView
                 android:id="@+id/profile_icon"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                    android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp"/>
+                android:layout_marginTop="25dp"/>
 
             <com.mylibrary.widgets.CustomTextView
                 android:id="@+id/profile_name"
@@ -86,7 +88,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="10dp"
                 android:singleLine="true"
                 android:text=""
                 android:textColor="#ffffff"
@@ -102,6 +104,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:text=""
+                android:visibility="gone"
                 android:textColor="#ffffff"
                 android:textSize="15sp"
                 android:typeface="sans"/>
@@ -121,10 +124,10 @@
 
         <View
             android:layout_width="fill_parent"
-            android:layout_height="2px"
+            android:layout_height="0dp"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="10dp"
-            android:background="#ffffff"/>
+            android:background="#000000"/>
 
     </RelativeLayout>
 

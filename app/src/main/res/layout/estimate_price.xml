@@ -36,6 +36,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_marginBottom="7dp"
+
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
@@ -86,7 +87,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:text="No Internet Connection"
+            android:text="@string/alert_nointernet"
             android:textColor="#FCC900"
             android:textSize="13sp"/>
     </RelativeLayout>

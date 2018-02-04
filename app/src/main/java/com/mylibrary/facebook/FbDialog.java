@@ -36,7 +36,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.casperon.app.cabily.R;
+import com.move.app.user.R;
 
 
 public class FbDialog extends Dialog {

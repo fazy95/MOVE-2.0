@@ -31,7 +31,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="15dp"
-            android:src="@drawable/selected_dot_icon"
+            android:src="@drawable/ic_single_tick"
             android:visibility="invisible"/>
     </RelativeLayout>
 

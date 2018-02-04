@@ -10,6 +10,7 @@ import com.android.volley.ParseError;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.move.app.user.R;
 
 
 /**
@@ -19,15 +20,15 @@ public class VolleyErrorResponse {
 
     public static void volleyError(Context context, VolleyError error) {
         if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-            Toast.makeText(context, "Unable to fetch data from server", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getResources().getString(R.string.service_request_net_slow_alert), Toast.LENGTH_LONG).show();
         } else if (error instanceof AuthFailureError) {
-            Toast.makeText(context, "AuthFailureError", Toast.LENGTH_LONG).show();
+        //    Toast.makeText(context, "AuthFailureError", Toast.LENGTH_LONG).show();
         } else if (error instanceof ServerError) {
-            Toast.makeText(context, "ServerError", Toast.LENGTH_LONG).show();
+         //   Toast.makeText(context, "ServerError", Toast.LENGTH_LONG).show();
         } else if (error instanceof NetworkError) {
-            Toast.makeText(context, "NetworkError", Toast.LENGTH_LONG).show();
+         //   Toast.makeText(context, "NetworkError", Toast.LENGTH_LONG).show();
         } else if (error instanceof ParseError) {
-            Toast.makeText(context, "ParseError", Toast.LENGTH_LONG).show();
+        //    Toast.makeText(context, "ParseError", Toast.LENGTH_LONG).show();
         }
     }
 }

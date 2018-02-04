@@ -83,7 +83,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:text="No Internet Connection"
+            android:text="@string/alert_nointernet"
             android:textColor="#FCC900"
             android:textSize="13sp"/>
     </RelativeLayout>

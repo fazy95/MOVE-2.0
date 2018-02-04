@@ -24,7 +24,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:text="@string/fare_breakup_label_message"
-                android:textColor="#004F46"
+                android:textColor="@color/app_color"
                 android:textSize="20dp"/>
 
 
@@ -35,7 +35,7 @@
                 android:layout_below="@+id/fare_breakup_label"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="25dp"
-                android:src="@drawable/car_banner1"/>
+                android:src="@drawable/default1"/>
 
             <com.mylibrary.widgets.CustomTextView
                 android:id="@+id/fare_breakup_driver_name_textView"
@@ -126,6 +126,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="30dp"
                 android:text="@string/fare_breakup_label_total_amount"
+                android:visibility="gone"
                 android:textColor="#4e4e4e"
                 android:textSize="16dp"/>
 
@@ -137,6 +138,7 @@
                 android:layout_below="@+id/fare_breakup_driver_name_textView"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="15dp"
+                android:visibility="gone"
                 android:layout_marginTop="30dp"
                 android:layout_toRightOf="@+id/fare_breakup_total_amount_label"
                 android:gravity="right"
@@ -183,6 +185,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/fare_breakup_label_waiting"
+                android:visibility="gone"
                 android:textColor="#4e4e4e"
                 android:textSize="16dp"/>
 
@@ -197,6 +200,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/fare_breakup_waiting_label"
                 android:gravity="right"
+                android:visibility="gone"
                 android:text=""
                 android:textColor="#4e4e4e"
                 android:textSize="16dp"/>
@@ -331,7 +335,8 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginTop="10dp"
                         android:orientation="vertical"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        >
 
                         <LinearLayout
                             android:layout_width="fill_parent"
@@ -439,10 +444,12 @@
                         android:layout_height="40dp"
                         android:layout_marginLeft="10dp"
                         android:background="@xml/edittext_border_grey_background"
-                        android:digits="0123456789."
+
                         android:hint="@string/my_rides_detail_tip_label"
                         android:imeOptions="actionDone"
-                        android:inputType="number"
+                        android:inputType="number|numberDecimal"
+
+                        android:maxLength="10"
                         android:paddingLeft="10dp"
                         android:textColor="#3f3e3e"
                         android:textColorHint="#918e8e"
@@ -481,8 +488,8 @@
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="#006400">
+
+        android:background="@color/app_color">
 
         <com.mylibrary.widgets.CustomTextView
             android:layout_width="wrap_content"

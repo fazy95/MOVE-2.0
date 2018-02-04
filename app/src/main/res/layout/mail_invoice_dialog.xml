@@ -25,6 +25,7 @@
             android:layout_below="@+id/mail_invoice_title"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
+
             android:background="@drawable/edittext_curve_background_grey"
             android:hint="@string/my_rides_detail_enter_emailId"
             android:imeOptions="actionDone"

@@ -62,11 +62,23 @@
 
 
             <com.mylibrary.widgets.CustomTextView
-                android:id="@+id/invite_earn_friend_earn_textview"
+                android:id="@+id/invite_earn_friend_earn_textview_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="20dp"
+                android:text="Friend joins,friend earns"
+                android:textColor="#4e4e4e"
+                android:textSize="17sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/invite_earn_friend_earn_textview"
+                android:layout_toRightOf="@+id/invite_earn_friend_earn_textview_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"
                 android:text=""
@@ -74,17 +86,31 @@
                 android:textSize="17sp"/>
 
             <com.mylibrary.widgets.CustomTextView
-                android:id="@+id/invite_earn_you_earn_textview"
+                android:id="@+id/invite_earn_you_earn_textview_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/invite_earn_friend_earn_textview"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="3dp"
+                android:text="You earn"
+                android:textColor="#4e4e4e"
+                android:textSize="17sp"/>
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/invite_earn_you_earn_textview"
+                android:layout_toRightOf="@+id/invite_earn_you_earn_textview_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/invite_earn_friend_earn_textview"
+                android:layout_centerHorizontal="true"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="3dp"
                 android:text=""
                 android:textColor="#4e4e4e"
                 android:textSize="17sp"/>
+
 
             <ImageView
                 android:id="@+id/invite_earn_car_imageView"
@@ -94,7 +120,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-                android:src="@drawable/invite_and_earn_car_new"/>
+                android:src="@drawable/invite_and_earn_car"/>
 
             <com.mylibrary.widgets.CustomTextView
                 android:id="@+id/invite_earn_referral_label"

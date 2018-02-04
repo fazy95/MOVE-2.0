@@ -25,24 +25,33 @@ public class MarkerAnimation {
         final long start = SystemClock.uptimeMillis();
         final Interpolator interpolator = new AccelerateDecelerateInterpolator();
         final float durationInMs = 3000;
+
         handler.post(new Runnable() {
             long elapsed;
             float t;
             float v;
+
             @Override
             public void run() {
+            // Calculate progress using interpolator
                 elapsed = SystemClock.uptimeMillis() - start;
                 t = elapsed / durationInMs;
                 v = interpolator.getInterpolation(t);
+
                 marker.setPosition(latLngInterpolator.interpolate(v, startPosition, finalPosition));
+                marker.setFlat(true);
+
+                // Repeat till progress is complete.
                 if (t < 1) {
+                    // Post again 16ms later.
                     handler.postDelayed(this, 16);
                 }
             }
         });
     }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public  static void animateMarkerToHC(final Marker marker, final LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
+    public static void animateMarkerToHC(final Marker marker, final LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
         final LatLng startPosition = marker.getPosition();
 
         ValueAnimator valueAnimator = new ValueAnimator();

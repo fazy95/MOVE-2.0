@@ -76,16 +76,6 @@
                 android:background="#ffffff"
                 android:divider="@null">
             </com.github.paolorotolo.expandableheightlistview.ExpandableHeightListView>
-            <pl.droidsonroids.gif.GifImageView
-                android:id="@+id/loadGifImage"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:visibility="gone"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/loading"
-                />
-
         </RelativeLayout>
     </ScrollView>
 

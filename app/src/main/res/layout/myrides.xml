@@ -64,7 +64,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:background="#00897B">
+            android:background="@color/app_color">
 
             <LinearLayout
                 android:id="@+id/my_rides_all_layout"
@@ -74,7 +74,7 @@
                 android:layout_marginLeft="1dp"
                 android:layout_marginTop="1dp"
                 android:layout_weight="1"
-                android:background="#00897B">
+                android:background="@color/app_color">
 
                 <com.mylibrary.widgets.CustomTextView
                     android:id="@+id/my_rides_all_textview"
@@ -104,7 +104,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/my_rides_upcoming"
-                    android:textColor="#00897B"
+                    android:textColor="@color/app_color"
                     android:textSize="14dp"/>
 
             </LinearLayout>
@@ -125,7 +125,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/my_rides_completed"
-                    android:textColor="#00897B"
+                    android:textColor="@color/app_color"
                     android:textSize="14dp"/>
             </LinearLayout>
         </LinearLayout>

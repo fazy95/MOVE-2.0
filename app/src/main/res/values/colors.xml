@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="ripple_blue_color">#01C1E5</color>
+    <color name="ripple_blue_color">#e84c3d</color>
     <color name="darkgreen_color">#027536</color>
     <color name="spinner_line_color">#e5e5e5</color>
     <color name="spinner_arrow_color">#e5e5e5</color>
     <color name="spinner_floatlabel_color">#F05253</color>
     <color name="spinner_highlight_color">#4CB5AC</color>
 
-    <color name="app_color">#01A7CD</color>
-    <color name="app_color_transperent">#cc01A7CD</color>
-    <color name="app_color_button">#CC2793ff</color>
+    <color name="app_color">#e84c3d</color>
+    <color name="app_color_transperent">#cce84c3d</color>
+    <color name="app_color_transperent1">#aae84c3d</color>
+    <color name="app_color_button">#e84c3d</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
-    <color name="ployline_color">#31c3e7</color>
+    <color name="ployline_color">#e84c3d</color>
+    <color name="apply_coupon">#4e4e4e</color>
+    <color name="text_color">#5b5b5b</color>
+    <color name="text_hint">#d4d4d4</color>
+    <color name="text_hint_dark">#919191</color>
+    <color name="accent">#d2d2d2</color>
+    <color name="normal">#8f8f8f</color>
+    <color name="acciviated">#e84c3d</color>
+
 
 
 

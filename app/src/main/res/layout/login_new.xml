@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/app_color">
+
+        <RelativeLayout
+            android:id="@+id/login_header_back_layout"
+            android:layout_width="50dp"
+            android:layout_height="60dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/back_arrow" />
+        </RelativeLayout>
+
+        <com.mylibrary.widgets.CustomTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/login_header_back_layout"
+            android:text="@string/login_label_login"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/header"
+        android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <RelativeLayout
+            android:id="@+id/login_facebook_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="@drawable/blue_border_background"
+            android:layout_marginTop="25dp">
+
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/fb_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_label_facecook_login_app"
+                android:textColor="#2159ba"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:textSize="15sp" />
+            <ImageView
+                android:id="@+id/login_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_toLeftOf="@+id/fb_label"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/facebook_icon"
+                />
+
+
+        </RelativeLayout>
+        <!--<ImageView
+            android:id="@+id/login_facebook_button"
+            android:layout_width="fill_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/sign_fb" />-->
+
+        <com.mylibrary.widgets.CustomTextView
+            android:id="@+id/login_or_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/login_facebook_button"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/login_label_or"
+            android:textColor="@color/text_color"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:id="@+id/email_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/login_or_label"
+            android:layout_marginTop="15dp">
+
+            <ImageView
+                android:id="@+id/email_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/profilemail" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/login_input_layout_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_toRightOf="@+id/email_icon"
+
+                android:layout_marginLeft="10dp"
+
+
+                android:theme="@style/TextLabel">
+
+                <EditText
+                    android:id="@+id/login_email_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:ems="10"
+
+                    android:hint="@string/register_label_email_hint"
+                    android:textColor="@color/text_color"
+                    android:textColorHint="#d4d4d4" />
+            </android.support.design.widget.TextInputLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/password_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/email_layout"
+            android:layout_marginTop="15dp">
+
+            <ImageView
+                android:id="@+id/password_icon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/profilepassword" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/login_input_layout_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/password_icon"
+
+                android:theme="@style/TextLabel">
+
+                <EditText
+                    android:id="@+id/login_password_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+
+                    android:hint="@string/register_label_pwd_hint"
+                    android:inputType="textNoSuggestions"
+                    android:textColor="@color/text_color"
+                    android:textColorHint="#d4d4d4" />
+            </android.support.design.widget.TextInputLayout>
+
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/checkbox"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/checkbox_new"
+            android:layout_marginTop="23dp"
+            android:layout_below="@+id/password_layout"/>
+        <com.mylibrary.widgets.CustomTextView
+            android:id="@+id/dummy_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="25dp"
+            android:gravity="left|center"
+            android:layout_toRightOf="@id/checkbox"
+            android:layout_below="@+id/password_layout"
+            android:text="@string/register_label_dummy_text"
+            android:textColor="@color/text_color"
+            android:textSize="14sp"
+            />
+
+
+        <com.mylibrary.widgets.CustomTextView
+            android:id="@+id/login_submit_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="30dp"
+
+            android:gravity="center"
+            android:layout_below="@+id/dummy_text"
+            android:text="@string/login_label_login"
+            android:textColor="@color/white"
+            android:background="@drawable/curve_red"
+            android:textSize="16sp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+        <View
+            android:id="@+id/vv"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@+id/login_submit_button"/>
+
+
+        <RelativeLayout
+            android:id="@+id/bottom_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/vv"
+            android:layout_marginTop="15dp">
+
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/register_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+
+
+                android:gravity="center"
+
+                android:text="@string/register_label"
+                android:textColor="@color/text_hint_dark"
+
+                android:textSize="16sp"
+                />
+            <com.mylibrary.widgets.CustomTextView
+                android:id="@+id/login_forgotpwd_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="25dp"
+                android:layout_alignParentRight="true"
+
+
+                android:gravity="center"
+
+                android:text="@string/login_label_forgotpwd"
+                android:textColor="@color/text_hint_dark"
+
+                android:textSize="16sp"
+                />
+            <!--<com.mylibrary.widgets.CustomTextView
+                android:id="@+id/forgot_password_label"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="30dp"
+
+                android:gravity="center"
+
+                android:text="@string/register_label_create_account"
+                android:textColor="@color/white"
+                android:background="@drawable/curve_red"
+                android:textSize="16sp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />-->
+
+
+        </RelativeLayout>
+</RelativeLayout>
+</ScrollView>
+
+</RelativeLayout>

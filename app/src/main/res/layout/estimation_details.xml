@@ -165,7 +165,7 @@
                 android:layout_below="@+id/estimate_detail_price_approximate_textview"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="6dp"
-                android:text=""
+                android:text="fdsc"
                 android:textColor="#878484"
                 android:textSize="13dp"
                 android:visibility="gone"/>
@@ -177,7 +177,7 @@
                 android:layout_below="@+id/estimate_detail_peektime_textview"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="6dp"
-                android:text=""
+                android:text="sdfc"
                 android:textColor="#878484"
                 android:textSize="13dp"
                 android:visibility="gone"/>

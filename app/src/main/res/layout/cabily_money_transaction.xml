@@ -33,7 +33,8 @@
             android:id="@+id/cabily_money_transaction_textview_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/cabily_money_transaction_header_back_layout"
+
             android:layout_centerVertical="true"
             android:text="@string/cabily_transaction_lable_header_textview"
             android:textColor="#ffffff"
@@ -64,7 +65,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:background="#00897B">
+            android:background="@color/app_color">
 
             <LinearLayout
                 android:id="@+id/cabily_money_transactions_all_layout"
@@ -74,7 +75,7 @@
                 android:layout_marginLeft="1dp"
                 android:layout_marginTop="1dp"
                 android:layout_weight="1"
-                android:background="#00897B">
+                android:background="@color/app_color">
 
                 <com.mylibrary.widgets.CustomTextView
                     android:id="@+id/cabily_money_transactions_all_textview"
@@ -104,7 +105,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/cabily_money_lable_transaction_credit"
-                    android:textColor="#00897B"
+                    android:textColor="@color/app_color"
                     android:textSize="15dp"/>
 
             </LinearLayout>
@@ -125,7 +126,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@string/cabily_money_lable_transaction_debit"
-                    android:textColor="#00897B"
+                    android:textColor="@color/app_color"
                     android:textSize="15dp"/>
             </LinearLayout>
         </LinearLayout>

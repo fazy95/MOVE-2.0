@@ -34,7 +34,8 @@
             android:text="@string/call_fireservice_lable"
             android:textColor="#ffffff"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="visible"/>
         <Button
             android:id="@+id/call_ambulance_button"
             android:layout_width="fill_parent"
@@ -47,7 +48,9 @@
             android:text="@string/call_ambulance_lable"
             android:textColor="#ffffff"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="visible"
+            />
     </RelativeLayout>
 
 </RelativeLayout>

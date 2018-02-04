@@ -102,6 +102,8 @@ public class DateFragment extends Fragment
         int initialDay = getArguments().getInt("day");
         Date minDate = (Date) getArguments().getSerializable("minDate");
         Date maxDate = (Date) getArguments().getSerializable("maxDate");
+        System.out.println("-------minDate----------"+minDate);
+        System.out.println("-------maxDate----------"+maxDate);
 
         // Unless we inflate using a cloned inflater with a Holo theme,
         // on Lollipop devices the DatePicker will be the new-style
@@ -136,6 +138,8 @@ public class DateFragment extends Fragment
                 }
             });
 
+        System.out.println("-------maxDate----------"+maxDate.getTime());
+        System.out.println("-------minDate----------"+minDate.getTime());
         if (minDate != null)
             mDatePicker.setMinDate(minDate.getTime());
 

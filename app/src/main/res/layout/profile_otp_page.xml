@@ -62,6 +62,7 @@
                 android:layout_marginRight="25dp"
                 android:background="#CCffffff"
                 android:hint="@string/otp_label_enter_otp"
+
                 android:imeOptions="actionDone"
                 android:inputType="textImeMultiLine"
                 android:paddingLeft="10dp"

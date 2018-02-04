@@ -179,7 +179,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_below="@+id/ratecard_cartype_relativeLayout"
-                android:visibility="gone">
+                >
 
                 <com.mylibrary.widgets.CustomTextView
                     android:id="@+id/ratecard_standard_label"

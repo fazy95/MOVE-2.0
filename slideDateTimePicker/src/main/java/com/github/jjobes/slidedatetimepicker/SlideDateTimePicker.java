@@ -1,7 +1,10 @@
 package com.github.jjobes.slidedatetimepicker;
 
 import java.util.Date;
+import java.util.Locale;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +33,7 @@ public class SlideDateTimePicker
     private boolean mIs24HourTime;
     private int mTheme;
     private int mIndicatorColor;
+    private Context context;
 
     /**
      * Creates a new instance of {@code SlideDateTimePicker}.
@@ -37,7 +41,7 @@ public class SlideDateTimePicker
      * @param fm  The {@code FragmentManager} from the calling activity that is used
      *            internally to show the {@code DialogFragment}.
      */
-    public SlideDateTimePicker(FragmentManager fm)
+    public SlideDateTimePicker(FragmentManager fm,Context context)
     {
         // See if there are any DialogFragments from the FragmentManager
         FragmentTransaction ft = fm.beginTransaction();
@@ -49,7 +53,7 @@ public class SlideDateTimePicker
             ft.remove(prev);
             ft.commit();
         }
-
+        this.context=context;
         mFragmentManager = fm;
     }
 
@@ -157,6 +161,25 @@ public class SlideDateTimePicker
      * Shows the dialog to the user. Make sure to call
      * {@link #setListener()} before calling this.
      */
+
+
+    public void setLanguage(String lang)
+    {
+
+        System.out.println("------------------jai----language----------"+lang);
+        Locale locale = null;
+        locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+
+    }
+
+
+
+
+
     public void show()
     {
         if (mListener == null)
@@ -203,15 +226,28 @@ public class SlideDateTimePicker
         private boolean is24HourTime;
         private int theme;
         private int indicatorColor;
+        private String Lang1;
+        private Context context;
 
-        public Builder(FragmentManager fm)
+        public Builder(FragmentManager fm,Context context)
         {
             this.fm = fm;
+            this.context = context;
         }
 
         /**
          * @see SlideDateTimePicker#setListener(SlideDateTimeListener)
          */
+
+
+        public Builder setLanguage(String lang)
+        {
+            this.Lang1 = lang;
+            return this;
+        }
+
+
+
         public Builder setListener(SlideDateTimeListener listener)
         {
             this.listener = listener;
@@ -283,7 +319,7 @@ public class SlideDateTimePicker
          */
         public SlideDateTimePicker build()
         {
-            SlideDateTimePicker picker = new SlideDateTimePicker(fm);
+            SlideDateTimePicker picker = new SlideDateTimePicker(fm,context);
             picker.setListener(listener);
             picker.setInitialDate(initialDate);
             picker.setMinDate(minDate);
@@ -292,6 +328,7 @@ public class SlideDateTimePicker
             picker.setIs24HourTime(is24HourTime);
             picker.setTheme(theme);
             picker.setIndicatorColor(indicatorColor);
+            picker.setLanguage(Lang1);
 
             return picker;
         }

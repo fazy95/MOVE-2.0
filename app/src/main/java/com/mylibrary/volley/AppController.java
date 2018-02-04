@@ -1,15 +1,17 @@
 package com.mylibrary.volley;
 
-import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.move.utils.MyActivityLifecycleCallbacks;
 
 
-
-public class AppController extends Application {
+public class AppController extends MultiDexApplication {
  
     public static final String TAG = AppController.class.getSimpleName();
  
@@ -21,8 +23,16 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        registerActivityLifecycleCallbacks(new MyActivityLifecycleCallbacks());
     }
- 
+    @Override
+    protected void attachBaseContext(Context base)
+    {
+        super.attachBaseContext(base);
+        MultiDex.install(AppController.this);
+    }
+
+
     public static synchronized AppController getInstance() {
         return mInstance;
     }

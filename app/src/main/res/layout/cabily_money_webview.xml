@@ -32,7 +32,7 @@
             android:id="@+id/cabily_money_webview_textview_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/cabily_money_webview_header_back_layout"
             android:layout_centerVertical="true"
             android:text="@string/cabily_webview_lable_header_textview"
             android:textColor="#ffffff"

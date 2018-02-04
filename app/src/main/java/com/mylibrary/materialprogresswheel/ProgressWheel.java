@@ -14,7 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.casperon.app.cabily.R;
+import com.move.app.user.R;
 
 
 /**
